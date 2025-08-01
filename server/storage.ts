@@ -1719,7 +1719,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
       return schedule;
     } catch (error) {
-      logger.storageError('GET_WEEKLY_SCHEDULE_ERROR', error as Error);
+      console.error('GET_WEEKLY_SCHEDULE_ERROR', error);
       throw error;
     }
   }
@@ -1747,16 +1747,73 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       .from(communications)
       .leftJoin(users, eq(communications.senderId, users.id));
 
-      // Apply filters
+      // Apply filters by rebuilding the query with proper where clauses
       if (filter === 'unread') {
-        query = query.where(and(
+        query = db.select({
+          id: communications.id,
+          senderId: communications.senderId,
+          recipientId: communications.recipientId,
+          subject: communications.subject,
+          message: communications.message,
+          type: communications.type,
+          priority: communications.priority,
+          status: communications.status,
+          readAt: communications.readAt,
+          createdAt: communications.createdAt,
+          sender: {
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email
+          }
+        })
+        .from(communications)
+        .leftJoin(users, eq(communications.senderId, users.id))
+        .where(and(
           eq(communications.recipientId, userId),
           eq(communications.status, 'unread')
         ));
       } else if (filter === 'sent') {
-        query = query.where(eq(communications.senderId, userId));
+        query = db.select({
+          id: communications.id,
+          senderId: communications.senderId,
+          recipientId: communications.recipientId,
+          subject: communications.subject,
+          message: communications.message,
+          type: communications.type,
+          priority: communications.priority,
+          status: communications.status,
+          readAt: communications.readAt,
+          createdAt: communications.createdAt,
+          sender: {
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email
+          }
+        })
+        .from(communications)
+        .leftJoin(users, eq(communications.senderId, users.id))
+        .where(eq(communications.senderId, userId));
       } else {
-        query = query.where(or(
+        query = db.select({
+          id: communications.id,
+          senderId: communications.senderId,
+          recipientId: communications.recipientId,
+          subject: communications.subject,
+          message: communications.message,
+          type: communications.type,
+          priority: communications.priority,
+          status: communications.status,
+          readAt: communications.readAt,
+          createdAt: communications.createdAt,
+          sender: {
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email
+          }
+        })
+        .from(communications)
+        .leftJoin(users, eq(communications.senderId, users.id))
+        .where(or(
           eq(communications.senderId, userId),
           eq(communications.recipientId, userId)
         ));
@@ -1765,7 +1822,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       const results = await query.orderBy(desc(communications.createdAt));
       return results;
     } catch (error) {
-      logger.storageError('GET_COMMUNICATIONS_ERROR', error as Error);
+      console.error('GET_COMMUNICATIONS_ERROR', error);
       throw error;
     }
   }
@@ -1777,7 +1834,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         .returning();
       return communication;
     } catch (error) {
-      logger.storageError('CREATE_COMMUNICATION_ERROR', error as Error);
+      console.error('CREATE_COMMUNICATION_ERROR', error);
       throw error;
     }
   }
@@ -1796,7 +1853,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         .returning();
       return communication;
     } catch (error) {
-      logger.storageError('MARK_COMMUNICATION_READ_ERROR', error as Error);
+      console.error('MARK_COMMUNICATION_READ_ERROR', error);
       throw error;
     }
   }
@@ -1809,7 +1866,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
       // Verify current password
       const bcrypt = await import('bcrypt');
-      const isValidPassword = await bcrypt.compare(currentPassword, user.password!);
+      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash!);
       if (!isValidPassword) {
         throw new Error('Current password is incorrect');
       }
@@ -1819,12 +1876,12 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
       // Update password
       await db.update(users)
-        .set({ password: hashedNewPassword })
+        .set({ passwordHash: hashedNewPassword })
         .where(eq(users.id, userId));
 
       return { success: true, message: 'Password updated successfully' };
     } catch (error) {
-      logger.storageError('CHANGE_PASSWORD_ERROR', error as Error);
+      console.error('CHANGE_PASSWORD_ERROR', error);
       throw error;
     }
   }
@@ -1844,7 +1901,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
       return institutionUsers;
     } catch (error) {
-      logger.storageError('GET_USERS_BY_INSTITUTION_ERROR', error as Error);
+      console.error('GET_USERS_BY_INSTITUTION_ERROR', error);
       throw error;
     }
   }
@@ -1878,7 +1935,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
           dayOfWeek: session.dayOfWeek || 1,
           hourPeriod: session.hourPeriod || 1,
           subjectCode: session.subjectCode,
-          subjectName: session.subjectName,
+          subjectName: session.subjectCode, // Use subjectCode since subjectName doesn't exist
           groupCode: session.groupCode,
           classroomCode: session.classroomCode,
           isLectiveHour: true // Default to lective, can be configured later
@@ -1894,7 +1951,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       logger.scheduleImport('WEEKLY_SCHEDULE_GENERATED', `Generated ${weeklyScheduleData.length} weekly schedule entries`);
       return weeklyScheduleData.length;
     } catch (error) {
-      logger.storageError('GENERATE_WEEKLY_SCHEDULE_ERROR', error as Error);
+      console.error('GENERATE_WEEKLY_SCHEDULE_ERROR', error);
       throw error;
     }
   }

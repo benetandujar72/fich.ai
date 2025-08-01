@@ -9,7 +9,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { GraduationCap, Eye, EyeOff, Clock, QrCode, CreditCard, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -80,7 +79,7 @@ export default function Login() {
   const onQuickAttendance = async (data: QuickAttendanceData) => {
     setIsQuickAttendanceLoading(true);
     try {
-      // First authenticate to get user info
+      // First authenticate the user quickly
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
       
       if ((authResponse as any).user) {
@@ -131,107 +130,240 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Login Form */}
+        {/* Login and Quick Attendance Tabs */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-center">
-              {language === "ca" ? "Iniciar Sessió" : "Iniciar Sesión"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="nom@exemple.com"
-                          data-testid="email-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <CardContent className="p-0">
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login" data-testid="login-tab">
+                  {language === "ca" ? "Entrar" : "Entrar"}
+                </TabsTrigger>
+                <TabsTrigger value="attendance" data-testid="attendance-tab">
+                  {language === "ca" ? "Marcatge" : "Marcaje"}
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* Regular Login Tab */}
+              <TabsContent value="login" className="p-6 space-y-4">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold">
+                    {language === "ca" ? "Iniciar Sessió" : "Iniciar Sesión"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ca" ? "Accedeix al sistema complet" : "Accede al sistema completo"}
+                  </p>
+                </div>
+                
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="nom@exemple.com"
+                              data-testid="email-input"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {language === "ca" ? "Contrasenya" : "Contraseña"}
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            data-testid="password-input"
-                            {...field}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                            onClick={() => setShowPassword(!showPassword)}
-                            data-testid="toggle-password-visibility"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {language === "ca" ? "Contrasenya" : "Contraseña"}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                data-testid="password-input"
+                                {...field}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowPassword(!showPassword)}
+                                data-testid="toggle-password-visibility"
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                  data-testid="login-button"
-                >
-                  {isLoading 
-                    ? (language === "ca" ? "Iniciant sessió..." : "Iniciando sesión...")
-                    : (language === "ca" ? "Iniciar Sessió" : "Iniciar Sesión")
-                  }
-                </Button>
-              </form>
-            </Form>
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isLoading}
+                      data-testid="login-button"
+                    >
+                      {isLoading 
+                        ? (language === "ca" ? "Iniciant sessió..." : "Iniciando sesión...")
+                        : (language === "ca" ? "Iniciar Sessió" : "Iniciar Sesión")
+                      }
+                    </Button>
+                  </form>
+                </Form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                {language === "ca" ? "No tens compte? " : "¿No tienes cuenta? "}
-                <Link href="/register">
-                  <Button variant="link" className="p-0" data-testid="register-link">
-                    {language === "ca" ? "Registra't aquí" : "Regístrate aquí"}
-                  </Button>
-                </Link>
-              </p>
-            </div>
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600">
+                    {language === "ca" ? "No tens compte? " : "¿No tienes cuenta? "}
+                    <Link href="/register">
+                      <Button variant="link" className="p-0" data-testid="register-link">
+                        {language === "ca" ? "Registra't aquí" : "Regístrate aquí"}
+                      </Button>
+                    </Link>
+                  </p>
+                </div>
+              </TabsContent>
+
+              {/* Quick Attendance Tab */}
+              <TabsContent value="attendance" className="p-6 space-y-4">
+                <div className="text-center mb-4">
+                  <Clock className="h-8 w-8 text-primary mx-auto mb-2" />
+                  <h3 className="text-lg font-semibold">
+                    {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ca" ? "Registra l'entrada o sortida sense entrar al sistema" : "Registra entrada o salida sin entrar al sistema"}
+                  </p>
+                </div>
+
+                <Form {...quickForm}>
+                  <form onSubmit={quickForm.handleSubmit(onQuickAttendance)} className="space-y-4">
+                    <FormField
+                      control={quickForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="nom@exemple.com"
+                              data-testid="quick-email-input"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={quickForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {language === "ca" ? "Contrasenya" : "Contraseña"}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                type={showQuickPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                data-testid="quick-password-input"
+                                {...field}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowQuickPassword(!showQuickPassword)}
+                                data-testid="toggle-quick-password-visibility"
+                              >
+                                {showQuickPassword ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isQuickAttendanceLoading}
+                      data-testid="quick-attendance-button"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      {isQuickAttendanceLoading 
+                        ? (language === "ca" ? "Processant..." : "Procesando...")
+                        : (language === "ca" ? "Marcar Assistència" : "Marcar Asistencia")
+                      }
+                    </Button>
+                  </form>
+                </Form>
+
+                {/* Alternative methods - for future implementation */}
+                <div className="mt-6 space-y-3">
+                  <div className="text-center text-sm text-muted-foreground">
+                    {language === "ca" ? "Altres mètodes de marcatge:" : "Otros métodos de marcaje:"}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      disabled
+                      data-testid="qr-attendance-button"
+                    >
+                      <QrCode className="h-4 w-4 mr-2" />
+                      {language === "ca" ? "Codi QR" : "Código QR"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      disabled
+                      data-testid="nfc-attendance-button"
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      NFC
+                    </Button>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">
+                    {language === "ca" ? "Pròximament disponibles" : "Próximamente disponibles"}
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
         <div className="text-center text-xs text-gray-500">
-          <p>
-            {language === "ca" 
-              ? "Sistema de gestió de presència per centres educatius"
-              : "Sistema de gestión de presencia para centros educativos"}
-          </p>
+          <p>EduPresència v1.0.0</p>
+          <p>{language === "ca" ? "Sistema de control de presència" : "Sistema de control de presencia"}</p>
         </div>
       </div>
     </div>

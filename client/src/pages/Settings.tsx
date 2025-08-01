@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import NetworkSettingsForm from "@/components/NetworkSettingsForm";
 import EmailSettingsForm from "@/components/EmailSettingsForm";
-import PasswordChangeModal from "@/components/PasswordChangeModal";
+import { PasswordChangeModal } from "@/components/PasswordChangeModal";
 import AbsenceJustificationReview from "@/components/AbsenceJustificationReview";
 import AutomatedAlertsConfig from "@/components/AutomatedAlertsConfig";
 
@@ -47,7 +47,7 @@ interface CenterSettings {
 export default function Settings() {
   const { language, setLanguage } = useLanguage();
   const { user } = useAuth();
-  const { canManageEmployees } = usePermissions();
+  const permissions = usePermissions();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -172,6 +172,47 @@ export default function Settings() {
 
   return (
     <main className="p-6 space-y-6">
+      {/* Personal Settings */}
+      <Card data-testid="personal-settings-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            {language === "ca" ? "Configuració Personal" : "Configuración Personal"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{language === "ca" ? "Canviar contrasenya" : "Cambiar contraseña"}</p>
+                <p className="text-sm text-muted-foreground">
+                  {language === "ca" 
+                    ? "Actualitza la teva contrasenya per mantenir el compte segur" 
+                    : "Actualiza tu contraseña para mantener la cuenta segura"}
+                </p>
+              </div>
+              <PasswordChangeModal>
+                <Button variant="outline" data-testid="change-password-button">
+                  <Edit className="h-4 w-4 mr-2" />
+                  {language === "ca" ? "Canviar" : "Cambiar"}
+                </Button>
+              </PasswordChangeModal>
+            </div>
+            
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">{language === "ca" ? "Informació del perfil" : "Información del perfil"}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {user?.firstName} {user?.lastName} ({user?.email})
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Center Configuration */}
       <Card data-testid="center-config-card">
         <CardHeader>
@@ -377,7 +418,7 @@ export default function Settings() {
       </Card>
 
       {/* Absence Justification Review - Only for Admins */}
-      {canManageEmployees && (
+      {permissions.canManageUsers && (
         <AbsenceJustificationReview 
           institutionId={institutionId || ""} 
           language={language} 
@@ -385,7 +426,7 @@ export default function Settings() {
       )}
 
       {/* Automated Alerts Configuration - Only for Admins */}
-      {canManageEmployees && (
+      {permissions.canManageUsers && (
         <AutomatedAlertsConfig 
           institutionId={institutionId || ""} 
           language={language} 

@@ -168,6 +168,40 @@ export const schedules = pgTable("schedules", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Communications table for teacher-admin messaging
+export const communications = pgTable("communications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  senderId: varchar("sender_id").notNull(), // User ID
+  recipientId: varchar("recipient_id"), // User ID (null for broadcast)
+  employeeId: varchar("employee_id"), // Employee ID if related to specific employee
+  subject: varchar("subject").notNull(),
+  message: text("message").notNull(),
+  type: varchar("type").notNull().default("message"), // message, alert, notification
+  priority: varchar("priority").notNull().default("normal"), // low, normal, high, urgent
+  status: varchar("status").notNull().default("unread"), // unread, read, archived
+  readAt: timestamp("read_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Weekly schedule view for employees (derived from Untis sessions)
+export const weeklySchedule = pgTable("weekly_schedule", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").notNull(),
+  institutionId: varchar("institution_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(),
+  dayOfWeek: integer("day_of_week").notNull(), // 1-5 (Monday-Friday)
+  hourPeriod: integer("hour_period").notNull(), // 1-8 typical class periods
+  subjectCode: varchar("subject_code"),
+  subjectName: varchar("subject_name"),
+  groupCode: varchar("group_code"),
+  classroomCode: varchar("classroom_code"),
+  isLectiveHour: boolean("is_lective_hour").notNull().default(true), // true for teaching, false for non-teaching
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Attendance records
 export const attendanceTypeEnum = pgEnum("attendance_type", ["check_in", "check_out"]);
 export const attendanceMethodEnum = pgEnum("attendance_method", ["web", "qr", "nfc", "manual"]);
@@ -561,6 +595,18 @@ export const insertUntisScheduleSessionSchema = createInsertSchema(untisSchedule
   importedAt: true,
 });
 
+export const insertCommunicationSchema = createInsertSchema(communications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWeeklyScheduleSchema = createInsertSchema(weeklySchedule).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type Subject = typeof subjects.$inferSelect;
@@ -599,3 +645,9 @@ export type AbsenceJustification = typeof absenceJustifications.$inferSelect;
 export type InsertAbsenceJustification = z.infer<typeof insertAbsenceJustificationSchema>;
 export type AlertNotification = typeof alertNotifications.$inferSelect;
 export type InsertAlertNotification = z.infer<typeof insertAlertNotificationSchema>;
+
+export type Communication = typeof communications.$inferSelect;
+export type InsertCommunication = z.infer<typeof insertCommunicationSchema>;
+
+export type WeeklySchedule = typeof weeklySchedule.$inferSelect;
+export type InsertWeeklySchedule = z.infer<typeof insertWeeklyScheduleSchema>;

@@ -19,7 +19,9 @@ import {
   LogOut,
   Clock,
   Upload,
-  UserCheck
+  UserCheck,
+  MessageSquare,
+  CalendarDays
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -78,6 +80,18 @@ export default function Sidebar() {
       href: "/academic-years",
       icon: GraduationCap,
       show: permissions.canCreateAcademicYear || permissions.canEditAcademicYear,
+    },
+    {
+      name: language === "ca" ? "Horari Setmanal" : "Horario Semanal",
+      href: "/weekly-schedule",
+      icon: CalendarDays,
+      show: permissions.canViewOwnAttendance,
+    },
+    {
+      name: language === "ca" ? "Comunicacions" : "Comunicaciones",
+      href: "/communications",
+      icon: MessageSquare,
+      show: true, // All users can use communications
     },
     {
       name: t("settings", language),

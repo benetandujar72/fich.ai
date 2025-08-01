@@ -21,6 +21,8 @@ import Privacy from "@/pages/Privacy";
 import DataSubjectRights from "@/pages/DataSubjectRights";
 import InstitutionManagement from "@/pages/InstitutionManagement";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
+import WeeklySchedule from "@/pages/WeeklySchedule";
+import Communications from "@/pages/Communications";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -186,6 +188,24 @@ function Router() {
                 title={language === "ca" ? "Gestió de Cursos Acadèmics" : "Gestión de Cursos Académicos"}
               />
               <AcademicYearManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/weekly-schedule" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "Horari Setmanal" : "Horario Semanal"}
+              />
+              <WeeklySchedule />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/communications" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "Comunicacions" : "Comunicaciones"}
+              />
+              <Communications />
             </ProtectedRoute>
           } />
           

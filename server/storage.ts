@@ -54,6 +54,12 @@ import {
   type InsertClassroom,
   type UntisScheduleSession,
   type InsertUntisScheduleSession,
+  communications,
+  type Communication,
+  type InsertCommunication,
+  weeklySchedule,
+  type WeeklySchedule,
+  type InsertWeeklySchedule,
 } from "@shared/schema";
 import { logger } from './logger';
 import { db } from "./db";
@@ -1677,6 +1683,218 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       };
     } catch (error) {
       logger.scheduleImportError('COMPLETE_IMPORT_ERROR', error as Error);
+      throw error;
+    }
+  }
+  // Weekly schedule methods
+  async getWeeklySchedule(userId: string, weekStart?: string) {
+    try {
+      // Get user's employee record
+      const user = await this.getUser(userId);
+      if (!user) throw new Error('User not found');
+
+      // Find employee by email
+      const [employee] = await db.select()
+        .from(employees)
+        .where(eq(employees.email, user.email!))
+        .limit(1);
+
+      if (!employee) {
+        return []; // Return empty if no employee record
+      }
+
+      // Get weekly schedule from Untis data
+      const schedule = await db.select({
+        id: weeklySchedule.id,
+        dayOfWeek: weeklySchedule.dayOfWeek,
+        hourPeriod: weeklySchedule.hourPeriod,
+        subjectCode: weeklySchedule.subjectCode,
+        subjectName: weeklySchedule.subjectName,
+        groupCode: weeklySchedule.groupCode,
+        classroomCode: weeklySchedule.classroomCode,
+        isLectiveHour: weeklySchedule.isLectiveHour
+      })
+      .from(weeklySchedule)
+      .where(eq(weeklySchedule.employeeId, employee.id));
+
+      return schedule;
+    } catch (error) {
+      logger.storageError('GET_WEEKLY_SCHEDULE_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  // Communications methods
+  async getCommunications(userId: string, filter?: string) {
+    try {
+      let query = db.select({
+        id: communications.id,
+        senderId: communications.senderId,
+        recipientId: communications.recipientId,
+        subject: communications.subject,
+        message: communications.message,
+        type: communications.type,
+        priority: communications.priority,
+        status: communications.status,
+        readAt: communications.readAt,
+        createdAt: communications.createdAt,
+        sender: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email
+        }
+      })
+      .from(communications)
+      .leftJoin(users, eq(communications.senderId, users.id));
+
+      // Apply filters
+      if (filter === 'unread') {
+        query = query.where(and(
+          eq(communications.recipientId, userId),
+          eq(communications.status, 'unread')
+        ));
+      } else if (filter === 'sent') {
+        query = query.where(eq(communications.senderId, userId));
+      } else {
+        query = query.where(or(
+          eq(communications.senderId, userId),
+          eq(communications.recipientId, userId)
+        ));
+      }
+
+      const results = await query.orderBy(desc(communications.createdAt));
+      return results;
+    } catch (error) {
+      logger.storageError('GET_COMMUNICATIONS_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  async createCommunication(communicationData: any) {
+    try {
+      const [communication] = await db.insert(communications)
+        .values(communicationData)
+        .returning();
+      return communication;
+    } catch (error) {
+      logger.storageError('CREATE_COMMUNICATION_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  async markCommunicationAsRead(communicationId: string, userId: string) {
+    try {
+      const [communication] = await db.update(communications)
+        .set({
+          status: 'read',
+          readAt: new Date()
+        })
+        .where(and(
+          eq(communications.id, communicationId),
+          eq(communications.recipientId, userId)
+        ))
+        .returning();
+      return communication;
+    } catch (error) {
+      logger.storageError('MARK_COMMUNICATION_READ_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  // Password change method
+  async changeUserPassword(userId: string, currentPassword: string, newPassword: string) {
+    try {
+      const user = await this.getUser(userId);
+      if (!user) throw new Error('User not found');
+
+      // Verify current password
+      const bcrypt = await import('bcrypt');
+      const isValidPassword = await bcrypt.compare(currentPassword, user.password!);
+      if (!isValidPassword) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Hash new password
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      await db.update(users)
+        .set({ password: hashedNewPassword })
+        .where(eq(users.id, userId));
+
+      return { success: true, message: 'Password updated successfully' };
+    } catch (error) {
+      logger.storageError('CHANGE_PASSWORD_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  // Get users by institution for communications
+  async getUsersByInstitution(institutionId: string) {
+    try {
+      const institutionUsers = await db.select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        role: users.role
+      })
+      .from(users)
+      .where(eq(users.institutionId, institutionId));
+
+      return institutionUsers;
+    } catch (error) {
+      logger.storageError('GET_USERS_BY_INSTITUTION_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  // Generate weekly schedule from Untis sessions (for import process)
+  async generateWeeklyScheduleFromUntis(institutionId: string, academicYearId: string) {
+    try {
+      // Clear existing weekly schedule for this academic year
+      await db.delete(weeklySchedule)
+        .where(and(
+          eq(weeklySchedule.institutionId, institutionId),
+          eq(weeklySchedule.academicYearId, academicYearId)
+        ));
+
+      // Get all Untis sessions
+      const sessions = await db.select()
+        .from(untisScheduleSessions)
+        .where(and(
+          eq(untisScheduleSessions.institutionId, institutionId),
+          eq(untisScheduleSessions.academicYearId, academicYearId)
+        ));
+
+      const weeklyScheduleData = [];
+
+      for (const session of sessions) {
+        // Convert Untis session to weekly schedule format
+        const scheduleEntry = {
+          employeeId: session.employeeId || '',
+          institutionId,
+          academicYearId,
+          dayOfWeek: session.dayOfWeek || 1,
+          hourPeriod: session.hourPeriod || 1,
+          subjectCode: session.subjectCode,
+          subjectName: session.subjectName,
+          groupCode: session.groupCode,
+          classroomCode: session.classroomCode,
+          isLectiveHour: true // Default to lective, can be configured later
+        };
+
+        weeklyScheduleData.push(scheduleEntry);
+      }
+
+      if (weeklyScheduleData.length > 0) {
+        await db.insert(weeklySchedule).values(weeklyScheduleData);
+      }
+
+      logger.scheduleImport('WEEKLY_SCHEDULE_GENERATED', `Generated ${weeklyScheduleData.length} weekly schedule entries`);
+      return weeklyScheduleData.length;
+    } catch (error) {
+      logger.storageError('GENERATE_WEEKLY_SCHEDULE_ERROR', error as Error);
       throw error;
     }
   }

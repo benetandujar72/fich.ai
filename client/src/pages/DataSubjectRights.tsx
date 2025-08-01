@@ -28,7 +28,7 @@ export default function DataSubjectRights() {
     },
     onSuccess: () => {
       toast({
-        title: t("success", language),
+        title: language === "ca" ? "Èxit" : "Éxito",
         description: language === "ca" 
           ? "Sol·licitud enviada correctament. Rebràs una resposta en un màxim de 30 dies."
           : "Solicitud enviada correctamente. Recibirás una respuesta en un máximo de 30 días.",
@@ -38,7 +38,7 @@ export default function DataSubjectRights() {
     },
     onError: (error: any) => {
       toast({
-        title: t("error", language),
+        title: language === "ca" ? "Error" : "Error",
         description: error.message || (language === "ca" ? "Error enviant la sol·licitud" : "Error enviando la solicitud"),
         variant: "destructive",
       });
@@ -61,8 +61,15 @@ export default function DataSubjectRights() {
       URL.revokeObjectURL(url);
       
       toast({
-        title: t("success", language),
+        title: language === "ca" ? "Èxit" : "Éxito",
         description: language === "ca" ? "Dades descarregades correctament" : "Datos descargados correctamente",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === "ca" ? "Error" : "Error",
+        description: error.message || (language === "ca" ? "Error descarregant les dades" : "Error descargando los datos"),
+        variant: "destructive",
       });
     },
   });
@@ -70,7 +77,7 @@ export default function DataSubjectRights() {
   const handleSubmitRequest = () => {
     if (!requestType || !description) {
       toast({
-        title: t("error", language),
+        title: language === "ca" ? "Error" : "Error",
         description: language === "ca" ? "Completa tots els camps obligatoris" : "Completa todos los campos obligatorios",
         variant: "destructive",
       });

@@ -310,7 +310,11 @@ export default function Privacy() {
 
         {/* Botó per sol·licitar informació */}
         <div className="text-center">
-          <Button className="bg-primary text-primary-foreground" data-testid="request-info-button">
+          <Button 
+            className="bg-primary text-primary-foreground" 
+            data-testid="request-info-button"
+            onClick={() => window.location.href = '/data-rights'}
+          >
             <FileText className="mr-2 h-4 w-4" />
             {language === "ca" ? "Sol·licitar còpia de les meves dades" : "Solicitar copia de mis datos"}
           </Button>

@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { GraduationCap, Eye, EyeOff, Clock, QrCode, CreditCard, CheckCircle } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Clock, QrCode, CreditCard, CheckCircle, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "wouter";
 
 const loginSchema = z.object({
@@ -36,6 +37,8 @@ export default function Login() {
   const [isQuickAttendanceLoading, setIsQuickAttendanceLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showQuickPassword, setShowQuickPassword] = useState(false);
+  const [attendanceResult, setAttendanceResult] = useState<any>(null);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -89,14 +92,9 @@ export default function Login() {
           type: (authResponse as any).nextAction // "check-in" or "check-out"
         });
 
-        const actionText = (authResponse as any).nextAction === "check-in" 
-          ? (language === "ca" ? "Entrada registrada" : "Entrada registrada")
-          : (language === "ca" ? "Sortida registrada" : "Salida registrada");
-
-        toast({
-          title: t("success", language),
-          description: `${actionText} - ${(attendanceResponse as any).time}`,
-        });
+        // Store attendance result and show modal
+        setAttendanceResult(attendanceResponse);
+        setShowAttendanceModal(true);
 
         // Clear form
         quickForm.reset();
@@ -366,6 +364,67 @@ export default function Login() {
           <p>{language === "ca" ? "Sistema de control de presència" : "Sistema de control de presencia"}</p>
         </div>
       </div>
+
+      {/* Attendance Result Modal */}
+      <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {language === "ca" ? "Marcatge Registrat" : "Marcaje Registrado"}
+            </DialogTitle>
+          </DialogHeader>
+          {attendanceResult && (
+            <div className="space-y-4 p-4">
+              {/* Status with color coding */}
+              <div className={`text-center p-4 rounded-lg ${
+                attendanceResult.status === 'late' ? 'bg-red-100 border-red-300' :
+                attendanceResult.status === 'early' ? 'bg-blue-100 border-blue-300' :
+                'bg-green-100 border-green-300'
+              }`}>
+                <div className={`text-2xl font-bold ${
+                  attendanceResult.status === 'late' ? 'text-red-700' :
+                  attendanceResult.status === 'early' ? 'text-blue-700' :
+                  'text-green-700'
+                }`}>
+                  {attendanceResult.type === 'check_in' 
+                    ? (language === "ca" ? "ENTRADA" : "ENTRADA")
+                    : (language === "ca" ? "SORTIDA" : "SALIDA")
+                  }
+                </div>
+                <div className={`text-sm ${
+                  attendanceResult.status === 'late' ? 'text-red-600' :
+                  attendanceResult.status === 'early' ? 'text-blue-600' :
+                  'text-green-600'
+                }`}>
+                  {attendanceResult.statusMessage}
+                </div>
+              </div>
+
+              {/* Time and date info */}
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-mono font-bold text-gray-800">
+                  {attendanceResult.time}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {attendanceResult.date}
+                </div>
+                <div className="text-sm text-gray-700">
+                  {attendanceResult.employeeName}
+                </div>
+              </div>
+
+              {/* Close button */}
+              <Button 
+                onClick={() => setShowAttendanceModal(false)}
+                className="w-full"
+                variant="outline"
+              >
+                {language === "ca" ? "Tancar" : "Cerrar"}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

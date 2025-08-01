@@ -271,18 +271,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { employeeId, type } = req.body;
       
+      // Get employee details for schedule checking
+      const employee = await storage.getEmployee(employeeId);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+
+      const now = new Date();
       const attendanceRecord = await storage.createAttendanceRecord({
         employeeId,
         type,
-        timestamp: new Date(),
-        method: "manual",
+        timestamp: now,
+        method: "web",
         location: "login_screen"
       });
 
+      // Calculate if attendance is on time, late, or early
+      const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+      const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); // Convert Sunday from 0 to 7
+      
+      let status = "on_time";
+      let statusMessage = "A l'hora";
+      
+      // Get employee schedule for today (this would need schedule data)
+      // For now, assume standard work hours: 9:00-17:00
+      if (type === "check_in") {
+        if (currentTime > "09:00") {
+          status = "late";
+          statusMessage = "Amb retard";
+        } else if (currentTime < "08:30") {
+          status = "early";
+          statusMessage = "Avançat";
+        }
+      }
+
       res.json({
         success: true,
-        time: new Date().toLocaleTimeString("ca-ES"),
+        time: now.toLocaleTimeString("ca-ES", { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          second: '2-digit'
+        }),
+        date: now.toLocaleDateString("ca-ES"),
         type,
+        status,
+        statusMessage,
+        employeeName: employee.fullName,
         record: attendanceRecord
       });
     } catch (error) {

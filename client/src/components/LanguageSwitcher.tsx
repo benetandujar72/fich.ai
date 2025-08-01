@@ -14,7 +14,7 @@ export default function LanguageSwitcher() {
           className="rounded-none border-r"
           data-testid="language-ca"
         >
-          🏴󠁥󠁳󠁣󠁴󠁿 Català
+          🏴󠁥󠁳󠁣󠁴󠁿
         </Button>
         <Button
           variant={language === "es" ? "default" : "ghost"}
@@ -23,7 +23,7 @@ export default function LanguageSwitcher() {
           className="rounded-none"
           data-testid="language-es"
         >
-          🇪🇸 Español
+          🇪🇸
         </Button>
       </div>
     </div>

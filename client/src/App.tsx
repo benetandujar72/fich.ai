@@ -17,6 +17,8 @@ import Alerts from "@/pages/Alerts";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import ScheduleImport from "@/pages/ScheduleImport";
+import Privacy from "@/pages/Privacy";
+import DataSubjectRights from "@/pages/DataSubjectRights";
 import InstitutionManagement from "@/pages/InstitutionManagement";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import NotFound from "@/pages/not-found";
@@ -148,6 +150,24 @@ function Router() {
                 title={t("settings", language)}
               />
               <Settings />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/privacy" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "Política de Privacitat" : "Política de Privacidad"}
+              />
+              <Privacy />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/data-rights" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "Exercici de Drets" : "Ejercicio de Derechos"}
+              />
+              <DataSubjectRights />
             </ProtectedRoute>
           } />
 

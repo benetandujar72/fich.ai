@@ -251,8 +251,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create user
-      const hashedPassword = await bcrypt.hash(password || 'prof123', 10);
-      const newUser = await storage.createUser({
+      const hashedPassword = await require('bcrypt').hash(password || 'prof123', 10);
+      const newUser = await storage.upsertUser({
         email,
         firstName,
         lastName,
@@ -276,6 +276,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching users for dropdown:", error);
       res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Data subject rights endpoints
+  app.post('/api/data-subject-rights', isAuthenticated, async (req: any, res) => {
+    try {
+      const { type, description, contactEmail, userId } = req.body;
+      
+      // Create a data subject rights request
+      const request = {
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        type,
+        description,
+        contactEmail,
+        status: 'pending',
+        createdAt: new Date(),
+        responseDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+      };
+      
+      // In a real system, this would be stored in the database
+      console.log('Data subject rights request:', request);
+      
+      res.json({ message: 'Request submitted successfully', requestId: request.id });
+    } catch (error) {
+      console.error('Error submitting data subject rights request:', error);
+      res.status(500).json({ message: 'Failed to submit request' });
+    }
+  });
+
+  app.get('/api/data-subject-rights/my-data', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const currentUser = await storage.getUser(userId);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Get user's employee data if exists
+      let employeeData = null;
+      try {
+        employeeData = await storage.getEmployeeByUserId(userId);
+      } catch (error) {
+        // Employee might not exist, which is fine
+      }
+
+      // Get attendance records if employee exists
+      let attendanceRecords: any[] = [];
+      if (employeeData) {
+        try {
+          attendanceRecords = await storage.getAttendanceRecords(employeeData.id);
+        } catch (error) {
+          // No attendance records, which is fine
+        }
+      }
+
+      const userData = {
+        personal_data: {
+          id: currentUser.id,
+          email: currentUser.email,
+          firstName: currentUser.firstName,
+          lastName: currentUser.lastName,
+          role: currentUser.role,
+          createdAt: currentUser.createdAt,
+          updatedAt: currentUser.updatedAt
+        },
+        employee_data: employeeData,
+        attendance_records: attendanceRecords,
+        export_date: new Date().toISOString(),
+        retention_period: '4 years from employment termination',
+        legal_basis: 'Legal obligation (labor law compliance)'
+      };
+
+      res.json(userData);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      res.status(500).json({ message: 'Failed to fetch user data' });
     }
   });
 

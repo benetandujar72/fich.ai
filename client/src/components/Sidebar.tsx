@@ -18,7 +18,8 @@ import {
   ChevronRight,
   LogOut,
   Clock,
-  Upload
+  Upload,
+  UserCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -83,6 +84,18 @@ export default function Sidebar() {
       href: "/settings",
       icon: Settings,
       show: permissions.canEditSettings || permissions.canManageUsers,
+    },
+    {
+      name: language === "ca" ? "Política de Privacitat" : "Política de Privacidad",
+      href: "/privacy",
+      icon: FileText,
+      show: true,
+    },
+    {
+      name: language === "ca" ? "Els meus Drets" : "Mis Derechos",
+      href: "/data-rights",
+      icon: UserCheck,
+      show: true,
     },
   ].filter(item => item.show);
 

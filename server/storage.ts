@@ -1621,12 +1621,18 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     try {
       const fs = await import('fs');
       
+      // Initialize counters
+      let teachersCreated = 0, teachersUpdated = 0;
+      let subjectsImported = 0, groupsImported = 0, schedulesImported = 0;
+      
       // Import teachers
       const teachersPath = './attached_assets/PROFESSORAT_1754044133486.TXT';
       if (fs.existsSync(teachersPath)) {
         const teachersContent = fs.readFileSync(teachersPath, 'utf8');
         const teachersResult = await this.importUntisTeachers(teachersContent, institutionId, academicYearId);
-        logger.scheduleImport('TEACHERS_IMPORTED', `Teachers: ${teachersResult.created} created, ${teachersResult.updated} updated`);
+        teachersCreated = teachersResult.created;
+        teachersUpdated = teachersResult.updated;
+        logger.scheduleImport('TEACHERS_IMPORTED', `Teachers: ${teachersCreated} created, ${teachersUpdated} updated`);
       }
       
       // Import subjects
@@ -1634,7 +1640,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       if (fs.existsSync(subjectsPath)) {
         const subjectsContent = fs.readFileSync(subjectsPath, 'utf8');
         const subjectsResult = await this.importUntisSubjects(subjectsContent, institutionId, academicYearId);
-        logger.scheduleImport('SUBJECTS_IMPORTED', `Subjects: ${subjectsResult.subjectsImported} imported`);
+        subjectsImported = subjectsResult.subjectsImported;
+        logger.scheduleImport('SUBJECTS_IMPORTED', `Subjects: ${subjectsImported} imported`);
       }
       
       // Import class groups
@@ -1642,7 +1649,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       if (fs.existsSync(groupsPath)) {
         const groupsContent = fs.readFileSync(groupsPath, 'utf8');
         const groupsResult = await this.importUntisClassGroups(groupsContent, institutionId, academicYearId);
-        logger.scheduleImport('GROUPS_IMPORTED', `Groups: ${groupsResult.groupsImported} imported`);
+        groupsImported = groupsResult.groupsImported;
+        logger.scheduleImport('GROUPS_IMPORTED', `Groups: ${groupsImported} imported`);
       }
       
       // Import schedule sessions
@@ -1650,7 +1658,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       if (fs.existsSync(schedulePath)) {
         const scheduleContent = fs.readFileSync(schedulePath, 'utf8');
         const scheduleResult = await this.importUntisScheduleFromTXT(scheduleContent, institutionId, academicYearId);
-        logger.scheduleImport('SCHEDULE_IMPORTED', `Sessions: ${scheduleResult.sessionsImported} imported, ${scheduleResult.employeesLinked} linked`);
+        schedulesImported = scheduleResult.sessionsImported || 0;
+        logger.scheduleImport('SCHEDULE_IMPORTED', `Sessions: ${schedulesImported} imported, ${scheduleResult.employeesLinked} linked`);
       }
       
       // Final employee linking with improved matching
@@ -1658,6 +1667,11 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       
       return {
         success: true,
+        teachersCreated,
+        teachersUpdated,
+        subjectsImported,
+        groupsImported,
+        schedulesImported,
         message: 'Complete GP Untis data import successful',
         finalEmployeesLinked: finalLinkCount
       };

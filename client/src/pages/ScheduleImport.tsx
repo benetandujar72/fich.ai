@@ -470,23 +470,34 @@ export default function ScheduleImport() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium mb-2">{language === "ca" ? "Creats" : "Creados"}</h4>
-                      <ul className="text-sm space-y-1">
-                        <li>• {importResults.created?.teachers || 0} {language === "ca" ? "professors" : "profesores"}</li>
-                        <li>• {importResults.created?.subjects || 0} {language === "ca" ? "matèries" : "materias"}</li>
-                        <li>• {importResults.created?.schedules || 0} {language === "ca" ? "horaris" : "horarios"}</li>
+                      <h4 className="font-semibold text-green-600 mb-2">
+                        {language === "ca" ? "Creats" : "Creados"}
+                      </h4>
+                      <ul className="space-y-1 text-sm">
+                        <li>• {importResults.created || importResults.teachersCreated || 0} {language === "ca" ? "professors" : "profesores"}</li>
+                        <li>• {importResults.subjectsImported || 0} {language === "ca" ? "matèries" : "materias"}</li>
+                        <li>• {importResults.sessionsImported || importResults.schedulesImported || 0} {language === "ca" ? "horaris" : "horarios"}</li>
                       </ul>
                     </div>
                     <div>
-                      <h4 className="font-medium mb-2">{language === "ca" ? "Actualitzats" : "Actualizados"}</h4>
-                      <ul className="text-sm space-y-1">
-                        <li>• {importResults.updated?.teachers || 0} {language === "ca" ? "professors" : "profesores"}</li>
-                        <li>• {importResults.updated?.subjects || 0} {language === "ca" ? "matèries" : "materias"}</li>
-                        <li>• {importResults.updated?.schedules || 0} {language === "ca" ? "horaris" : "horarios"}</li>
+                      <h4 className="font-semibold text-blue-600 mb-2">
+                        {language === "ca" ? "Actualitzats" : "Actualizados"}
+                      </h4>
+                      <ul className="space-y-1 text-sm">
+                        <li>• {importResults.updated || importResults.teachersUpdated || 0} {language === "ca" ? "professors" : "profesores"}</li>
+                        <li>• {importResults.groupsImported || 0} {language === "ca" ? "grups" : "grupos"}</li>
+                        <li>• {importResults.employeesLinked || importResults.finalEmployeesLinked || 0} {language === "ca" ? "horaris vinculats" : "horarios vinculados"}</li>
                       </ul>
                     </div>
+                    {importResults.message && (
+                      <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+                        <p className="text-sm text-green-800 dark:text-green-200">
+                          {importResults.message}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

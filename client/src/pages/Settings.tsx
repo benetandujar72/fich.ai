@@ -90,26 +90,11 @@ export default function Settings() {
     setCenterSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const mockAdminUsers = [
-    {
-      id: "admin-1",
-      name: "Joan Pérez",
-      email: "joan.perez@centre.edu",
-      role: "superadmin",
-      lastAccess: "fa 2 hores",
-      avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face",
-      testId: "admin-joan"
-    },
-    {
-      id: "admin-2",
-      name: "Maria Fernández",
-      email: "maria.fernandez@centre.edu", 
-      role: "admin",
-      lastAccess: "fa 1 dia",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face",
-      testId: "admin-maria"
-    },
-  ];
+  // Fetch real admin users from database
+  const { data: adminUsers = [], isLoading: usersLoading } = useQuery({
+    queryKey: ["/api/users/admins", institutionId],
+    enabled: !!institutionId,
+  });
 
   const getRoleBadge = (role: string) => {
     const roleMap = {
@@ -317,54 +302,59 @@ export default function Settings() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockAdminUsers.map((admin) => (
-                  <TableRow key={admin.id} data-testid={admin.testId}>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <img
-                          src={admin.avatar}
-                          alt={admin.name}
-                          className="w-8 h-8 rounded-full object-cover mr-3"
-                        />
-                        <div>
-                          <p className="text-sm font-medium text-text">
-                            {admin.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {admin.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {getRoleBadge(admin.role)}
-                    </TableCell>
-                    <TableCell className="text-sm text-text">
-                      {admin.lastAccess}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          data-testid={`edit-admin-${admin.id}`}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        {admin.role !== "superadmin" && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="text-error hover:text-red-700"
-                            data-testid={`delete-admin-${admin.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
+                {usersLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8">
+                      <div className="animate-pulse space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : adminUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                      {language === "ca" ? "No hi ha usuaris administradors" : "No hay usuarios administradores"}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  adminUsers.map((admin: any) => (
+                    <TableRow key={admin.id} data-testid={`admin-${admin.id}`}>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                            <Users className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-text">
+                              {admin.firstName} {admin.lastName}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {admin.email}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {getRoleBadge(admin.role)}
+                      </TableCell>
+                      <TableCell className="text-sm text-text">
+                        {new Date(admin.createdAt).toLocaleDateString(language === "ca" ? "ca-ES" : "es-ES")}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            data-testid={`edit-admin-${admin.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

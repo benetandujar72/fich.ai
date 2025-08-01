@@ -130,51 +130,13 @@ export default function Alerts() {
     }
   };
 
-  const mockActiveAlerts = [
-    {
-      id: "alert-1",
-      type: "absence",
-      title: language === "ca" ? "Absència sense justificar" : "Ausencia sin justificar",
-      description: "Pere Martínez - No ha fitxat l'entrada",
-      time: "fa 25 minuts",
-      testId: "alert-absence-pere"
-    },
-    {
-      id: "alert-2", 
-      type: "late_arrival",
-      title: language === "ca" ? "Retard detectat" : "Retraso detectado",
-      description: "Maria López - 15 minuts de retard",
-      time: "fa 10 minuts",
-      testId: "alert-late-maria"
-    },
-    {
-      id: "alert-3",
-      type: "substitute_needed",
-      title: language === "ca" ? "Guàrdia assignada automàticament" : "Guardia asignada automáticamente", 
-      description: "Anna Garcia - Aula 205 (substitució Pere Martínez)",
-      time: "fa 5 minuts",
-      testId: "alert-substitute-anna"
-    },
-  ];
+  // Fetch real alerts from database
+  const { data: activeAlerts = [], isLoading: alertsLoading } = useQuery({
+    queryKey: ["/api/alerts", institutionId],
+    enabled: !!institutionId,
+  });
 
-  const mockAlertHistory = [
-    {
-      id: "history-1",
-      date: "15/01/2025 08:25",
-      employee: "Pere Martínez",
-      type: language === "ca" ? "Absència" : "Ausencia",
-      status: "active",
-      testId: "history-pere-absence"
-    },
-    {
-      id: "history-2",
-      date: "14/01/2025 08:20",
-      employee: "Maria López",
-      type: language === "ca" ? "Retard" : "Retraso",
-      status: "resolved",
-      testId: "history-maria-late"
-    },
-  ];
+  // Real alert history will be loaded from database
 
   if (isLoading) {
     return (
@@ -253,54 +215,59 @@ export default function Alerts() {
             </div>
           ) : (
             <div className="space-y-4">
-              {mockActiveAlerts.map((alert) => (
-                <div 
-                  key={alert.id}
-                  className={`border-l-4 p-4 rounded-r-lg ${getAlertColor(alert.type)}`}
-                  data-testid={alert.testId}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="mr-3">
-                        {getAlertIcon(alert.type)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-text">{alert.title}</p>
-                        <p className="text-sm text-gray-600">{alert.description}</p>
-                        <p className="text-xs text-gray-500">{alert.time}</p>
+              {alertsLoading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="animate-pulse border-l-4 border-gray-200 p-4 rounded-r-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex space-x-2">
-                      {alert.type === "absence" && (
-                        <Button 
-                          variant="ghost" 
+                  ))}
+                </div>
+              ) : activeAlerts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Shield className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>{language === "ca" ? "No hi ha alertes actives" : "No hay alertas activas"}</p>
+                </div>
+              ) : (
+                activeAlerts.map((alert: any) => (
+                  <div 
+                    key={alert.id}
+                    className={`border-l-4 p-4 rounded-r-lg ${getAlertColor(alert.type)}`}
+                    data-testid={`alert-${alert.id}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="mr-3">
+                          {getAlertIcon(alert.type)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-text">{alert.title}</p>
+                          <p className="text-sm text-gray-600">{alert.description}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(alert.createdAt).toLocaleString(language === "ca" ? "ca-ES" : "es-ES")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="ghost"
                           size="sm"
-                          data-testid={`assign-substitute-${alert.id}`}
+                          onClick={() => resolveAlertMutation.mutate(alert.id)}
+                          data-testid={`dismiss-alert-${alert.id}`}
                         >
-                          {language === "ca" ? "Assignar guàrdia" : "Asignar guardia"}
+                          <X className="h-4 w-4" />
                         </Button>
-                      )}
-                      {alert.type === "late_arrival" && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          data-testid={`justify-late-${alert.id}`}
-                        >
-                          {language === "ca" ? "Justificar" : "Justificar"}
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => resolveAlertMutation.mutate(alert.id)}
-                        data-testid={`dismiss-alert-${alert.id}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           )}
         </CardContent>
@@ -336,39 +303,11 @@ export default function Alerts() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockAlertHistory.map((alert) => (
-                  <TableRow key={alert.id} data-testid={alert.testId}>
-                    <TableCell>{alert.date}</TableCell>
-                    <TableCell>{alert.employee}</TableCell>
-                    <TableCell>{alert.type}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={alert.status === "active" ? "destructive" : "default"}
-                        className={alert.status === "active" ? 
-                          "bg-error/10 text-error" : 
-                          "bg-secondary/10 text-secondary"
-                        }
-                      >
-                        {alert.status === "active" ? 
-                          (language === "ca" ? "Activa" : "Activa") :
-                          (language === "ca" ? "Resolta" : "Resuelta")
-                        }
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        data-testid={`manage-alert-${alert.id}`}
-                      >
-                        {alert.status === "active" ? 
-                          (language === "ca" ? "Gestionar" : "Gestionar") :
-                          (language === "ca" ? "Veure detalls" : "Ver detalles")
-                        }
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    {language === "ca" ? "Historial d'alertes es carregarà des de la base de dades" : "Historial de alertas se cargará desde la base de datos"}
+                  </TableCell>
+                </TableRow>
               </TableBody>
             </Table>
           </div>

@@ -501,6 +501,20 @@ export class DatabaseStorage implements IStorage {
       activeAlerts: activeAlerts.count,
     };
   }
+
+  // Get admin users for an institution
+  async getAdminUsers(institutionId: string): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.institutionId, institutionId),
+          or(eq(users.role, "admin"), eq(users.role, "superadmin"))
+        )
+      )
+      .orderBy(asc(users.firstName));
+  }
 }
 
 export const storage = new DatabaseStorage();

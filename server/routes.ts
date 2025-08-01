@@ -192,6 +192,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Recent activity routes
+  app.get("/api/dashboard/recent-activity/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      // For now, return empty array - this will be implemented later
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching recent activity:", error);
+      res.status(500).json({ message: "Failed to fetch recent activity" });
+    }
+  });
+
+  // Alerts routes
+  app.get("/api/alerts/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const alerts = await storage.getActiveAlerts(institutionId);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
+  // Admin users routes
+  app.get("/api/users/admins/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const adminUsers = await storage.getAdminUsers(institutionId);
+      res.json(adminUsers);
+    } catch (error) {
+      console.error("Error fetching admin users:", error);
+      res.status(500).json({ message: "Failed to fetch admin users" });
+    }
+  });
+
   app.post('/api/settings', isAuthenticated, async (req, res) => {
     try {
       const setting = await storage.upsertSetting(req.body);

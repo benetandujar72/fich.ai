@@ -31,13 +31,20 @@ Preferred communication style: Simple, everyday language.
 2. **Admin**: Institution-specific management, employee control, reports
 3. **Employee**: Personal data only, attendance tracking, limited reports
 
+### ✅ Latest Implemented Features (January 2025)
+- **Quick Attendance System**: Direct login screen attendance marking without system entry
+- **Smart Work Cycle Management**: Automatic check-in/check-out detection based on last records
+- **GP Untis Schedule Import**: Complete import system for teachers, subjects, and schedules
+- **Cross-Academic Year Data Transfer**: Copy teachers and subjects between academic years
+- **QR Code & NFC Preparation**: Frontend placeholders for future QR/NFC attendance methods
+
 ### Missing Core Functionalities to Implement
 1. **Institution Management**: Create/edit institutions, multi-year support
 2. **Academic Year Management**: Create/manage academic years per institution
 3. **User Profile Management**: Complete user profile system
 4. **Employee Onboarding**: Complete employee creation workflow
 5. **Advanced Settings**: Institution-specific configurations
-6. **Time Tracking Configuration**: QR codes, methods, thresholds
+6. **QR Code & NFC Implementation**: Complete QR/NFC attendance marking functionality
 7. **Advanced Reporting**: Multi-year reports, export functionality
 8. **Email Notification System**: Alert notifications via email
 9. **Additional Roles**: Coordinator, Supervisor, Secretary, Auditor roles

@@ -515,6 +515,28 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(asc(users.firstName));
   }
+
+  // Authenticate user for quick attendance
+  async authenticateUser(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return null;
+
+    const bcrypt = await import('bcrypt');
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    return isValid ? user : null;
+  }
+
+  // Get last attendance record for a user
+  async getLastAttendanceRecord(userId: string): Promise<AttendanceRecord | null> {
+    const [record] = await db
+      .select()
+      .from(attendanceRecords)
+      .where(eq(attendanceRecords.userId, userId))
+      .orderBy(desc(attendanceRecords.timestamp))
+      .limit(1);
+    
+    return record || null;
+  }
 }
 
 export const storage = new DatabaseStorage();

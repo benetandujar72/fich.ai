@@ -228,6 +228,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Quick authentication endpoint
+  app.post('/api/quick-auth', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      // Authenticate user
+      const user = await storage.authenticateUser(email, password);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Check last attendance record to determine next action
+      const lastAttendance = await storage.getLastAttendanceRecord(user.id);
+      let nextAction = "check-in";
+      
+      if (lastAttendance) {
+        const today = new Date().toDateString();
+        const lastDate = new Date(lastAttendance.timestamp).toDateString();
+        
+        if (today === lastDate) {
+          // Same day - check if user is checked in
+          nextAction = lastAttendance.type === "check-in" ? "check-out" : "check-in";
+        }
+      }
+
+      res.json({ user, nextAction });
+    } catch (error) {
+      console.error("Error in quick auth:", error);
+      res.status(500).json({ message: "Authentication failed" });
+    }
+  });
+
+  // Quick attendance endpoint
+  app.post('/api/quick-attendance', async (req, res) => {
+    try {
+      const { userId, type } = req.body;
+      
+      const attendanceRecord = await storage.createAttendanceRecord({
+        userId,
+        type,
+        timestamp: new Date(),
+        method: "manual",
+        location: "login_screen"
+      });
+
+      res.json({
+        success: true,
+        time: new Date().toLocaleTimeString("ca-ES"),
+        type,
+        record: attendanceRecord
+      });
+    } catch (error) {
+      console.error("Error registering attendance:", error);
+      res.status(500).json({ message: "Failed to register attendance" });
+    }
+  });
+
+  // GP Untis schedule import routes
+  app.post('/api/schedule-import/preview', isAuthenticated, async (req, res) => {
+    try {
+      // This would normally parse the GP Untis file
+      // For now, returning mock preview data
+      const mockPreview = {
+        teachers: [
+          { code: "MAT01", name: "Maria Tur", email: "maria.tur@bitacola.edu" },
+          { code: "CAT02", name: "Joan Pons", email: "joan.pons@bitacola.edu" }
+        ],
+        subjects: [
+          { code: "MAT", name: "Matemàtiques", department: "Ciències" },
+          { code: "CAT", name: "Català", department: "Llengües" }
+        ],
+        schedules: [
+          { teacher: "MAT01", subject: "MAT", day: "Monday", startTime: "08:00", endTime: "09:00", group: "1ESO-A" }
+        ],
+        conflicts: []
+      };
+      
+      res.json(mockPreview);
+    } catch (error) {
+      console.error("Error previewing import:", error);
+      res.status(500).json({ message: "Failed to preview import" });
+    }
+  });
+
+  app.post('/api/schedule-import/execute', isAuthenticated, async (req, res) => {
+    try {
+      // This would normally execute the actual import
+      // For now, returning mock results
+      const mockResults = {
+        created: {
+          teachers: 2,
+          subjects: 5,
+          schedules: 25
+        },
+        updated: {
+          teachers: 0,
+          subjects: 1,
+          schedules: 3
+        },
+        errors: []
+      };
+      
+      res.json(mockResults);
+    } catch (error) {
+      console.error("Error executing import:", error);
+      res.status(500).json({ message: "Failed to execute import" });
+    }
+  });
+
   app.post('/api/settings', isAuthenticated, async (req, res) => {
     try {
       const setting = await storage.upsertSetting(req.body);

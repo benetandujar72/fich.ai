@@ -16,6 +16,7 @@ import Attendance from "@/pages/Attendance";
 import Alerts from "@/pages/Alerts";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
+import ScheduleImport from "@/pages/ScheduleImport";
 import InstitutionManagement from "@/pages/InstitutionManagement";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import NotFound from "@/pages/not-found";
@@ -128,6 +129,16 @@ function Router() {
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <Reports />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/schedule-import" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title={language === "ca" ? "Importació d'Horaris" : "Importación de Horarios"}
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <ScheduleImport />
             </ProtectedRoute>
           } />
           

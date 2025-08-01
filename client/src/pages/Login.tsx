@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Clock, QrCode, CreditCard, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "wouter";
 
 const loginSchema = z.object({
@@ -21,14 +22,32 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+// Quick attendance schema
+const quickAttendanceSchema = z.object({
+  email: z.string().email("Email no vàlid"),
+  password: z.string().min(6, "La contrasenya ha de tenir almenys 6 caràcters"),
+});
+
+type QuickAttendanceData = z.infer<typeof quickAttendanceSchema>;
+
 export default function Login() {
   const { language } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuickAttendanceLoading, setIsQuickAttendanceLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showQuickPassword, setShowQuickPassword] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const quickForm = useForm<QuickAttendanceData>({
+    resolver: zodResolver(quickAttendanceSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -55,6 +74,42 @@ export default function Login() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onQuickAttendance = async (data: QuickAttendanceData) => {
+    setIsQuickAttendanceLoading(true);
+    try {
+      // First authenticate to get user info
+      const authResponse = await apiRequest("POST", "/api/quick-auth", data);
+      
+      if ((authResponse as any).user) {
+        // Now register attendance
+        const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", {
+          userId: (authResponse as any).user.id,
+          type: (authResponse as any).nextAction // "check-in" or "check-out"
+        });
+
+        const actionText = (authResponse as any).nextAction === "check-in" 
+          ? (language === "ca" ? "Entrada registrada" : "Entrada registrada")
+          : (language === "ca" ? "Sortida registrada" : "Salida registrada");
+
+        toast({
+          title: t("success", language),
+          description: `${actionText} - ${(attendanceResponse as any).time}`,
+        });
+
+        // Clear form
+        quickForm.reset();
+      }
+    } catch (error: any) {
+      toast({
+        title: t("error", language),
+        description: error.message || (language === "ca" ? "Error en el marcatge" : "Error en el marcaje"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsQuickAttendanceLoading(false);
     }
   };
 

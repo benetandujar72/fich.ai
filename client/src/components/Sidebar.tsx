@@ -17,7 +17,8 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Clock
+  Clock,
+  Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -58,6 +59,12 @@ export default function Sidebar() {
       href: "/reports",
       icon: FileText,
       show: permissions.canGeneratePersonalReports || permissions.canGenerateInstitutionReports,
+    },
+    {
+      name: language === "ca" ? "Importar Horaris" : "Importar Horarios",
+      href: "/schedule-import",
+      icon: Upload,
+      show: permissions.canEditSchedules,
     },
     {
       name: language === "ca" ? "Gestió d'Institucions" : "Gestión de Instituciones",

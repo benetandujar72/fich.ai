@@ -1718,7 +1718,13 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       .where(eq(weeklySchedule.employeeId, employee.id));
 
       console.log(`WeeklySchedule API - Found ${schedule.length} sessions for employee ${employee.id} (${user.email})`);
-      console.log('WeeklySchedule API - First session:', schedule[0]);
+      if (schedule.length > 0) {
+        console.log('WeeklySchedule API - First session:', JSON.stringify(schedule[0], null, 2));
+        console.log('WeeklySchedule API - All sessions:', JSON.stringify(schedule, null, 2));
+      } else {
+        console.log('WeeklySchedule API - No sessions found, checking employee data...');
+        console.log('WeeklySchedule API - Employee found:', JSON.stringify(employee, null, 2));
+      }
       
       return schedule;
     } catch (error) {

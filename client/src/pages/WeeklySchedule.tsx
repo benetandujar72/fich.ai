@@ -44,6 +44,9 @@ export default function WeeklySchedule() {
   // Debug log
   console.log('WeeklySchedule - User ID:', user?.id);
   console.log('WeeklySchedule - Schedule Data:', scheduleData);
+  console.log('WeeklySchedule - Schedule Data Length:', Array.isArray(scheduleData) ? scheduleData.length : 'Not array');
+  console.log('WeeklySchedule - Current Week:', format(currentWeek, 'yyyy-MM-dd'));
+  console.log('WeeklySchedule - Week Start:', format(weekStart, 'yyyy-MM-dd (EEEE)', { locale }));
   console.log('WeeklySchedule - Error:', error);
   console.log('WeeklySchedule - Loading:', isLoading);
 

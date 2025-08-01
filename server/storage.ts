@@ -1700,10 +1700,39 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         .limit(1);
 
       if (!employee) {
+        console.log('WeeklySchedule API - No employee found for user:', user.email);
         return []; // Return empty if no employee record
       }
 
-      // Get weekly schedule from Untis data
+      // Get current academic year for the institution
+      const currentDate = weekStart ? new Date(weekStart) : new Date();
+      const [currentAcademicYear] = await db.select()
+        .from(academicYears)
+        .where(
+          and(
+            eq(academicYears.institutionId, employee.institutionId),
+            lte(academicYears.startDate, currentDate),
+            gte(academicYears.endDate, currentDate)
+          )
+        )
+        .limit(1);
+
+      if (!currentAcademicYear) {
+        console.log('WeeklySchedule API - No active academic year found for date:', currentDate.toISOString());
+        console.log('WeeklySchedule API - Institution:', employee.institutionId);
+        
+        // Get all academic years for debugging
+        const allAcademicYears = await db.select()
+          .from(academicYears)
+          .where(eq(academicYears.institutionId, employee.institutionId));
+        console.log('WeeklySchedule API - Available academic years:', JSON.stringify(allAcademicYears, null, 2));
+        
+        return []; // Return empty if no active academic year
+      }
+
+      console.log('WeeklySchedule API - Using academic year:', currentAcademicYear.name, currentAcademicYear.id);
+
+      // Get weekly schedule from Untis data for the active academic year
       const schedule = await db.select({
         id: weeklySchedule.id,
         dayOfWeek: weeklySchedule.dayOfWeek,
@@ -1715,15 +1744,20 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         isLectiveHour: weeklySchedule.isLectiveHour
       })
       .from(weeklySchedule)
-      .where(eq(weeklySchedule.employeeId, employee.id));
+      .where(
+        and(
+          eq(weeklySchedule.employeeId, employee.id),
+          eq(weeklySchedule.academicYearId, currentAcademicYear.id)
+        )
+      );
 
-      console.log(`WeeklySchedule API - Found ${schedule.length} sessions for employee ${employee.id} (${user.email})`);
+      console.log(`WeeklySchedule API - Found ${schedule.length} sessions for employee ${employee.id} (${user.email}) in academic year ${currentAcademicYear.name}`);
       if (schedule.length > 0) {
         console.log('WeeklySchedule API - First session:', JSON.stringify(schedule[0], null, 2));
-        console.log('WeeklySchedule API - All sessions:', JSON.stringify(schedule, null, 2));
       } else {
         console.log('WeeklySchedule API - No sessions found, checking employee data...');
         console.log('WeeklySchedule API - Employee found:', JSON.stringify(employee, null, 2));
+        console.log('WeeklySchedule API - Academic year used:', JSON.stringify(currentAcademicYear, null, 2));
       }
       
       return schedule;

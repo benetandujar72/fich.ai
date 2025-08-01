@@ -565,8 +565,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Institution not found' });
       }
 
-      // Read the real uploaded TXT file
-      const fs = require('fs');
+      // Read the real uploaded TXT file using dynamic import
+      const fs = await import('fs');
       const filePath = './attached_assets/HORARIS_1754043300200.TXT';
       
       if (!fs.existsSync(filePath)) {

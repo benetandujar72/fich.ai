@@ -37,6 +37,11 @@ Preferred communication style: Simple, everyday language.
 - **GP Untis Schedule Import**: Complete import system for teachers, subjects, and schedules
 - **Cross-Academic Year Data Transfer**: Copy teachers and subjects between academic years
 - **QR Code & NFC Preparation**: Frontend placeholders for future QR/NFC attendance methods
+- **Enhanced Attendance UI**: Color-coded attendance modal with detailed timestamps and employee info
+- **Real-Time Digital Clock**: Live clock in attendance tab showing current time and date
+- **User Dropdown Selection**: Quick user selection dropdown in attendance tab with database employees
+- **Flag-Only Language Selector**: Simplified language switcher showing only Catalan and Spanish flags
+- **Auto-Focus Attendance**: Attendance tab opens by default with auto-focus on email field
 
 ### Missing Core Functionalities to Implement
 1. **Institution Management**: Create/edit institutions, multi-year support
@@ -89,7 +94,7 @@ The application follows a monorepo architecture with clear separation between cl
 - **Protected Routes**: Both client-side and server-side route protection
 - **Permission System**: usePermissions hook with 20+ permission checks
 - **UI Adaptation**: Components and navigation adapt based on user permissions
-- **Login Credentials**: Test accounts for admin@bitacola.edu, director@bitacola.edu, profesor@bitacola.edu
+- **Login Credentials**: Most users use password "prof123", except benet.andujar@insbitacola.cat (superadmin) uses "25@2705BEangu"
 
 ### Development & Build Pipeline
 - **Development Server**: Vite with HMR for fast frontend development

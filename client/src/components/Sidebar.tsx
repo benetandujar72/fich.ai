@@ -84,8 +84,14 @@ export default function Sidebar({ className }: SidebarProps) {
 
   const navigation = [...baseNavigation, ...managementNavigation];
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout error:", error);
+      window.location.href = "/login";
+    }
   };
 
   return (

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { 
   insertEmployeeSchema,
   insertAttendanceRecordSchema,
@@ -17,7 +17,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -144,7 +144,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/attendance', isAuthenticated, async (req, res) => {
     try {
-      const record = await storage.createAttendanceRecord(req.body);
+      const attendanceData = {
+        ...req.body,
+        timestamp: req.body.timestamp ? new Date(req.body.timestamp) : new Date()
+      };
+      const record = await storage.createAttendanceRecord(attendanceData);
       res.json(record);
     } catch (error) {
       console.error("Error creating attendance record:", error);
@@ -167,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/alerts/:id/resolve', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = req.user?.id;
       const alert = await storage.resolveAlert(id, userId);
       res.json(alert);
     } catch (error) {

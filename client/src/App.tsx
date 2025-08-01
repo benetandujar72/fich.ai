@@ -8,7 +8,8 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Landing from "@/pages/Landing";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
 import Employees from "@/pages/Employees";
 import Attendance from "@/pages/Attendance";
@@ -55,7 +56,10 @@ function Router() {
     return (
       <div className="min-h-screen bg-background">
         <LanguageSwitcher />
-        <Landing />
+        <Switch>
+          <Route path="/register" component={Register} />
+          <Route component={Login} />
+        </Switch>
       </div>
     );
   }

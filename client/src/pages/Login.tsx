@@ -82,10 +82,10 @@ export default function Login() {
       // First authenticate the user quickly
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
       
-      if ((authResponse as any).user) {
+      if ((authResponse as any).user && (authResponse as any).employee) {
         // Now register attendance
         const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", {
-          userId: (authResponse as any).user.id,
+          employeeId: (authResponse as any).employee.id,
           type: (authResponse as any).nextAction // "check-in" or "check-out"
         });
 

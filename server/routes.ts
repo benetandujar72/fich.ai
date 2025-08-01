@@ -239,8 +239,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Check last attendance record to determine next action
-      const lastAttendance = await storage.getLastAttendanceRecord(user.id);
+      // Get employee record first
+      const employee = await storage.getEmployeeByUserId(user.id);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee record not found" });
+      }
+
+      // Check last attendance record to determine next action  
+      const lastAttendance = await storage.getLastAttendanceRecord(employee.id);
       let nextAction = "check-in";
       
       if (lastAttendance) {
@@ -253,7 +259,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json({ user, nextAction });
+      res.json({ user, employee, nextAction });
     } catch (error) {
       console.error("Error in quick auth:", error);
       res.status(500).json({ message: "Authentication failed" });
@@ -263,10 +269,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Quick attendance endpoint
   app.post('/api/quick-attendance', async (req, res) => {
     try {
-      const { userId, type } = req.body;
+      const { employeeId, type } = req.body;
       
       const attendanceRecord = await storage.createAttendanceRecord({
-        employeeId: userId,
+        employeeId,
         type,
         timestamp: new Date(),
         method: "manual",

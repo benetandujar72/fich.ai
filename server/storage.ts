@@ -148,48 +148,34 @@ export class DatabaseStorage implements IStorage {
 
   // Employee operations
   async getEmployees(institutionId: string, searchQuery?: string): Promise<Employee[]> {
-    let query = db
-      .select({
-        id: employees.id,
-        userId: employees.userId,
-        institutionId: employees.institutionId,
-        departmentId: employees.departmentId,
-        employeeId: employees.employeeId,
-        role: employees.role,
-        startDate: employees.startDate,
-        endDate: employees.endDate,
-        isActive: employees.isActive,
-        createdAt: employees.createdAt,
-        updatedAt: employees.updatedAt,
-        user: {
-          id: users.id,
-          email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImageUrl: users.profileImageUrl
-        },
-        department: {
-          id: departments.id,
-          name: departments.name
-        }
-      })
+    const query = db
+      .select()
       .from(employees)
-      .leftJoin(users, eq(employees.userId, users.id))
-      .leftJoin(departments, eq(employees.departmentId, departments.id))
       .where(eq(employees.institutionId, institutionId));
 
-    if (searchQuery) {
-      query = query.where(
-        or(
-          sql`${users.firstName} ILIKE ${`%${searchQuery}%`}`,
-          sql`${users.lastName} ILIKE ${`%${searchQuery}%`}`,
-          sql`${users.email} ILIKE ${`%${searchQuery}%`}`,
-          sql`${employees.employeeId} ILIKE ${`%${searchQuery}%`}`
-        )
-      );
-    }
+    return await query.orderBy(asc(employees.fullName));
+  }
 
-    return await query.orderBy(asc(users.firstName), asc(users.lastName));
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    const [employee] = await db.select().from(employees).where(eq(employees.id, id));
+    return employee;
+  }
+
+  async searchEmployees(institutionId: string, searchQuery: string): Promise<Employee[]> {
+    return await db
+      .select()
+      .from(employees)
+      .where(
+        and(
+          eq(employees.institutionId, institutionId),
+          or(
+            sql`${employees.fullName} ILIKE ${`%${searchQuery}%`}`,
+            sql`${employees.email} ILIKE ${`%${searchQuery}%`}`,
+            sql`${employees.dni} ILIKE ${`%${searchQuery}%`}`
+          )
+        )
+      )
+      .orderBy(asc(employees.fullName));
   }
 
   async createEmployee(employee: InsertEmployee): Promise<Employee> {
@@ -431,15 +417,7 @@ export class DatabaseStorage implements IStorage {
     return upserted;
   }
 
-  // Institution operations
-  async getInstitutions(): Promise<Institution[]> {
-    return await db.select().from(institutions).orderBy(asc(institutions.name));
-  }
 
-  async createInstitution(institutionData: InsertInstitution): Promise<Institution> {
-    const [institution] = await db.insert(institutions).values(institutionData).returning();
-    return institution;
-  }
 
   // Academic year operations
   async getAcademicYears(institutionId: string): Promise<AcademicYear[]> {
@@ -522,16 +500,26 @@ export class DatabaseStorage implements IStorage {
     if (!user) return null;
 
     const bcrypt = await import('bcrypt');
-    const isValid = await bcrypt.compare(password, user.passwordHash);
+    const isValid = await bcrypt.compare(password, user.passwordHash || '');
     return isValid ? user : null;
   }
 
-  // Get last attendance record for a user
-  async getLastAttendanceRecord(userId: string): Promise<AttendanceRecord | null> {
+  // Get employee by user ID
+  async getEmployeeByUserId(userId: string): Promise<Employee | null> {
+    const [employee] = await db
+      .select()
+      .from(employees)
+      .where(eq(employees.userId, userId));
+    
+    return employee || null;
+  }
+
+  // Get last attendance record for an employee
+  async getLastAttendanceRecord(employeeId: string): Promise<AttendanceRecord | null> {
     const [record] = await db
       .select()
       .from(attendanceRecords)
-      .where(eq(attendanceRecords.userId, userId))
+      .where(eq(attendanceRecords.employeeId, employeeId))
       .orderBy(desc(attendanceRecords.timestamp))
       .limit(1);
     

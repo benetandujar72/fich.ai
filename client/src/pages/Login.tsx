@@ -194,8 +194,10 @@ export default function Login() {
                           </FormLabel>
                           <FormControl>
                             <Input
+                              id="login-email"
                               type="email"
                               placeholder="nom@exemple.com"
+                              autoComplete="email"
                               data-testid="email-input"
                               {...field}
                             />
@@ -216,8 +218,10 @@ export default function Login() {
                           <FormControl>
                             <div className="relative">
                               <Input
+                                id="login-password"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
+                                autoComplete="current-password"
                                 data-testid="password-input"
                                 {...field}
                               />
@@ -337,8 +341,10 @@ export default function Login() {
                                 {language === "ca" ? "o escriu manualment:" : "o escribe manualmente:"}
                               </div>
                               <Input
+                                id="quick-email"
                                 type="email"
                                 placeholder="nom@exemple.com"
+                                autoComplete="email"
                                 data-testid="quick-email-input"
                                 ref={quickEmailRef}
                                 {...field}
@@ -361,8 +367,10 @@ export default function Login() {
                           <FormControl>
                             <div className="relative">
                               <Input
+                                id="quick-password"
                                 type={showQuickPassword ? "text" : "password"}
                                 placeholder="••••••••"
+                                autoComplete="current-password"
                                 data-testid="quick-password-input"
                                 {...field}
                               />

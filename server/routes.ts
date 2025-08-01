@@ -1194,9 +1194,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/communications", isAuthenticated, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const communicationData = {
-        ...req.body,
-        senderId: userId
+        id: require('crypto').randomUUID(),
+        institutionId: req.body.institutionId || '5262a4a1-44ec-48e5-b520-102b2dffea43',
+        senderId: userId,
+        recipientId: req.body.recipientId,
+        subject: req.body.subject,
+        message: req.body.message,
+        type: req.body.type || 'message',
+        priority: req.body.priority || 'normal',
+        status: 'unread',
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       
       const communication = await storage.createCommunication(communicationData);

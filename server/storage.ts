@@ -944,7 +944,7 @@ export class DatabaseStorage implements IStorage {
         .insert(settings)
         .values({
           institutionId,
-          keys: 'automated_alerts',
+          key: 'automated_alerts',
           value: alertSettings,
         })
         .returning();
@@ -1442,7 +1442,44 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
             .where(eq(employees.id, existing.id));
           updatedCount++;
         } else {
-          await db.insert(employees).values(teacherData);
+          // Check if user exists, if not create one
+          let userId;
+          const [existingUser] = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, teacherData.email));
+
+          if (existingUser) {
+            userId = existingUser.id;
+          } else {
+            // Create user for the teacher with default password
+            const bcrypt = await import('bcrypt');
+            const passwordHash = await bcrypt.hash('prof123', 10);
+            
+            const [newUser] = await db
+              .insert(users)
+              .values({
+                email: teacherData.email,
+                firstName: teacherData.fullName.split(' ')[0],
+                lastName: teacherData.fullName.split(' ').slice(1).join(' ') || '',
+                role: 'employee',
+                institutionId,
+                passwordHash
+              })
+              .returning();
+            userId = newUser.id;
+            logger.scheduleImport('USER_CREATED', `Created user for teacher: ${teacherData.email}`);
+          }
+
+          // Create employee with userId
+          await db.insert(employees).values({
+            ...teacherData,
+            userId,
+            dni: teacherData.teacherCode, // Use teacher code as DNI
+            startDate: new Date(),
+            contractType: 'full_time',
+            status: 'active'
+          });
           createdCount++;
         }
       }

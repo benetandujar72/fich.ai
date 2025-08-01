@@ -1,168 +1,174 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
-import { useAuth } from "@/hooks/useAuth";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Clock, 
-  Bell, 
-  BarChart3, 
+import { cn } from "@/lib/utils";
+import {
+  Home,
+  Users,
+  Calendar,
+  AlertTriangle,
+  FileText,
   Settings,
+  Building2,
   GraduationCap,
+  ChevronLeft,
+  ChevronRight,
   LogOut,
-  Building,
-  BookOpen
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-interface SidebarProps {
-  className?: string;
-}
-
-export default function Sidebar({ className }: SidebarProps) {
+export default function Sidebar() {
   const [location] = useLocation();
-  const { language } = useLanguage();
   const { user } = useAuth();
+  const permissions = usePermissions();
+  const { language } = useLanguage();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Base navigation items available to all users
-  const baseNavigation = [
-    { 
-      name: t("dashboard", language), 
-      href: "/dashboard", 
-      icon: LayoutDashboard,
-      testId: "nav-dashboard"
+  const navItems = [
+    {
+      name: t("dashboard", language),
+      href: "/dashboard",
+      icon: Home,
+      show: true,
     },
-    { 
-      name: t("employees", language), 
-      href: "/employees", 
+    {
+      name: t("employee_management", language),
+      href: "/employees",
       icon: Users,
-      testId: "nav-employees"
+      show: permissions.canViewEmployees,
     },
-    { 
-      name: t("attendance", language), 
-      href: "/attendance", 
+    {
+      name: t("attendance", language),
+      href: "/attendance",
       icon: Clock,
-      testId: "nav-attendance"
+      show: permissions.canViewOwnAttendance || permissions.canViewAllAttendance,
     },
-    { 
-      name: t("alerts", language), 
-      href: "/alerts", 
-      icon: Bell,
-      testId: "nav-alerts"
+    {
+      name: t("alerts", language),
+      href: "/alerts",
+      icon: AlertTriangle,
+      show: permissions.canViewAlerts,
     },
-    { 
-      name: t("reports", language), 
-      href: "/reports", 
-      icon: BarChart3,
-      testId: "nav-reports"
+    {
+      name: t("reports", language),
+      href: "/reports",
+      icon: FileText,
+      show: permissions.canGeneratePersonalReports || permissions.canGenerateInstitutionReports,
     },
-    { 
-      name: t("settings", language), 
-      href: "/settings", 
+    {
+      name: language === "ca" ? "Gestió d'Institucions" : "Gestión de Instituciones",
+      href: "/institutions",
+      icon: Building2,
+      show: permissions.canViewInstitutions,
+    },
+    {
+      name: language === "ca" ? "Cursos Acadèmics" : "Cursos Académicos",
+      href: "/academic-years",
+      icon: GraduationCap,
+      show: permissions.canCreateAcademicYear || permissions.canEditAcademicYear,
+    },
+    {
+      name: t("settings", language),
+      href: "/settings",
       icon: Settings,
-      testId: "nav-settings"
+      show: permissions.canEditSettings || permissions.canManageUsers,
     },
-  ];
+  ].filter(item => item.show);
 
-  // Additional management items for admins and superadmins
-  const managementNavigation = [
-    ...(user?.role === "superadmin" ? [{
-      name: language === "ca" ? "Institucions" : "Instituciones", 
-      href: "/institutions", 
-      icon: Building,
-      testId: "nav-institutions"
-    }] : []),
-    ...(user?.role === "admin" || user?.role === "superadmin" ? [{
-      name: language === "ca" ? "Cursos Acadèmics" : "Cursos Académicos", 
-      href: "/academic-years", 
-      icon: BookOpen,
-      testId: "nav-academic-years"
-    }] : []),
-  ];
-
-  const navigation = [...baseNavigation, ...managementNavigation];
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/logout", { method: "POST" });
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Logout error:", error);
-      window.location.href = "/login";
-    }
+  const handleLogout = () => {
+    window.location.href = '/api/logout';
   };
 
   return (
-    <nav className={cn("fixed top-0 left-0 h-full w-64 bg-surface shadow-lg z-40", className)}>
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center">
-          <GraduationCap className="text-2xl text-primary mr-3 h-8 w-8" />
-          <div>
-            <h1 className="text-xl font-bold text-text">EduPresència</h1>
-            <p className="text-sm text-gray-600">Centre Educatiu</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-4">
-        <ul className="space-y-2">
-          {navigation.map((item) => {
-            const isActive = location === item.href;
-            const Icon = item.icon;
-            
-            return (
-              <li key={item.name}>
-                <Link href={item.href}>
-                  <Button
-                    variant={isActive ? "default" : "ghost"}
-                    className={cn(
-                      "w-full justify-start",
-                      isActive && "bg-primary text-white"
-                    )}
-                    data-testid={item.testId}
-                  >
-                    <Icon className="mr-3 h-4 w-4" />
-                    {item.name}
-                  </Button>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      {user && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-          <div className="flex items-center mb-3">
-            <img 
-              src={user.profileImageUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face"} 
-              alt="Profile" 
-              className="w-10 h-10 rounded-full object-cover mr-3"
-              data-testid="user-avatar"
-            />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-text" data-testid="user-name">
-                {user.firstName} {user.lastName}
-              </p>
-              <p className="text-xs text-gray-600" data-testid="user-role">
-                {user.role === "superadmin" ? "Superadministrador" : 
-                 user.role === "admin" ? "Administrador" : "Empleat"}
-              </p>
-            </div>
+    <div className={cn(
+      "fixed top-0 left-0 h-full bg-card border-r border-border z-50 transition-all duration-300",
+      isCollapsed ? "w-16" : "w-64"
+    )}>
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center justify-between">
+            {!isCollapsed && (
+              <div>
+                <h1 className="text-xl font-bold text-primary">EduPresència</h1>
+                <p className="text-xs text-muted-foreground">
+                  {language === "ca" ? "Control de presència" : "Control de presencia"}
+                </p>
+              </div>
+            )}
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleLogout}
-              className="text-gray-600 hover:text-error"
-              data-testid="logout-button"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="ml-auto"
             >
-              <LogOut className="h-4 w-4" />
+              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             </Button>
           </div>
         </div>
-      )}
-    </nav>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2">
+          {navItems.map((item) => {
+            const isActive = location === item.href || 
+              (item.href === "/dashboard" && location === "/");
+            
+            return (
+              <Link key={item.href} href={item.href}>
+                <div
+                  className={cn(
+                    "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  )}
+                  data-testid={`nav-${item.href.slice(1)}`}
+                >
+                  <item.icon size={20} className={cn("flex-shrink-0", !isCollapsed && "mr-3")} />
+                  {!isCollapsed && (
+                    <span className="truncate">{item.name}</span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* User info and logout */}
+        <div className="p-4 border-t border-border">
+          {!isCollapsed && user && (
+            <div className="mb-4 p-3 bg-muted rounded-lg">
+              <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
+              <p className="text-xs text-muted-foreground">{user.email}</p>
+              <p className="text-xs text-primary">
+                {user.role === 'superadmin' && (language === "ca" ? "Superadministrador" : "Superadministrador")}
+                {user.role === 'admin' && (language === "ca" ? "Administrador" : "Administrador")}
+                {user.role === 'employee' && (language === "ca" ? "Professor/a" : "Profesor/a")}
+              </p>
+            </div>
+          )}
+          
+          <Button
+            variant="ghost"
+            size={isCollapsed ? "sm" : "default"}
+            onClick={handleLogout}
+            className={cn(
+              "w-full justify-start text-muted-foreground hover:text-foreground",
+              isCollapsed && "px-2"
+            )}
+            data-testid="logout-button"
+          >
+            <LogOut size={20} className={cn("flex-shrink-0", !isCollapsed && "mr-3")} />
+            {!isCollapsed && (
+              <span>{language === "ca" ? "Tancar sessió" : "Cerrar sesión"}</span>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

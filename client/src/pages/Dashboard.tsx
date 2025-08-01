@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions, useRoleDisplay } from "@/hooks/usePermissions";
 import { t } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,8 @@ import {
 export default function Dashboard() {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const permissions = usePermissions();
+  const { getRoleDisplayName } = useRoleDisplay();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Get institution ID from authenticated user
@@ -103,25 +106,25 @@ export default function Dashboard() {
   ];
 
   const quickActions = [
-    {
+    permissions.canCreateEmployee && {
       title: language === "ca" ? "Afegir nou empleat" : "Añadir nuevo empleado",
       icon: UserPlus,
       color: "bg-primary hover:bg-blue-700",
       testId: "action-add-employee"
     },
-    {
+    permissions.canImportSchedules && {
       title: language === "ca" ? "Importar horaris" : "Importar horarios",
       icon: FolderInput,
       color: "bg-secondary hover:bg-green-700",
       testId: "action-import-schedules"
     },
-    {
+    (permissions.canGenerateInstitutionReports || permissions.canGeneratePersonalReports) && {
       title: language === "ca" ? "Generar informe" : "Generar informe",
       icon: Download,
       color: "bg-accent hover:bg-orange-600",
       testId: "action-generate-report"
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <main className="p-6">
@@ -190,6 +193,9 @@ export default function Dashboard() {
                     {new Date().toLocaleDateString("ca-ES")}
                   </p>
                   <p className="text-lg font-bold text-primary">{timeString}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {getRoleDisplayName(user?.role || '', language)}
+                  </p>
                 </div>
               </div>
             </CardHeader>

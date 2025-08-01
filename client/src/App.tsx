@@ -92,7 +92,7 @@ function Router() {
           } />
           
           <Route path="/employees" component={() => 
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
               <Header 
                 title={t("employee_management", language)}
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
@@ -112,7 +112,7 @@ function Router() {
           } />
           
           <Route path="/alerts" component={() => 
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
               <Header 
                 title={t("alerts", language)}
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
@@ -132,7 +132,7 @@ function Router() {
           } />
           
           <Route path="/settings" component={() => 
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
               <Header 
                 title={t("settings", language)}
               />
@@ -141,7 +141,7 @@ function Router() {
           } />
 
           <Route path="/institutions" component={() => 
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['superadmin']}>
               <Header 
                 title={language === "ca" ? "Gestió d'Institucions" : "Gestión de Instituciones"}
               />
@@ -150,7 +150,7 @@ function Router() {
           } />
 
           <Route path="/academic-years" component={() => 
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
               <Header 
                 title={language === "ca" ? "Gestió de Cursos Acadèmics" : "Gestión de Cursos Académicos"}
               />

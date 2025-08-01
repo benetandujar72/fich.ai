@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { t } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import {
 export default function Reports() {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const permissions = usePermissions();
   
   const [reportType, setReportType] = useState("general_attendance");
   const [startDate, setStartDate] = useState("");

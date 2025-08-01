@@ -141,7 +141,7 @@ export default function Login() {
         {/* Login and Quick Attendance Tabs */}
         <Card>
           <CardContent className="p-0">
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs defaultValue="attendance" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login" data-testid="login-tab">
                   {language === "ca" ? "Entrar" : "Entrar"}

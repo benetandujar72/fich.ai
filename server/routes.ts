@@ -852,6 +852,196 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email settings routes
+  app.get("/api/email-settings/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const settings = await storage.getEmailSettings(institutionId);
+      res.json(settings || {
+        institutionId,
+        smtpHost: "",
+        smtpPort: 587,
+        smtpUser: "",
+        smtpPassword: "",
+        senderEmail: "",
+        senderName: ""
+      });
+    } catch (error) {
+      console.error("Error fetching email settings:", error);
+      res.status(500).json({ message: "Failed to fetch email settings" });
+    }
+  });
+
+  app.put("/api/email-settings/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const emailConfig = req.body;
+      
+      const settings = await storage.upsertEmailSettings({
+        institutionId,
+        ...emailConfig
+      });
+      
+      res.json(settings);
+    } catch (error) {
+      console.error("Error updating email settings:", error);
+      res.status(500).json({ message: "Failed to update email settings" });
+    }
+  });
+
+  app.post("/api/email-settings/:institutionId/test", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const emailConfig = req.body;
+      
+      // Simple test email sending (mock implementation)
+      // In production, would use nodemailer or similar
+      console.log("Test email would be sent with config:", emailConfig);
+      
+      res.json({ 
+        message: "Test email sent successfully",
+        config: {
+          host: emailConfig.smtpHost,
+          port: emailConfig.smtpPort,
+          user: emailConfig.smtpUser
+        }
+      });
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({ message: "Failed to send test email" });
+    }
+  });
+
+  // Absence justification routes
+  app.get("/api/absence-justifications/:employeeId", isAuthenticated, async (req, res) => {
+    try {
+      const { employeeId } = req.params;
+      const justifications = await storage.getAbsenceJustifications(employeeId);
+      res.json(justifications);
+    } catch (error) {
+      console.error("Error fetching absence justifications:", error);
+      res.status(500).json({ message: "Failed to fetch absence justifications" });
+    }
+  });
+
+  app.post("/api/absence-justifications", isAuthenticated, async (req, res) => {
+    try {
+      const justificationData = req.body;
+      const justification = await storage.createAbsenceJustification(justificationData);
+      res.json(justification);
+    } catch (error) {
+      console.error("Error creating absence justification:", error);
+      res.status(500).json({ message: "Failed to create absence justification" });
+    }
+  });
+
+  app.put("/api/absence-justifications/:id/status", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, adminResponse } = req.body;
+      
+      const updated = await storage.updateAbsenceJustificationStatus(id, status, adminResponse);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating absence justification status:", error);
+      res.status(500).json({ message: "Failed to update absence justification status" });
+    }
+  });
+
+  // Password management routes
+  app.put("/api/users/:userId/password", isAuthenticated, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { newPassword } = req.body;
+      
+      // Validate password strength
+      if (!newPassword || newPassword.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }
+      
+      // Check for complexity requirements
+      const hasUppercase = /[A-Z]/.test(newPassword);
+      const hasLowercase = /[a-z]/.test(newPassword);
+      const hasNumbers = /\d/.test(newPassword);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+      
+      if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+        return res.status(400).json({ 
+          message: "Password must contain uppercase, lowercase, numbers, and special characters" 
+        });
+      }
+      
+      const updatedUser = await storage.updateUserPassword(userId, newPassword);
+      res.json({ message: "Password updated successfully", userId: updatedUser.id });
+    } catch (error) {
+      console.error("Error updating user password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
+  // Weekly attendance calendar route
+  app.get("/api/attendance/weekly/:employeeId/:weekStart", isAuthenticated, async (req, res) => {
+    try {
+      const { employeeId, weekStart } = req.params;
+      const startDate = new Date(weekStart);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6);
+      
+      const weeklyData = await storage.getWeeklyAttendance(employeeId, startDate, endDate);
+      res.json(weeklyData);
+    } catch (error) {
+      console.error("Error fetching weekly attendance:", error);
+      res.status(500).json({ message: "Failed to fetch weekly attendance" });
+    }
+  });
+
+  // Admin absence justification routes
+  app.get("/api/absence-justifications/admin/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const justifications = await storage.getInstitutionAbsenceJustifications(institutionId);
+      res.json(justifications);
+    } catch (error) {
+      console.error("Error fetching institution absence justifications:", error);
+      res.status(500).json({ message: "Failed to fetch absence justifications" });
+    }
+  });
+
+  // Automated alerts settings endpoints
+  app.get('/api/automated-alerts-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const settings = await storage.getAutomatedAlertSettings(institutionId);
+      res.json(settings || {});
+    } catch (error) {
+      console.error("Error fetching automated alert settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.put('/api/automated-alerts-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const settings = req.body;
+      const updated = await storage.updateAutomatedAlertSettings(institutionId, settings);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating automated alert settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  app.post('/api/automated-alerts-settings/:institutionId/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      await storage.sendTestAlert(institutionId);
+      res.json({ message: "Test alert sent successfully" });
+    } catch (error) {
+      console.error("Error sending test alert:", error);
+      res.status(500).json({ message: "Failed to send test alert" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

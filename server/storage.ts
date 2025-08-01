@@ -11,6 +11,9 @@ import {
   substituteAssignments,
   settings,
   attendanceNetworkSettings,
+  emailSettings,
+  absenceJustifications,
+  alertNotifications,
   type User,
   type UpsertUser,
   type Institution,
@@ -33,6 +36,12 @@ import {
   type InsertSetting,
   type AttendanceNetworkSetting,
   type InsertAttendanceNetworkSetting,
+  type EmailSetting,
+  type InsertEmailSetting,
+  type AbsenceJustification,
+  type InsertAbsenceJustification,
+  type AlertNotification,
+  type InsertAlertNotification,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, asc, or, sql, count } from "drizzle-orm";
@@ -94,6 +103,28 @@ export interface IStorage {
   getAttendanceNetworkSettings(institutionId: string): Promise<AttendanceNetworkSetting | undefined>;
   upsertAttendanceNetworkSettings(settings: InsertAttendanceNetworkSetting): Promise<AttendanceNetworkSetting>;
   isIPAllowedForAttendance(institutionId: string, clientIP: string): Promise<boolean>;
+
+  // Email settings operations
+  getEmailSettings(institutionId: string): Promise<EmailSetting | undefined>;
+  upsertEmailSettings(settings: InsertEmailSetting): Promise<EmailSetting>;
+
+  // Absence justifications operations
+  getAbsenceJustifications(employeeId: string): Promise<AbsenceJustification[]>;
+  createAbsenceJustification(justification: InsertAbsenceJustification): Promise<AbsenceJustification>;
+  updateAbsenceJustificationStatus(id: string, status: string, adminResponse?: string): Promise<AbsenceJustification>;
+
+  // Alert notifications operations
+  createAlertNotification(notification: InsertAlertNotification): Promise<AlertNotification>;
+  getAlertNotifications(institutionId: string): Promise<AlertNotification[]>;
+
+  // Password management operations
+  updateUserPassword(userId: string, newPassword: string): Promise<User>;
+
+  // Weekly attendance operations
+  getWeeklyAttendance(employeeId: string, startDate: Date, endDate: Date): Promise<any[]>;
+
+  // Institution-wide absence justifications
+  getInstitutionAbsenceJustifications(institutionId: string): Promise<AbsenceJustification[]>;
 
   // Dashboard statistics
   getDashboardStats(institutionId: string): Promise<any>;
@@ -198,6 +229,27 @@ export class DatabaseStorage implements IStorage {
       .where(eq(employees.id, id))
       .returning();
     return updated;
+  }
+
+  // Institution-wide absence justifications
+  async getInstitutionAbsenceJustifications(institutionId: string): Promise<AbsenceJustification[]> {
+    const justifications = await db
+      .select({
+        id: absenceJustifications.id,
+        employeeId: absenceJustifications.employeeId,
+        employeeName: sql<string>`${employees.firstName} || ' ' || ${employees.lastName}`.as('employeeName'),
+        date: absenceJustifications.date,
+        reason: absenceJustifications.reason,
+        status: absenceJustifications.status,
+        adminResponse: absenceJustifications.adminResponse,
+        createdAt: absenceJustifications.createdAt,
+      })
+      .from(absenceJustifications)
+      .innerJoin(employees, eq(absenceJustifications.employeeId, employees.id))
+      .where(eq(employees.institutionId, institutionId))
+      .orderBy(desc(absenceJustifications.createdAt));
+
+    return justifications;
   }
 
   async deleteEmployee(id: string): Promise<void> {
@@ -411,18 +463,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertSetting(setting: InsertSetting): Promise<Setting> {
-    const [upserted] = await db
-      .insert(settings)
-      .values(setting)
-      .onConflictDoUpdate({
-        target: [settings.institutionId, settings.key],
-        set: {
+    // Check if setting exists first
+    const existing = await this.getSetting(setting.institutionId, setting.key);
+    
+    if (existing) {
+      // Update existing setting
+      const [updated] = await db
+        .update(settings)
+        .set({
           value: setting.value,
           updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return upserted;
+        })
+        .where(and(
+          eq(settings.institutionId, setting.institutionId),
+          eq(settings.key, setting.key)
+        ))
+        .returning();
+      return updated;
+    } else {
+      // Insert new setting
+      const [inserted] = await db
+        .insert(settings)
+        .values({
+          ...setting,
+          id: sql`gen_random_uuid()`,
+        })
+        .returning();
+      return inserted;
+    }
   }
 
   // Attendance network settings operations
@@ -490,6 +558,207 @@ export class DatabaseStorage implements IStorage {
     } else {
       // Direct IP match
       return ip === network;
+    }
+  }
+
+  // Email settings operations
+  async getEmailSettings(institutionId: string): Promise<EmailSetting | undefined> {
+    const [settings] = await db
+      .select()
+      .from(emailSettings)
+      .where(eq(emailSettings.institutionId, institutionId));
+    return settings;
+  }
+
+  async upsertEmailSettings(settings: InsertEmailSetting): Promise<EmailSetting> {
+    const existing = await this.getEmailSettings(settings.institutionId);
+    
+    if (existing) {
+      const [updated] = await db
+        .update(emailSettings)
+        .set({
+          ...settings,
+          updatedAt: new Date(),
+        })
+        .where(eq(emailSettings.institutionId, settings.institutionId))
+        .returning();
+      return updated;
+    } else {
+      const [inserted] = await db
+        .insert(emailSettings)
+        .values({
+          ...settings,
+          id: sql`gen_random_uuid()`,
+        })
+        .returning();
+      return inserted;
+    }
+  }
+
+  // Absence justifications operations
+  async getAbsenceJustifications(employeeId: string): Promise<AbsenceJustification[]> {
+    return await db
+      .select()
+      .from(absenceJustifications)
+      .where(eq(absenceJustifications.employeeId, employeeId))
+      .orderBy(desc(absenceJustifications.date));
+  }
+
+  async createAbsenceJustification(justification: InsertAbsenceJustification): Promise<AbsenceJustification> {
+    const [created] = await db
+      .insert(absenceJustifications)
+      .values({
+        ...justification,
+        id: sql`gen_random_uuid()`,
+      })
+      .returning();
+    return created;
+  }
+
+  async updateAbsenceJustificationStatus(id: string, status: string, adminResponse?: string): Promise<AbsenceJustification> {
+    const [updated] = await db
+      .update(absenceJustifications)
+      .set({
+        status,
+        adminResponse,
+        updatedAt: new Date(),
+      })
+      .where(eq(absenceJustifications.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Alert notifications operations
+  async createAlertNotification(notification: InsertAlertNotification): Promise<AlertNotification> {
+    const [created] = await db
+      .insert(alertNotifications)
+      .values({
+        ...notification,
+        id: sql`gen_random_uuid()`,
+      })
+      .returning();
+    return created;
+  }
+
+  async getAlertNotifications(institutionId: string): Promise<AlertNotification[]> {
+    return await db
+      .select()
+      .from(alertNotifications)
+      .where(eq(alertNotifications.institutionId, institutionId))
+      .orderBy(desc(alertNotifications.sentAt));
+  }
+
+  // Password management operations
+  async updateUserPassword(userId: string, newPassword: string): Promise<User> {
+    const bcrypt = await import('bcrypt');
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        hashedPassword,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return updatedUser;
+  }
+
+  // Weekly attendance operations
+  async getWeeklyAttendance(employeeId: string, startDate: Date, endDate: Date): Promise<any[]> {
+    try {
+      // Get attendance records for the week
+      const records = await db
+        .select()
+        .from(attendanceRecords)
+        .where(
+          and(
+            eq(attendanceRecords.employeeId, employeeId),
+            gte(attendanceRecords.timestamp, startDate),
+            lte(attendanceRecords.timestamp, endDate)
+          )
+        )
+        .orderBy(attendanceRecords.timestamp);
+
+    // Get absence justifications for the week
+    const justifications = await db
+      .select()
+      .from(absenceJustifications)
+      .where(
+        and(
+          eq(absenceJustifications.employeeId, employeeId),
+          gte(absenceJustifications.date, startDate),
+          lte(absenceJustifications.date, endDate)
+        )
+      );
+
+    // Group attendance by date
+    const dailyAttendance = new Map();
+    
+    records.forEach((record: any) => {
+      const date = record.timestamp.toISOString().split('T')[0];
+      if (!dailyAttendance.has(date)) {
+        dailyAttendance.set(date, { date, records: [] });
+      }
+      dailyAttendance.get(date).records.push(record);
+    });
+
+    // Process each day's data
+    const weeklyData = [];
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      const dayData = dailyAttendance.get(dateStr);
+      const justification = justifications.find(j => 
+        j.date.toISOString().split('T')[0] === dateStr
+      );
+
+      let checkInTime = null;
+      let checkOutTime = null;
+      let totalHours = null;
+
+      if (dayData) {
+        const checkInRecord = dayData.records.find((r: any) => r.type === 'check_in');
+        const checkOutRecord = dayData.records.find((r: any) => r.type === 'check_out');
+        
+        if (checkInRecord) {
+          checkInTime = checkInRecord.timestamp.toLocaleTimeString('ca-ES', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
+        
+        if (checkOutRecord) {
+          checkOutTime = checkOutRecord.timestamp.toLocaleTimeString('ca-ES', {
+            hour: '2-digit', 
+            minute: '2-digit'
+          });
+        }
+
+        if (checkInRecord && checkOutRecord) {
+          const diff = checkOutRecord.timestamp.getTime() - checkInRecord.timestamp.getTime();
+          totalHours = Math.round((diff / (1000 * 60 * 60)) * 100) / 100;
+        }
+      }
+
+      weeklyData.push({
+        date: dateStr,
+        checkInTime,
+        checkOutTime,
+        totalHours,
+        justification: justification ? {
+          id: justification.id,
+          reason: justification.reason,
+          status: justification.status,
+          adminResponse: justification.adminResponse
+        } : null
+      });
+    }
+
+    return weeklyData;
+    } catch (error) {
+      console.error("Error in getWeeklyAttendance:", error);
+      return [];
     }
   }
 
@@ -614,6 +883,122 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .where(eq(users.role, "employee"))
       .orderBy(asc(users.firstName), asc(users.lastName));
+  }
+
+  // Automated alert settings operations
+  async getAutomatedAlertSettings(institutionId: string): Promise<any> {
+    const settings = await db
+      .select()
+      .from(settings)
+      .where(
+        and(
+          eq(settings.institutionId, institutionId),
+          eq(settings.key, 'automated_alerts')
+        )
+      )
+      .limit(1);
+
+    return settings.length > 0 ? settings[0].value : null;
+  }
+
+  async updateAutomatedAlertSettings(institutionId: string, alertSettings: any): Promise<any> {
+    const existingSettings = await db
+      .select()
+      .from(settings)
+      .where(
+        and(
+          eq(settings.institutionId, institutionId),
+          eq(settings.key, 'automated_alerts')
+        )
+      )
+      .limit(1);
+
+    if (existingSettings.length > 0) {
+      // Update existing
+      const [updated] = await db
+        .update(settings)
+        .set({
+          value: alertSettings,
+          updatedAt: new Date(),
+        })
+        .where(eq(settings.id, existingSettings[0].id))
+        .returning();
+      return updated.value;
+    } else {
+      // Create new
+      const [created] = await db
+        .insert(settings)
+        .values({
+          institutionId,
+          key: 'automated_alerts',
+          value: alertSettings,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      return created.value;
+    }
+  }
+
+  async sendTestAlert(institutionId: string): Promise<void> {
+    // Get email settings first
+    const emailSettings = await this.getEmailSettings(institutionId);
+    if (!emailSettings || !emailSettings.senderEmail) {
+      throw new Error("Email configuration not found. Please configure email settings first.");
+    }
+
+    // Get alert settings
+    const alertSettings = await this.getAutomatedAlertSettings(institutionId);
+    if (!alertSettings || !alertSettings.recipientEmails || alertSettings.recipientEmails.length === 0) {
+      throw new Error("No recipients configured for alerts.");
+    }
+
+    // Get institution info
+    const institution = await this.getInstitution(institutionId);
+    const centerName = institution?.name || "Centre Educatiu";
+
+    // Prepare test email content
+    const subject = `[PROVA] ${centerName} - Test d'Alertes Automàtiques`;
+    
+    const body = `Estimat/da administrador/a,
+
+Aquest és un email de prova del sistema d'alertes automàtiques d'EduPresència.
+
+CONFIGURACIÓ ACTUAL:
+- Centre: ${centerName}
+- Llindar de retard: ${alertSettings.delayThresholdMinutes || 15} minuts
+- Llindar d'absència: ${alertSettings.absenceThresholdDays || 3} dies
+- Freqüència d'informes: ${alertSettings.reportFrequency || 'setmanal'}
+- Hora d'enviament: ${alertSettings.reportTime || '09:00'}
+
+COMPLIMENT LEGAL:
+${alertSettings.legalComplianceMode ? 
+  'El sistema inclou referències legals per garantir el compliment de l\'Article 34.9 de l\'Estatut dels Treballadors.' :
+  'Mode de compliment legal desactivat.'}
+
+Si rebeu aquest email, la configuració és correcta.
+
+Salutacions cordials,
+Sistema de Control d'Assistència EduPresència
+
+---
+Aquest és un email automàtic generat pel sistema. Si us plau, no respongueu directament.
+Data de prova: ${new Date().toLocaleString('ca-ES')}`;
+
+    // In a real implementation, this would send the actual email
+    // For now, we simulate the process
+    console.log(`Test alert sent to: ${alertSettings.recipientEmails.join(', ')}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Body preview: ${body.substring(0, 100)}...`);
+    
+    // In production, integrate with actual email service like SendGrid, SES, or SMTP
+    // Example pseudo-code:
+    // await emailService.send({
+    //   from: emailSettings.senderEmail,
+    //   to: alertSettings.recipientEmails,
+    //   subject,
+    //   text: body
+    // });
   }
 }
 

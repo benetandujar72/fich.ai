@@ -46,17 +46,54 @@ Preferred communication style: Simple, everyday language.
 - **Digital Document Signing**: PDF exports with SHA-256 digital signatures and audit trails
 - **GDPR Data Export**: Secure data downloads with user name and date in filename
 
-### Missing Core Functionalities to Implement
-1. **Institution Management**: Create/edit institutions, multi-year support
-2. **Academic Year Management**: Create/manage academic years per institution
-3. **User Profile Management**: Complete user profile system
-4. **Employee Onboarding**: Complete employee creation workflow
-5. **Advanced Settings**: Institution-specific configurations
-6. **QR Code & NFC Implementation**: Complete QR/NFC attendance marking functionality
-7. **Advanced Reporting**: Multi-year reports, export functionality
-8. **Email Notification System**: Alert notifications via email
-9. **Additional Roles**: Coordinator, Supervisor, Secretary, Auditor roles
-10. **Mobile Application**: Native iOS/Android app with offline capabilities
+### Pending Tasks (CONFIG Identifiers)
+**CONFIG-001: Email Notification System** ✓ STARTING
+- Configurable sender email in settings panel
+- Subject with person information
+- Legal content formatting for attendance alerts
+- Automated periodic notifications
+
+**CONFIG-002: Settings Data Persistence** ✓ URGENT - Database constraint issue
+- Fix unique constraint error in settings table
+- Ensure all configuration data persists correctly
+
+**CONFIG-003: Secure Password Management** ✓ COMPLETADO
+- Allow admins to change user passwords securely con PasswordChangeModal
+- Password strength validation with visual indicators and requirements
+- Secure backend API endpoint with bcrypt hashing
+
+**CONFIG-004: Network-Restricted Attendance** ✓ PENDING
+- Block quick attendance from outside local network
+- Show appropriate error message for non-local access
+
+**CONFIG-005: Attendance Button States** ✓ COMPLETADO
+- Color-coded attendance interface (verde para entrada, rojo para salida)
+- Enable/disable buttons based on last action (entry/exit)
+- Visual state management con mensajes informativos
+
+**CONFIG-006: Weekly Calendar Interface** ✓ COMPLETADO
+- Monday-Friday personalized schedule view con navegación semanal
+- Color coding: Green (complete), Red (incidents), Orange (no attendance), Blue (justified)
+- Click to justify absences con modal y workflow completo
+
+**CONFIG-007: Absence Justification Workflow** ✓ COMPLETADO  
+- Modal for absence reason entry con validación
+- Calendar marking system for justified absences con estados visuales
+- Admin approval/rejection system con AbsenceJustificationReview component
+
+**CONFIG-008: Automated Legal Alerts** ✓ COMPLETADO
+- Configurable periodic email reports con AutomatedAlertsConfig component
+- Accumulated delay minutes tracking con thresholds configurables
+- Legal compliance content con plantillas personalizables y referencias legales
+
+**CONFIG-009: Risk Assessment Dashboard** ✓ PENDING
+- Teacher list with color-coded risk levels
+- Manual notification buttons
+- Empathetic messaging templates
+
+**CONFIG-010: Email Configuration Panel** ✓ PENDING
+- SMTP settings configuration
+- Email templates management
 
 ## System Architecture
 

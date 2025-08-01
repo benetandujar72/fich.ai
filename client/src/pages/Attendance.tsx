@@ -21,9 +21,14 @@ import {
   LogOut, 
   QrCode, 
   CreditCard,
-  Clock
+  Clock,
+  Wifi,
+  WifiOff,
+  AlertTriangle
 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import QuickAttendanceModal from "@/components/modals/QuickAttendanceModal";
+import WeeklyCalendar from "@/components/WeeklyCalendar";
 import type { AttendanceRecord } from "@shared/schema";
 
 export default function Attendance() {
@@ -34,6 +39,7 @@ export default function Attendance() {
   
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
+  const [networkPermission, setNetworkPermission] = useState<{ allowed: boolean; message: string } | null>(null);
 
   // Get employee ID from authenticated user
   const employeeId = user?.id;
@@ -43,8 +49,39 @@ export default function Attendance() {
     enabled: !!employeeId,
   });
 
+  // Get the last attendance record to determine button states
+  const lastAttendanceRecord = attendanceRecords.length > 0 
+    ? attendanceRecords.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+    : null;
+
+  const shouldDisableCheckIn = lastAttendanceRecord?.type === 'check_in';
+  const shouldDisableCheckOut = !lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out';
+
+  // Check network permission before attendance
+  const checkNetworkPermission = async () => {
+    try {
+      const result = await apiRequest("POST", "/api/attendance/check-permission", {
+        institutionId: user?.institutionId
+      });
+      setNetworkPermission(result as { allowed: boolean; message: string });
+      return result.allowed;
+    } catch (error) {
+      console.error("Error checking network permission:", error);
+      setNetworkPermission({ allowed: false, message: "Error verificant permisos de xarxa" });
+      return false;
+    }
+  };
+
   const attendanceMutation = useMutation({
     mutationFn: async (data: { type: "check_in" | "check_out"; employeeId: string; timestamp: Date }) => {
+      // Check network permission first
+      const isAllowed = await checkNetworkPermission();
+      if (!isAllowed) {
+        throw new Error(language === "ca" 
+          ? "Fitxatge només disponible des de la xarxa local del centre"
+          : "Fichaje solo disponible desde la red local del centro");
+      }
+      
       return await apiRequest("POST", "/api/attendance", {
         ...data,
         method: "web",
@@ -59,10 +96,10 @@ export default function Attendance() {
           : (language === "ca" ? "Sortida registrada correctament" : "Salida registrada correctamente"),
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: t("error", language),
-        description: language === "ca" ? "Error registrant el fitxatge" : "Error registrando el fichaje",
+        description: error.message || (language === "ca" ? "Error registrant el fitxatge" : "Error registrando el fichaje"),
         variant: "destructive",
       });
     },
@@ -74,6 +111,13 @@ export default function Attendance() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Check network permission on component mount
+  useEffect(() => {
+    if (user?.institutionId) {
+      checkNetworkPermission();
+    }
+  }, [user?.institutionId]);
 
   const timeString = currentTime.toLocaleTimeString("ca-ES", {
     hour: "2-digit",
@@ -146,6 +190,25 @@ export default function Attendance() {
 
   return (
     <main className="p-6">
+      {/* Network Permission Alert */}
+      {networkPermission && !networkPermission.allowed && (
+        <Alert className="mb-6 border-red-200 bg-red-50">
+          <WifiOff className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            <strong>{language === "ca" ? "Accés restringit:" : "Acceso restringido:"}</strong> {networkPermission.message}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {networkPermission && networkPermission.allowed && (
+        <Alert className="mb-6 border-green-200 bg-green-50">
+          <Wifi className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            <strong>{language === "ca" ? "Xarxa autoritzada:" : "Red autorizada:"}</strong> {networkPermission.message}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Quick Check-in */}
         <Card data-testid="quick-checkin-card">
@@ -163,21 +226,51 @@ export default function Attendance() {
             <div className="space-y-4">
               <Button 
                 onClick={handleCheckIn}
-                disabled={attendanceMutation.isPending}
-                className="w-full bg-secondary text-white py-4 px-6 text-lg font-medium hover:bg-green-700"
+                disabled={
+                  attendanceMutation.isPending || 
+                  (networkPermission && !networkPermission.allowed) ||
+                  shouldDisableCheckIn
+                }
+                className={`w-full py-4 px-6 text-lg font-medium ${
+                  shouldDisableCheckIn
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                    : networkPermission && !networkPermission.allowed 
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                      : "bg-green-600 text-white hover:bg-green-700"
+                }`}
                 data-testid="checkin-button"
               >
                 <LogIn className="mr-3 h-5 w-5" />
                 {t("checkin_entry", language)}
+                {shouldDisableCheckIn && (
+                  <span className="ml-2 text-xs">
+                    ({language === "ca" ? "Ja has fitxat l'entrada" : "Ya has fichado la entrada"})
+                  </span>
+                )}
               </Button>
               <Button 
                 onClick={handleCheckOut}
-                disabled={attendanceMutation.isPending}
-                className="w-full bg-error text-white py-4 px-6 text-lg font-medium hover:bg-red-700"
+                disabled={
+                  attendanceMutation.isPending || 
+                  (networkPermission && !networkPermission.allowed) ||
+                  shouldDisableCheckOut
+                }
+                className={`w-full py-4 px-6 text-lg font-medium ${
+                  shouldDisableCheckOut
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                    : networkPermission && !networkPermission.allowed 
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                      : "bg-red-600 text-white hover:bg-red-700"
+                }`}
                 data-testid="checkout-button"
               >
                 <LogOut className="mr-3 h-5 w-5" />
                 {t("checkin_exit", language)}
+                {shouldDisableCheckOut && (
+                  <span className="ml-2 text-xs">
+                    ({language === "ca" ? "Primer has de fitxar l'entrada" : "Primero debes fichar la entrada"})
+                  </span>
+                )}
               </Button>
             </div>
 
@@ -278,6 +371,12 @@ export default function Attendance() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Weekly Calendar */}
+        <WeeklyCalendar 
+          employeeId={employeeId || ""} 
+          language={language} 
+        />
       </div>
 
       {/* Attendance History */}

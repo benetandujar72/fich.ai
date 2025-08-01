@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { t } from "@/lib/i18n";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -27,9 +28,14 @@ import {
   Edit,
   Trash2,
   Save,
-  Users
+  Users,
+  Mail
 } from "lucide-react";
 import NetworkSettingsForm from "@/components/NetworkSettingsForm";
+import EmailSettingsForm from "@/components/EmailSettingsForm";
+import PasswordChangeModal from "@/components/PasswordChangeModal";
+import AbsenceJustificationReview from "@/components/AbsenceJustificationReview";
+import AutomatedAlertsConfig from "@/components/AutomatedAlertsConfig";
 
 interface CenterSettings {
   centerName: string;
@@ -41,6 +47,7 @@ interface CenterSettings {
 export default function Settings() {
   const { language, setLanguage } = useLanguage();
   const { user } = useAuth();
+  const { canManageEmployees } = usePermissions();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -56,6 +63,7 @@ export default function Settings() {
 
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true);
   const [showAddAdminForm, setShowAddAdminForm] = useState(false);
+  const [passwordChangeUser, setPasswordChangeUser] = useState<{ id: string; email: string } | null>(null);
   const [newAdminData, setNewAdminData] = useState({
     email: "",
     firstName: "",
@@ -310,8 +318,37 @@ export default function Settings() {
         </CardContent>
       </Card>
 
+      {/* Email Configuration Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Mail className="mr-2 h-5 w-5" />
+            {language === "ca" ? "Configuració d'Email" : "Configuración de Email"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <Info className="text-green-600 mr-3 h-5 w-5 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-green-800 mb-1">
+                  {language === "ca" ? "Notificacions automàtiques" : "Notificaciones automáticas"}
+                </p>
+                <p className="text-sm text-green-700">
+                  {language === "ca" 
+                    ? "Configura el servidor d'email per enviar alertes automàtiques de retards, absències i notificacions legals."
+                    : "Configura el servidor de email para enviar alertas automáticas de retrasos, ausencias y notificaciones legales."}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <EmailSettingsForm institutionId={institutionId} language={language} />
+        </CardContent>
+      </Card>
+
       {/* Network Settings Section */}
-      <Card className="p-6">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Shield className="mr-2 h-5 w-5" />
@@ -338,6 +375,22 @@ export default function Settings() {
           <NetworkSettingsForm institutionId={institutionId} language={language} />
         </CardContent>
       </Card>
+
+      {/* Absence Justification Review - Only for Admins */}
+      {canManageEmployees && (
+        <AbsenceJustificationReview 
+          institutionId={institutionId || ""} 
+          language={language} 
+        />
+      )}
+
+      {/* Automated Alerts Configuration - Only for Admins */}
+      {canManageEmployees && (
+        <AutomatedAlertsConfig 
+          institutionId={institutionId || ""} 
+          language={language} 
+        />
+      )}
 
       {/* User Management */}
       <Card data-testid="user-management-card">
@@ -416,6 +469,15 @@ export default function Settings() {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setPasswordChangeUser({ id: admin.id, email: admin.email })}
+                            data-testid={`change-password-${admin.id}`}
+                            title={language === "ca" ? "Canviar contrasenya" : "Cambiar contraseña"}
+                          >
+                            <Shield className="h-4 w-4" />
+                          </Button>
                           <Button 
                             variant="ghost" 
                             size="sm"
@@ -572,6 +634,17 @@ export default function Settings() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Password Change Modal */}
+      {passwordChangeUser && (
+        <PasswordChangeModal
+          isOpen={!!passwordChangeUser}
+          onClose={() => setPasswordChangeUser(null)}
+          userId={passwordChangeUser.id}
+          userEmail={passwordChangeUser.email}
+          language={language}
+        />
       )}
     </main>
   );

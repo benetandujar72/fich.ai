@@ -178,9 +178,47 @@ export const settings = pgTable("settings", {
   key: varchar("key").notNull(),
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-  uniqueInstitutionKey: unique().on(table.institutionId, table.key),
-}));
+});
+
+// Email configuration settings
+export const emailSettings = pgTable("email_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull().unique(),
+  smtpHost: varchar("smtp_host"),
+  smtpPort: integer("smtp_port"),
+  smtpUser: varchar("smtp_user"),
+  smtpPassword: varchar("smtp_password"),
+  senderEmail: varchar("sender_email"),
+  senderName: varchar("sender_name"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Absence justifications
+export const absenceJustifications = pgTable("absence_justifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").notNull(),
+  date: date("date").notNull(),
+  reason: text("reason").notNull(),
+  adminResponse: text("admin_response"),
+  status: varchar("status").notNull().default("pending"), // pending, approved, rejected
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Alert notifications log
+export const alertNotifications = pgTable("alert_notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  employeeId: varchar("employee_id").notNull(),
+  type: varchar("type").notNull(), // delay_alert, accumulated_delay, manual_notification
+  subject: varchar("subject").notNull(),
+  content: text("content").notNull(),
+  delayMinutes: integer("delay_minutes").default(0),
+  accumulatedMinutes: integer("accumulated_minutes").default(0),
+  sentAt: timestamp("sent_at").defaultNow(),
+  emailSent: boolean("email_sent").default(false),
+});
 
 // Network settings for attendance control - only allow attendance from specific networks
 export const attendanceNetworkSettings = pgTable("attendance_network_settings", {
@@ -360,6 +398,23 @@ export const insertAttendanceNetworkSettingSchema = createInsertSchema(attendanc
   updatedAt: true,
 });
 
+export const insertEmailSettingSchema = createInsertSchema(emailSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAbsenceJustificationSchema = createInsertSchema(absenceJustifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAlertNotificationSchema = createInsertSchema(alertNotifications).omit({
+  id: true,
+  sentAt: true,
+});
+
 export const insertAcademicYearSchema = createInsertSchema(academicYears).omit({
   id: true,
   createdAt: true,
@@ -389,3 +444,9 @@ export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = z.infer<typeof insertSettingSchema>;
 export type AttendanceNetworkSetting = typeof attendanceNetworkSettings.$inferSelect;
 export type InsertAttendanceNetworkSetting = z.infer<typeof insertAttendanceNetworkSettingSchema>;
+export type EmailSetting = typeof emailSettings.$inferSelect;
+export type InsertEmailSetting = z.infer<typeof insertEmailSettingSchema>;
+export type AbsenceJustification = typeof absenceJustifications.$inferSelect;
+export type InsertAbsenceJustification = z.infer<typeof insertAbsenceJustificationSchema>;
+export type AlertNotification = typeof alertNotifications.$inferSelect;
+export type InsertAlertNotification = z.infer<typeof insertAlertNotificationSchema>;

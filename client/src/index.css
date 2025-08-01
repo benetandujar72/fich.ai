@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 98%);
+  --foreground: hsl(240, 10%, 13%);
+  --muted: hsl(240, 4.8%, 95.9%);
+  --muted-foreground: hsl(240, 3.8%, 46.1%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 13%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 13%);
+  --border: hsl(240, 5.9%, 90%);
+  --input: hsl(240, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(142, 76%, 36%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(38, 92%, 50%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(240, 10%, 13%);
+  --radius: 0.5rem;
+  --surface: hsl(0, 0%, 100%);
+  --text: hsl(240, 10%, 13%);
+  --error: hsl(0, 84%, 60%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(142, 76%, 36%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(38, 92%, 50%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --surface: hsl(240, 10%, 3.9%);
+  --text: hsl(0, 0%, 98%);
+  --error: hsl(0, 62.8%, 30.6%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Custom scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(240, 4.8%, 95.9%);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(240, 3.8%, 46.1%);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(240, 5%, 34%);
+  }
+
+  /* Focus styles for accessibility */
+  input:focus, 
+  select:focus, 
+  button:focus,
+  textarea:focus {
+    outline: 2px solid hsl(207, 90%, 54%);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Custom component styles */
+  .nav-link {
+    @apply text-gray-700 hover:bg-gray-100 transition-colors duration-200;
+  }
+
+  .nav-link.active {
+    @apply bg-primary text-white;
+  }
+
+  .language-btn {
+    @apply transition-colors duration-200;
+  }
+
+  .language-btn.active {
+    @apply bg-primary text-white;
+  }
+
+  /* Animation for smooth transitions */
+  .section-content {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { 
+      opacity: 0; 
+      transform: translateY(10px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+
+  /* Responsive sidebar behavior */
+  @media (max-width: 1023px) {
+    .sidebar-mobile {
+      transform: translateX(-100%);
+    }
+    
+    .main-content-mobile {
+      margin-left: 0 !important;
+    }
+  }
+
+  /* Custom card hover effects */
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-lg;
+  }
+
+  /* Status badge variations */
+  .status-active {
+    @apply bg-secondary/10 text-secondary;
+  }
+
+  .status-inactive {
+    @apply bg-gray-100 text-gray-600;
+  }
+
+  .status-warning {
+    @apply bg-accent/10 text-accent;
+  }
+
+  .status-error {
+    @apply bg-error/10 text-error;
+  }
+
+  /* Alert variations */
+  .alert-error {
+    @apply border-l-4 border-error bg-error/5;
+  }
+
+  .alert-warning {
+    @apply border-l-4 border-accent bg-accent/5;
+  }
+
+  .alert-info {
+    @apply border-l-4 border-primary bg-primary/5;
+  }
+
+  .alert-success {
+    @apply border-l-4 border-secondary bg-secondary/5;
+  }
+}

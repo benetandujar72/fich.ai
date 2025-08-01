@@ -1,0 +1,282 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
+import { 
+  insertEmployeeSchema,
+  insertAttendanceRecordSchema,
+  insertAbsenceSchema,
+  insertSettingSchema 
+} from "@shared/schema";
+import { z } from "zod";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Dashboard routes
+  app.get("/api/dashboard/stats/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const stats = await storage.getDashboardStats(institutionId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
+    }
+  });
+
+  // Institution routes
+  app.get("/api/institutions", isAuthenticated, async (req, res) => {
+    try {
+      const institutions = await storage.getInstitutions();
+      res.json(institutions);
+    } catch (error) {
+      console.error("Error fetching institutions:", error);
+      res.status(500).json({ message: "Failed to fetch institutions" });
+    }
+  });
+
+  app.get("/api/institutions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const institution = await storage.getInstitution(id);
+      if (!institution) {
+        return res.status(404).json({ message: "Institution not found" });
+      }
+      res.json(institution);
+    } catch (error) {
+      console.error("Error fetching institution:", error);
+      res.status(500).json({ message: "Failed to fetch institution" });
+    }
+  });
+
+  // Employee routes
+  app.get("/api/employees/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { search } = req.query;
+      
+      let employees;
+      if (search && typeof search === 'string') {
+        employees = await storage.searchEmployees(institutionId, search);
+      } else {
+        employees = await storage.getEmployees(institutionId);
+      }
+      
+      res.json(employees);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      res.status(500).json({ message: "Failed to fetch employees" });
+    }
+  });
+
+  app.get("/api/employees/single/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const employee = await storage.getEmployee(id);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      res.json(employee);
+    } catch (error) {
+      console.error("Error fetching employee:", error);
+      res.status(500).json({ message: "Failed to fetch employee" });
+    }
+  });
+
+  app.post("/api/employees", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertEmployeeSchema.parse(req.body);
+      const employee = await storage.createEmployee(validatedData);
+      res.status(201).json(employee);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid employee data", errors: error.errors });
+      }
+      console.error("Error creating employee:", error);
+      res.status(500).json({ message: "Failed to create employee" });
+    }
+  });
+
+  app.put("/api/employees/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertEmployeeSchema.partial().parse(req.body);
+      const employee = await storage.updateEmployee(id, validatedData);
+      res.json(employee);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid employee data", errors: error.errors });
+      }
+      console.error("Error updating employee:", error);
+      res.status(500).json({ message: "Failed to update employee" });
+    }
+  });
+
+  app.delete("/api/employees/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteEmployee(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      res.status(500).json({ message: "Failed to delete employee" });
+    }
+  });
+
+  // Schedule routes
+  app.get("/api/schedules/:employeeId", isAuthenticated, async (req, res) => {
+    try {
+      const { employeeId } = req.params;
+      const schedules = await storage.getEmployeeSchedules(employeeId);
+      res.json(schedules);
+    } catch (error) {
+      console.error("Error fetching schedules:", error);
+      res.status(500).json({ message: "Failed to fetch schedules" });
+    }
+  });
+
+  // Attendance routes
+  app.get("/api/attendance/:employeeId", isAuthenticated, async (req, res) => {
+    try {
+      const { employeeId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      
+      const records = await storage.getAttendanceRecords(employeeId, start, end);
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      res.status(500).json({ message: "Failed to fetch attendance records" });
+    }
+  });
+
+  app.post("/api/attendance", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertAttendanceRecordSchema.parse(req.body);
+      const record = await storage.createAttendanceRecord(validatedData);
+      res.status(201).json(record);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid attendance data", errors: error.errors });
+      }
+      console.error("Error creating attendance record:", error);
+      res.status(500).json({ message: "Failed to create attendance record" });
+    }
+  });
+
+  app.get("/api/attendance/institution/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { date } = req.query;
+      const targetDate = date ? new Date(date as string) : new Date();
+      
+      const attendance = await storage.getInstitutionAttendance(institutionId, targetDate);
+      res.json(attendance);
+    } catch (error) {
+      console.error("Error fetching institution attendance:", error);
+      res.status(500).json({ message: "Failed to fetch institution attendance" });
+    }
+  });
+
+  // Absence routes
+  app.get("/api/absences", isAuthenticated, async (req, res) => {
+    try {
+      const { employeeId, institutionId } = req.query;
+      const absences = await storage.getAbsences(
+        employeeId as string, 
+        institutionId as string
+      );
+      res.json(absences);
+    } catch (error) {
+      console.error("Error fetching absences:", error);
+      res.status(500).json({ message: "Failed to fetch absences" });
+    }
+  });
+
+  app.post("/api/absences", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertAbsenceSchema.parse(req.body);
+      const absence = await storage.createAbsence(validatedData);
+      res.status(201).json(absence);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid absence data", errors: error.errors });
+      }
+      console.error("Error creating absence:", error);
+      res.status(500).json({ message: "Failed to create absence" });
+    }
+  });
+
+  // Alert routes
+  app.get("/api/alerts/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const alerts = await storage.getActiveAlerts(institutionId);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
+  app.put("/api/alerts/:id/resolve", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user.claims.sub;
+      const alert = await storage.resolveAlert(id, userId);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error resolving alert:", error);
+      res.status(500).json({ message: "Failed to resolve alert" });
+    }
+  });
+
+  // Settings routes
+  app.get("/api/settings/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const settings = await storage.getSettings(institutionId);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.put("/api/settings/:institutionId/:key", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId, key } = req.params;
+      const { value } = req.body;
+      
+      const setting = await storage.upsertSetting({
+        institutionId,
+        key,
+        value: String(value),
+      });
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating setting:", error);
+      res.status(500).json({ message: "Failed to update setting" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}

@@ -1169,7 +1169,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId } = req.params;
       const weekStart = req.query.weekStart as string;
       
+      console.log(`API Route - Getting schedule for userId: ${userId}, weekStart: ${weekStart}`);
+      
       const schedule = await storage.getWeeklySchedule(userId, weekStart);
+      
+      console.log(`API Route - Found ${schedule.length} schedule entries`);
+      
       res.json(schedule);
     } catch (error) {
       console.error("Error fetching weekly schedule:", error);

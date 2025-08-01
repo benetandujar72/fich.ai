@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { GraduationCap, Eye, EyeOff, Clock, QrCode, CreditCard, CheckCircle, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 
 const loginSchema = z.object({
@@ -40,6 +42,8 @@ export default function Login() {
   const [attendanceResult, setAttendanceResult] = useState<any>(null);
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const quickEmailRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState("attendance");
 
   // Update clock every second
   useEffect(() => {
@@ -49,6 +53,21 @@ export default function Login() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Focus on quick email input when attendance tab is selected
+  useEffect(() => {
+    if (activeTab === "attendance" && quickEmailRef.current) {
+      setTimeout(() => {
+        quickEmailRef.current?.focus();
+      }, 100);
+    }
+  }, [activeTab]);
+
+  // Fetch users for dropdown
+  const { data: users } = useQuery({
+    queryKey: ["/api/users/all"],
+    enabled: true,
+  });
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -141,7 +160,7 @@ export default function Login() {
         {/* Login and Quick Attendance Tabs */}
         <Card>
           <CardContent className="p-0">
-            <Tabs defaultValue="attendance" className="w-full">
+            <Tabs defaultValue="attendance" className="w-full" onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login" data-testid="login-tab">
                   {language === "ca" ? "Entrar" : "Entrar"}
@@ -290,12 +309,40 @@ export default function Login() {
                             {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
                           </FormLabel>
                           <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="nom@exemple.com"
-                              data-testid="quick-email-input"
-                              {...field}
-                            />
+                            <div className="space-y-2">
+                              {/* User selection dropdown */}
+                              {users && users.length > 0 && (
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                  }}
+                                  data-testid="quick-user-select"
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={language === "ca" ? "Selecciona un usuari..." : "Selecciona un usuario..."} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {users.map((user: any) => (
+                                      <SelectItem key={user.id} value={user.email}>
+                                        {user.firstName} {user.lastName} - {user.email}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
+                              
+                              {/* Manual email input */}
+                              <div className="text-center text-sm text-muted-foreground">
+                                {language === "ca" ? "o escriu manualment:" : "o escribe manualmente:"}
+                              </div>
+                              <Input
+                                ref={quickEmailRef}
+                                type="email"
+                                placeholder="nom@exemple.com"
+                                data-testid="quick-email-input"
+                                {...field}
+                              />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>

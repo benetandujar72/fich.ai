@@ -228,6 +228,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // All users route for quick attendance dropdown
+  app.get("/api/users/all", async (req, res) => {
+    try {
+      const users = await storage.getAllUsersForDropdown();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users for dropdown:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // Quick authentication endpoint
   app.post('/api/quick-auth', async (req, res) => {
     try {

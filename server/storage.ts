@@ -525,6 +525,20 @@ export class DatabaseStorage implements IStorage {
     
     return record || null;
   }
+
+  // Get all users for dropdown (simplified data)
+  async getAllUsersForDropdown(): Promise<any[]> {
+    return await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      })
+      .from(users)
+      .where(eq(users.role, "employee"))
+      .orderBy(asc(users.firstName), asc(users.lastName));
+  }
 }
 
 export const storage = new DatabaseStorage();

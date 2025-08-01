@@ -121,44 +121,9 @@ export default function Login() {
           type: (authResponse as any).nextAction // "check-in" or "check-out"
         });
 
-        // Create formatted result for modal
-        const now = new Date();
-        const currentTime = now.toLocaleTimeString("ca-ES", {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-        const currentDate = now.toLocaleDateString("ca-ES", {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-
-        // Determine status based on time (assume work starts at 9:00)
-        const workStartTime = 9; // 9:00 AM
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
-        const isLate = (authResponse as any).nextAction === "check_in" && (currentHour > workStartTime || (currentHour === workStartTime && currentMinute > 0));
-        const isEarly = (authResponse as any).nextAction === "check_in" && currentHour < workStartTime;
-
-        const status = isLate ? 'late' : isEarly ? 'early' : 'on_time';
-        const statusMessage = isLate 
-          ? (language === "ca" ? "Arribada tardana" : "Llegada tardía")
-          : isEarly 
-          ? (language === "ca" ? "Arribada anticipada" : "Llegada anticipada")
-          : (language === "ca" ? "A l'hora" : "A tiempo");
-
-        // Store attendance result and show modal
-        setAttendanceResult({
-          type: (authResponse as any).nextAction,
-          time: currentTime,
-          date: currentDate,
-          employeeName: `${(authResponse as any).user.firstName} ${(authResponse as any).user.lastName}`,
-          status: status,
-          statusMessage: statusMessage,
-          record: attendanceResponse
-        });
+        // Use the response directly from the server which already has all the formatted data
+        console.log("Attendance response:", attendanceResponse);
+        setAttendanceResult(attendanceResponse);
         setShowAttendanceModal(true);
 
         // Clear form

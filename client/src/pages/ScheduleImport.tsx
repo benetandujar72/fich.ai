@@ -155,9 +155,10 @@ export default function ScheduleImport() {
     setImportResults(null);
 
     try {
-      const response = await apiRequest('/api/schedule-import/test-real', 'POST', {});
+      const response = await apiRequest('POST', '/api/schedule-import/test-real', {});
+      const result = await response.json();
 
-      setImportResults(response);
+      setImportResults(result);
       
       // Refresh statistics
       queryClient.invalidateQueries({ 
@@ -166,7 +167,7 @@ export default function ScheduleImport() {
       
       toast({
         title: language === "ca" ? "Prova completada" : "Prueba completada",
-        description: `${response.sessionsImported} sessions del fitxer real importades correctament`,
+        description: `${result.sessionsImported} sessions del fitxer real importades correctament`,
       });
     } catch (error) {
       console.error('Test import error:', error);
@@ -257,7 +258,7 @@ export default function ScheduleImport() {
                         <SelectValue placeholder={language === "ca" ? "Selecciona curs" : "Selecciona curso"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {academicYears.map((year: any) => (
+                        {(academicYears as any[]).map((year: any) => (
                           <SelectItem key={year.id} value={year.id}>
                             {year.name}
                           </SelectItem>
@@ -446,7 +447,7 @@ export default function ScheduleImport() {
                           <SelectValue placeholder={language === "ca" ? "Selecciona..." : "Selecciona..."} />
                         </SelectTrigger>
                         <SelectContent>
-                          {academicYears.map((year: any) => (
+                          {(academicYears as any[]).map((year: any) => (
                             <SelectItem key={year.id} value={year.id}>
                               {year.name}
                             </SelectItem>
@@ -461,7 +462,7 @@ export default function ScheduleImport() {
                           <SelectValue placeholder={language === "ca" ? "Selecciona..." : "Selecciona..."} />
                         </SelectTrigger>
                         <SelectContent>
-                          {academicYears.map((year: any) => (
+                          {(academicYears as any[]).map((year: any) => (
                             <SelectItem key={year.id} value={year.id}>
                               {year.name}
                             </SelectItem>

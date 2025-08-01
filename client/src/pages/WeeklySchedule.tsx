@@ -46,16 +46,22 @@ export default function WeeklySchedule() {
   };
 
   const getTimeForHour = (hour: number): string => {
-    // Standard Spanish school schedule
+    // Institut Bitàcola schedule according to specifications
     const times = [
-      "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-11:30", // Break
-      "11:30-12:30", "12:30-13:30", "13:30-14:30", "14:30-15:30"
+      "08:00-09:00", // 1a hora
+      "09:00-10:00", // 2a hora  
+      "10:00-11:00", // 3a hora
+      "11:30-12:30", // 4a hora (després del pati 11:00-11:30)
+      "12:30-13:30", // 5a hora
+      "13:30-14:30", // 6a hora
+      "15:30-16:30", // 7a hora (després del dinar 14:30-15:30)
+      "16:30-17:30"  // 8a hora
     ];
     return times[hour - 1] || `${7 + hour}:00-${8 + hour}:00`;
   };
 
   const isBreakTime = (hour: number): boolean => {
-    return hour === 4; // 11:00-11:30 break
+    return false; // No break time rows, just time gaps
   };
 
   const getTotalHours = (): { lective: number; nonLective: number } => {
@@ -183,62 +189,73 @@ export default function WeeklySchedule() {
                 </tr>
               </thead>
               <tbody>
-                {hourPeriods.map((hour) => (
-                  <tr key={hour} className={isBreakTime(hour) ? "bg-yellow-50 dark:bg-yellow-900/10" : ""}>
-                    <td className="border p-2 text-sm font-medium">
-                      <div>{hour}ª</div>
-                      <div className="text-xs text-muted-foreground">
-                        {getTimeForHour(hour)}
-                      </div>
-                    </td>
-                    {weekDays.map((day, dayIndex) => {
-                      const dayOfWeek = dayIndex + 1; // Monday = 1
-                      const session = getSessionForSlot(dayOfWeek, hour);
-                      
-                      if (isBreakTime(hour)) {
-                        return (
-                          <td key={dayIndex} className="border p-2 text-center text-sm text-muted-foreground">
-                            {language === "ca" ? "Pati" : "Recreo"}
-                          </td>
-                        );
-                      }
-                      
-                      if (!session) {
-                        return (
-                          <td key={dayIndex} className="border p-2 text-center text-muted-foreground">
-                            -
-                          </td>
-                        );
-                      }
-                      
-                      return (
-                        <td key={dayIndex} className="border p-2">
-                          <div className={`p-2 rounded text-sm ${
-                            session.isLectiveHour 
-                              ? 'bg-blue-100 dark:bg-blue-900/30 border-l-4 border-l-blue-500'
-                              : 'bg-orange-100 dark:bg-orange-900/30 border-l-4 border-l-orange-500'
-                          }`}>
-                            <div className="font-medium flex items-center gap-1">
-                              <BookOpen className="h-3 w-3" />
-                              {session.subjectName || session.subjectCode}
-                            </div>
-                            {session.groupCode && (
-                              <div className="text-xs flex items-center gap-1 mt-1">
-                                <Users className="h-3 w-3" />
-                                {session.groupCode}
-                              </div>
-                            )}
-                            {session.classroomCode && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {session.classroomCode}
-                              </div>
-                            )}
+                {hourPeriods.map((hour) => {
+                  // Add visual separator after 3rd hour (pati) and 6th hour (dinar)
+                  const showSeparator = hour === 3 || hour === 6;
+                  
+                  return (
+                    <React.Fragment key={hour}>
+                      <tr>
+                        <td className="border p-2 text-sm font-medium">
+                          <div>{hour}ª</div>
+                          <div className="text-xs text-muted-foreground">
+                            {getTimeForHour(hour)}
                           </div>
                         </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                        {weekDays.map((day, dayIndex) => {
+                          const dayOfWeek = dayIndex + 1; // Monday = 1
+                          const session = getSessionForSlot(dayOfWeek, hour);
+                          
+                          if (!session) {
+                            return (
+                              <td key={dayIndex} className="border p-2 text-center text-muted-foreground">
+                                -
+                              </td>
+                            );
+                          }
+                          
+                          return (
+                            <td key={dayIndex} className="border p-2">
+                              <div className={`p-2 rounded text-sm ${
+                                session.isLectiveHour 
+                                  ? 'bg-blue-100 dark:bg-blue-900/30 border-l-4 border-l-blue-500'
+                                  : 'bg-orange-100 dark:bg-orange-900/30 border-l-4 border-l-orange-500'
+                              }`}>
+                                <div className="font-medium flex items-center gap-1">
+                                  <BookOpen className="h-3 w-3" />
+                                  {session.subjectName || session.subjectCode}
+                                </div>
+                                {session.groupCode && (
+                                  <div className="text-xs flex items-center gap-1 mt-1">
+                                    <Users className="h-3 w-3" />
+                                    {session.groupCode}
+                                  </div>
+                                )}
+                                {session.classroomCode && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {session.classroomCode}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {showSeparator && (
+                        <tr className="bg-yellow-50 dark:bg-yellow-900/10">
+                          <td className="border p-1 text-xs text-center text-muted-foreground">
+                            {hour === 3 ? (language === "ca" ? "Pati" : "Recreo") : (language === "ca" ? "Dinar" : "Comida")}
+                          </td>
+                          {weekDays.map((_, dayIndex) => (
+                            <td key={dayIndex} className="border p-1 text-xs text-center text-muted-foreground">
+                              {hour === 3 ? "11:00-11:30" : "14:30-15:30"}
+                            </td>
+                          ))}
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

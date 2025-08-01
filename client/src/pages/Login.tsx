@@ -347,7 +347,7 @@ export default function Login() {
                           <FormControl>
                             <div className="space-y-2">
                               {/* User selection dropdown */}
-                              {users && users.length > 0 && (
+                              {users && Array.isArray(users) && users.length > 0 && (
                                 <Select
                                   onValueChange={(value) => {
                                     field.onChange(value);

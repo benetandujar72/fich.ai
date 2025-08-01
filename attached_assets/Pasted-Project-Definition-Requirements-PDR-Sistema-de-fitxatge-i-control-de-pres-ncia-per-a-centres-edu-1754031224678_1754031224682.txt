@@ -1,0 +1,169 @@
+Project Definition Requirements (PDR) – Sistema de fitxatge i control de presència per a centres educatius
+Introducció
+Els centres educatius catalans estan obligats a registrar la jornada laboral diària dels treballadors que tenen una relació laboral (professors, administratius, personal de serveis, etc.). A partir del Reial decret llei 8/2019 es va modificar l’article 34.9 de l’Estatut dels Treballadors perquè les empreses garanteixin un registre diari de la jornada que inclogui les hores d’inici i de finalització. Aquest registre s’ha d’organitzar mitjançant la negociació col·lectiva o un acord d’empresa i s’ha de conservar durant quatre anys per estar a disposició dels treballadors, dels seus representants i de la Inspecció de Treball
+boe.es
+. En el cas dels centres d’ensenyament, el conveni col·lectiu nacional per als centres de règim general regula específicament el control i registre de l’horari: el registre horari diari s’aplica a totes les persones amb contracte laboral (s’exclouen autònoms, religiosos i l’alta direcció) i ha d’incloure les hores lectives i no lectives del personal docent
+boe.es
+. L’empresa ha de fixar l’horari de cada docent a l’inici de curs, després de consultar la representació legal dels treballadors, i ha d’establir l’hora d’entrada i de sortida
+boe.es
+. La presència fora d’aquests horaris no es considera temps de treball llevat que l’empresa encarregui o autoritzi l’activitat, i s’ha de registrar l’endemà
+boe.es
+.
+
+Pel que fa a la protecció de dades, el tractament de la informació de presència es basa en el compliment d’una obligació legal (article 6.1.c del RGPD); per tant, no cal el consentiment dels treballadors, però sí informar-los sobre l’existència del registre i la seva finalitat
+aepd.es
+. L’Agència Espanyola de Protecció de Dades (AEPD) recomana utilitzar el sistema menys intrusiu possible, no deixar els registres a la vista de tercers i garantir que les dades no s’emprin per a altres finalitats com ara la geolocalització
+aepd.es
+. El principi de minimització de dades obliga a recollir només la informació necessària i a conservar-la durant el termini legalment establert (quatre anys) i després eliminar-la
+figueras.legal
+. Els treballadors tenen dret a accedir, rectificar i limitar el tractament de les seves dades
+figueras.legal
+. La utilització de dades biomètriques (per exemple, empremtes dactilars o reconeixement facial) és especialment sensible i només s’ha de fer servir quan sigui estrictament necessari; l’AEPD aconsella optar per sistemes d’autenticació (un a un) en comptes de sistemes d’identificació (un a molts) i avaluar els riscos mitjançant una anàlisi d’impacte
+figueras.legal
+.
+
+Aquest document recull els requisits per dissenyar una aplicació de fitxatge i control de presència destinada a centres educatius. S’hi inclou la normativa vigent, les necessitats funcionals i de protecció de dades i una proposta de sistema d’alertes i de gestió intel·ligent de les absències.
+
+Context normatiu i requisits legals
+Obligacions de registre horari en centres educatius
+Aspecte	Obligació legal	Referències
+Àmbit personal	S’ha de registrar la jornada diària de totes les persones treballadores amb contracte laboral. Queden fora les persones sense relació laboral (autònoms, religiosos) i l’alta direcció
+boe.es
+.	Art. 34.9 Estatut dels Treballadors, Reial decret llei 8/2019; Conveni col·lectiu 2024
+boe.es
+Calendari i horari	L’empresa estableix l’horari de cada treballador a l’inici del curs escolar, després de consultar la representació legal dels treballadors
+boe.es
+. En el cas del personal docent cal especificar l’horari lectiu i no lectiu
+boe.es
+.	Conveni col·lectiu 2024
+boe.es
+Registre de jornada	El control horari diari ha d’incloure la jornada total de la persona treballadora, amb l’hora d’entrada i de sortida
+boe.es
+. La presència fora de l’horari general només es considera temps de treball si l’empresa ho autoritza; en aquest cas s’ha de comunicar per tal que s’enregistri
+boe.es
+.	Conveni col·lectiu 2024
+boe.es
+Sistemes de registre	L’empresa pot triar lliurement el sistema (paper, digital, dispositiu mòbil, etc.), però ha de consultar la representació dels treballadors i complir amb la normativa de protecció de dades
+boe.es
+. Els registres han d’estar disponibles per als treballadors, els seus representants i la Inspecció de Treball durant quatre anys
+boe.es
+.	Conveni col·lectiu 2024
+boe.es
+; Art. 34.9 ET
+boe.es
+Tractament de dades	El registre es basa en l’obligació legal; no cal consentiment, però sí informació als treballadors
+aepd.es
+. Cal complir els principis de minimització, confidencialitat i limitació de la finalitat
+aepd.es
+figueras.legal
+.	RGPD; LOPDGDD; Guies de l’AEPD
+Biometria i geolocalització	La utilització de dades biomètriques per al control horari és considerada sensible. S’ha de justificar la seva necessitat i utilitzar preferentment sistemes d’autenticació. L’AEPD recomana optar per mètodes menys intrusius i realitzar una avaluació d’impacte
+figueras.legal
+. La geolocalització només s’ha de fer servir per verificar l’hora d’entrada i sortida i no per rastrejar moviments
+aepd.es
+.	Guies de l’AEPD
+
+Implicacions per al disseny del sistema
+Inscripció de centres i anys: cada centre educatiu ha de disposar d’un calendari escolar i laboral propi, i l’aplicació ha de permetre configurar diferents cursos acadèmics. L’horari de cada docent s’ha de definir al principi de cada curs, incloent-hi hores lectives i no lectives.
+
+Política de retenció de dades: els registres de fitxatge s’han de conservar durant quatre anys i després eliminar-se de manera segura
+boe.es
+.
+
+Informació a l’usuari: els docents i personal han d’estar informats de la finalitat del registre, la base legal (compliment d’obligació legal), el període de conservació i els seus drets (accés, rectificació, oposició i supressió). Aquesta informació es pot integrar a l’avís de privacitat de l’aplicació.
+
+Confidencialitat i accés: el sistema ha de garantir que els registres no estiguin visibles per a tercers i que només hi puguin accedir el treballador, els seus representants, l’administrador del centre i els inspectors autoritzats
+figueras.legal
+.
+
+Minimització de dades: l’aplicació només ha de recollir dades essencials (identificador del docent, dia i hora d’entrada/sortida, motiu de l’absència). No s’han d’emmagatzemar dades de geolocalització o itineraris, excepte per verificar la ubicació puntual quan el fitxatge es fa fora del centre, i en tot cas s’ha d’assegurar que no es faci un seguiment continu
+aepd.es
+.
+
+Biometria opcional: si s’ofereix un mòdul biomètric, s’ha d’implementar com a opció amb autenticació (un a un) i requereix una avaluació d’impacte i justificació documental, respectant l’article 9 del RGPD
+figueras.legal
+.
+
+Requisits funcionals de l’aplicació
+1. Gestió multiinstitut i multi‑curs
+Gestió de centres: l’aplicació ha de permetre crear i administrar múltiples centres educatius dins d’un mateix sistema. Cada centre tindrà el seu calendari escolar, períodes lectius i no lectius, i la seva pròpia base de docents i personal.
+
+Cursos acadèmics: cada centre ha de poder definir cursos acadèmics (p.ex. 2024‑2025) amb dates de començament i fi. El sistema ha de mantenir històrics de cursos per consultar registres passats durant el període de conservació.
+
+Rols d’usuari: hi haurà tres nivells de rols:
+
+Superadministrador: gestiona tots els centres, assigna rols, configura la política global, consulta estadístiques agregades i crea nous centres.
+
+Administrador de centre: gestiona els docents i el personal del seu centre (alta, baixa i modificació), defineix els horaris individuals i gestiona les alertes i incidències.
+
+Usuari (docent o personal): pot fitxar l’entrada i sortida, indicar el motiu d’una absència o incidència i consultar el seu propi registre.
+
+2. Gestió de treballadors i horaris
+CRUD de treballadors: l’administrador de centre podrà crear, llegir, actualitzar i eliminar registres de personal. Cada registre inclourà: nom complet, número d’identificació (DNI/NIE), centre assignat, rol (docent, administratiu, servei), tipus de jornada (completa o parcial), calendari de feina i permisos d’usuari.
+
+Importació de dades: possibilitat d’importar llistes de treballadors (p.ex. fitxer CSV/Excel) i els seus horaris assignats, així com exportar dades per a auditories.
+
+Horaris diaris personalitzats: cada docent disposarà d’un horari diari que especifiqui les hores lectives i no lectives. L’administrador podrà modificar aquest horari a l’inici de cada curs o durant el curs quan s’acordi un canvi amb la representació dels treballadors.
+
+Calendari de guàrdies: l’aplicació ha d’incorporar la gestió de guàrdies per cobrir absències; les guàrdies es generaran a partir dels horaris i disponibilitats.
+
+3. Fitxatge i registres de jornada
+Mètodes de fitxatge: el sistema permetrà diverses modalitats de fitxatge per recollir la informació de manera segura:
+
+Terminal físic (lector de targetes, codis QR o dispositiu amb codi personal). Evitar l’ús de biometria, i si s’utilitza, oferir-ho com a mètode d’autenticació opcional i no obligatori
+figueras.legal
+.
+
+Aplicació web o mòbil: l’usuari podrà registrar l’entrada i la sortida des del seu dispositiu dins del centre. Quan es permeti el fitxatge fora del centre (p.ex. per sortides escolars), es podrà capturar la geolocalització puntual per verificar el lloc però mai rastrejar moviments continus
+aepd.es
+.
+
+Registre d’incidències: els treballadors podran indicar motius com baixa mèdica, absència per motius personals, sortida autoritzada, reunió fora del centre o altres incidències. L’administrador podrà registrar absències d’ofici (p.ex. baixa mèdica) i adjuntar documentació justificativa.
+
+Alertes de fitxatge: el sistema generarà alertes automàtiques quan:
+
+No es registri l’entrada o sortida en el marge establert (incidència de no fitxatge o fitxatge tardà).
+
+Es registri un retard respecte a l’hora d’entrada establerta.
+
+Es detecti una absència sense justificar.
+
+Gestió de guàrdies automàtica: quan es detecti una absència sense fitxatge o una absència prevista, el sistema generarà una llista de docents disponibles per cobrir la guàrdia en funció dels seus horaris i de les preferències definides per l’administrador. L’aplicació enviarà notificacions al professorat assignat per informar-los de la guàrdia.
+
+Flux d’autorització: el personal pot sol·licitar sortides o modificacions d’horari. L’administrador (o cap d’estudis) revisarà i aprovarà/rebutjarà aquestes sol·licituds. Els canvis aprovats quedaran registrats per a possibles inspeccions.
+
+4. Sistema d’alertes i intel·ligència artificial
+Paràmetres personalitzables: l’administrador podrà definir els llindars que generen alertes (p.ex. 5 minuts de tolerància per a retards, nombre màxim de retard al mes, etc.) i configurar l’horari límit per rebre notificacions.
+
+Aprenentatge sobre absències: es pot implementar una funcionalitat d’intel·ligència artificial (IA) que identifiqui patrons d’absència (p.ex. repetides en determinats dies o franges). L’IA pot suggerir mesures preventives (p.ex. reforç en guàrdies) o recomanar adaptacions de l’horari.
+
+Notificacions intel·ligents: el sistema pot aprendre les preferències dels docents (disponibilitat, franja de guàrdies) i enviar notificacions de guàrdia a aquells que compleixin els requisits. S’han d’evitar decisions automàtiques que afectin els drets dels treballadors; sempre hi haurà una revisió humana abans d’assignar guàrdies. Les recomanacions de la IA han de basar-se en dades de presència i absència, no en altres dades personals, per complir amb el RGPD.
+
+5. Estadístiques i informes
+Informes personalitzats: l’aplicació ha de generar informes filtrats per intervals de dates, per persona, per motiu d’absència o per tipus de jornada. Les estadístiques inclouran hores treballades, retards, absències justificades/no justificades i guàrdies realitzades.
+
+Quadre de comandament: l’administrador i el superadministrador disposaran d’un quadre de comandament amb indicadors com percentatge d’assistència, mitjana de retards, comparativa entre centres i tendències per períodes de temps. Cal assegurar que les dades es mostren de manera agregada per protegir la confidencialitat.
+
+Exportació de dades: possibilitat d’exportar informes en format CSV o PDF per facilitar la presentació a la Inspecció de Treball o per a auditories internes.
+
+6. Seguretat i protecció de dades
+Seguretat per defecte: el sistema ha d’implementar mesures de seguretat tècniques i organitzatives (xifratge de dades en repòs i en trànsit, control d’accés basat en rols, autenticació robusta, registres d’accés). S’ha de limitar l’accés als registres a persones autoritzades i al mateix treballador
+figueras.legal
+.
+
+Privacitat per disseny: integrar els principis de privacitat per disseny des de la fase de desenvolupament. Això inclou minimitzar les dades recollides, pseudonimitzar els identificadors quan sigui possible i permetre la portabilitat de les dades per l’usuari.
+
+Gestió de consentiment: tot i que l’obligació de registre es basa en una obligació legal, les funcionalitats opcionals que requereixin dades addicionals (p.ex. mòdul biomètric, geolocalització fora del centre) han d’anar acompanyades del consentiment explícit i revocable del treballador.
+
+Avaluació d’impacte: en cas d’utilitzar biometria o IA per a decisions de gestió, cal realitzar una avaluació d’impacte de protecció de dades i documentar les mesures adoptades
+figueras.legal
+.
+
+Gestió de tercers: si es contracta un proveïdor extern per al sistema de fitxatge, s’ha de signar un acord de tractament de dades (article 28 del RGPD) i garantir que el proveïdor compleix amb els requisits de seguretat i confidencialitat
+ineaf.es
+.
+
+Conclusió
+El desenvolupament d’una aplicació de fitxatge i control de presència per a centres educatius requereix integrar requisits legals, funcionals i de privacitat. La normativa vigent estableix l’obligatorietat de registrar les hores d’entrada i de sortida de tot el personal laboral i conservar els registres durant quatre anys
+boe.es
+. L’aplicació ha de permetre una gestió multiinstitut i multi‑curs, tenir un mòdul de gestió d’horaris i guàrdies, generar alertes i notificacions intel·ligents i assegurar la protecció de dades amb un disseny basat en la privacitat per defecte i la minimització de dades. Complint aquests requisits, els centres educatius podran gestionar de manera eficient l’assistència del personal docent i administratiu, facilitar les auditories i garantir la transparència amb els treballadors.

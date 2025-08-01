@@ -97,7 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const employee = await storage.createEmployee(req.body);
       res.json(employee);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating employee:", error);
       res.status(500).json({ message: "Failed to create employee" });
     }
@@ -150,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       const record = await storage.createAttendanceRecord(attendanceData);
       res.json(record);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating attendance record:", error);
       res.status(400).json({ message: "Invalid attendance data", error: error.message });
     }
@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/alerts/:id/resolve', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user?.id;
+      const userId = (req.user as any)?.id;
       const alert = await storage.resolveAlert(id, userId);
       res.json(alert);
     } catch (error) {
@@ -249,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (today === lastDate) {
           // Same day - check if user is checked in
-          nextAction = lastAttendance.type === "check-in" ? "check-out" : "check-in";
+          nextAction = lastAttendance.type === "check_in" ? "check-out" : "check-in";
         }
       }
 
@@ -266,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId, type } = req.body;
       
       const attendanceRecord = await storage.createAttendanceRecord({
-        userId,
+        employeeId: userId,
         type,
         timestamp: new Date(),
         method: "manual",
@@ -392,7 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let employees;
       if (search && typeof search === 'string') {
-        employees = await storage.searchEmployees(institutionId, search);
+        employees = await storage.getEmployees(institutionId, search);
       } else {
         employees = await storage.getEmployees(institutionId);
       }
@@ -407,7 +407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/employees/single/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const employee = await storage.getEmployee(id);
+      const employee = await storage.getUser(id);
       if (!employee) {
         return res.status(404).json({ message: "Employee not found" });
       }

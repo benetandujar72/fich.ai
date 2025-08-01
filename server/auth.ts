@@ -115,15 +115,35 @@ export async function setupAuth(app: Express) {
     }
   });
 
-  // Logout route
-  app.post("/api/logout", (req, res) => {
-    req.logout((err) => {
+  // Logout routes (both GET and POST for compatibility)
+  const logoutHandler = (req: any, res: any) => {
+    req.logout((err: any) => {
       if (err) {
+        console.error("Logout error:", err);
         return res.status(500).json({ message: "Error en el logout" });
       }
-      res.json({ message: "Logout exitós" });
+      
+      // Destroy session completely
+      req.session.destroy((destroyErr: any) => {
+        if (destroyErr) {
+          console.error("Session destroy error:", destroyErr);
+        }
+        
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        
+        // Send response based on request type
+        if (req.method === 'GET') {
+          res.redirect('/');
+        } else {
+          res.json({ message: "Logout exitós" });
+        }
+      });
     });
-  });
+  };
+
+  app.post("/api/logout", logoutHandler);
+  app.get("/api/logout", logoutHandler);
 }
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {

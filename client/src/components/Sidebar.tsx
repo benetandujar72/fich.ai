@@ -86,8 +86,29 @@ export default function Sidebar() {
     },
   ].filter(item => item.show);
 
-  const handleLogout = () => {
-    window.location.href = '/api/logout';
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        // Force reload to clear all client state
+        window.location.href = '/';
+      } else {
+        console.error('Logout failed');
+        // Fallback to GET request
+        window.location.href = '/api/logout';
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback to GET request
+      window.location.href = '/api/logout';
+    }
   };
 
   return (

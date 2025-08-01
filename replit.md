@@ -8,6 +8,26 @@ EduPresència is a comprehensive attendance tracking and presence management sys
 
 Preferred communication style: Simple, everyday language.
 
+## Current Development Requirements (January 2025)
+
+### Database Instantiation Priority
+- Remove all mock/hardcoded data from development code
+- Create real database entities with proper relationships
+- Implement multi-year functionality for academic year management
+- Create test dataset: Institut Bitàcola with 20 teachers for 2025-2026 academic year
+
+### Missing Core Functionalities to Implement
+1. **Institution Management**: Create/edit institutions, multi-year support
+2. **Academic Year Management**: Create/manage academic years per institution
+3. **User Profile Management**: Complete user profile system
+4. **Advanced User Management**: Add administrators, manage roles
+5. **Employee Onboarding**: Complete employee creation workflow
+6. **Advanced Settings**: Institution-specific configurations
+7. **Data Seeding**: Real test data instead of mocks
+8. **Time Tracking Configuration**: QR codes, methods, thresholds
+9. **Advanced Reporting**: Multi-year reports, export functionality
+10. **Email Notification System**: Alert notifications via email
+
 ## System Architecture
 
 ### Full-Stack Monorepo Structure

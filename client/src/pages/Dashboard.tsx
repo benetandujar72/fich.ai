@@ -25,8 +25,8 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Mock institution ID - in real app, this would come from user context
-  const institutionId = user?.institutionId || "mock-institution-id";
+  // Get institution ID from authenticated user
+  const institutionId = user?.institutionId;
 
   const { data: stats, isLoading } = useQuery<{
     totalEmployees: number;

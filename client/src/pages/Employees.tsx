@@ -42,8 +42,8 @@ export default function Employees() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
-  // Mock institution ID - in real app, this would come from user context
-  const institutionId = user?.institutionId || "mock-institution-id";
+  // Get institution ID from authenticated user
+  const institutionId = user?.institutionId;
 
   const { data: employees = [], isLoading } = useQuery<Employee[]>({
     queryKey: ["/api/employees", institutionId, searchQuery],

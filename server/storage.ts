@@ -1,6 +1,7 @@
 import {
   users,
   institutions,
+  academicYears,
   employees,
   departments,
   schedules,
@@ -13,6 +14,8 @@ import {
   type UpsertUser,
   type Institution,
   type InsertInstitution,
+  type AcademicYear,
+  type InsertAcademicYear,
   type Employee,
   type InsertEmployee,
   type Schedule,
@@ -38,9 +41,11 @@ export interface IStorage {
 
   // Institution operations
   getInstitutions(): Promise<Institution[]>;
-  getInstitution(id: string): Promise<Institution | undefined>;
   createInstitution(institution: InsertInstitution): Promise<Institution>;
-  updateInstitution(id: string, institution: Partial<InsertInstitution>): Promise<Institution>;
+
+  // Academic year operations
+  getAcademicYears(institutionId: string): Promise<AcademicYear[]>;
+  createAcademicYear(academicYear: InsertAcademicYear): Promise<AcademicYear>;
   deleteInstitution(id: string): Promise<void>;
 
   // Employee operations
@@ -136,17 +141,49 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Employee operations
-  async getEmployees(institutionId: string): Promise<Employee[]> {
-    return await db
-      .select()
+  async getEmployees(institutionId: string, searchQuery?: string): Promise<Employee[]> {
+    let query = db
+      .select({
+        id: employees.id,
+        userId: employees.userId,
+        institutionId: employees.institutionId,
+        departmentId: employees.departmentId,
+        employeeId: employees.employeeId,
+        role: employees.role,
+        startDate: employees.startDate,
+        endDate: employees.endDate,
+        isActive: employees.isActive,
+        createdAt: employees.createdAt,
+        updatedAt: employees.updatedAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl
+        },
+        department: {
+          id: departments.id,
+          name: departments.name
+        }
+      })
       .from(employees)
-      .where(eq(employees.institutionId, institutionId))
-      .orderBy(asc(employees.fullName));
-  }
+      .leftJoin(users, eq(employees.userId, users.id))
+      .leftJoin(departments, eq(employees.departmentId, departments.id))
+      .where(eq(employees.institutionId, institutionId));
 
-  async getEmployee(id: string): Promise<Employee | undefined> {
-    const [employee] = await db.select().from(employees).where(eq(employees.id, id));
-    return employee;
+    if (searchQuery) {
+      query = query.where(
+        or(
+          sql`${users.firstName} ILIKE ${`%${searchQuery}%`}`,
+          sql`${users.lastName} ILIKE ${`%${searchQuery}%`}`,
+          sql`${users.email} ILIKE ${`%${searchQuery}%`}`,
+          sql`${employees.employeeId} ILIKE ${`%${searchQuery}%`}`
+        )
+      );
+    }
+
+    return await query.orderBy(asc(users.firstName), asc(users.lastName));
   }
 
   async createEmployee(employee: InsertEmployee): Promise<Employee> {
@@ -165,22 +202,6 @@ export class DatabaseStorage implements IStorage {
 
   async deleteEmployee(id: string): Promise<void> {
     await db.delete(employees).where(eq(employees.id, id));
-  }
-
-  async searchEmployees(institutionId: string, query: string): Promise<Employee[]> {
-    return await db
-      .select()
-      .from(employees)
-      .where(
-        and(
-          eq(employees.institutionId, institutionId),
-          or(
-            sql`${employees.fullName} ILIKE ${`%${query}%`}`,
-            sql`${employees.email} ILIKE ${`%${query}%`}`,
-            sql`${employees.dni} ILIKE ${`%${query}%`}`
-          )
-        )
-      );
   }
 
   // Schedule operations
@@ -402,6 +423,30 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return upserted;
+  }
+
+  // Institution operations
+  async getInstitutions(): Promise<Institution[]> {
+    return await db.select().from(institutions).orderBy(asc(institutions.name));
+  }
+
+  async createInstitution(institutionData: InsertInstitution): Promise<Institution> {
+    const [institution] = await db.insert(institutions).values(institutionData).returning();
+    return institution;
+  }
+
+  // Academic year operations
+  async getAcademicYears(institutionId: string): Promise<AcademicYear[]> {
+    return await db
+      .select()
+      .from(academicYears)
+      .where(eq(academicYears.institutionId, institutionId))
+      .orderBy(desc(academicYears.startDate));
+  }
+
+  async createAcademicYear(yearData: InsertAcademicYear): Promise<AcademicYear> {
+    const [academicYear] = await db.insert(academicYears).values(yearData).returning();
+    return academicYear;
   }
 
   // Dashboard statistics

@@ -29,8 +29,8 @@ export default function Reports() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Mock institution ID - in real app, this would come from user context
-  const institutionId = user?.institutionId || "mock-institution-id";
+  // Get institution ID from authenticated user
+  const institutionId = user?.institutionId;
 
   const reportTypes = [
     { 

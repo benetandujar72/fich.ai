@@ -15,6 +15,8 @@ import Attendance from "@/pages/Attendance";
 import Alerts from "@/pages/Alerts";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
+import InstitutionManagement from "@/pages/InstitutionManagement";
+import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -131,6 +133,24 @@ function Router() {
                 title={t("settings", language)}
               />
               <Settings />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/institutions" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "Gestió d'Institucions" : "Gestión de Instituciones"}
+              />
+              <InstitutionManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/academic-years" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "Gestió de Cursos Acadèmics" : "Gestión de Cursos Académicos"}
+              />
+              <AcademicYearManagement />
             </ProtectedRoute>
           } />
           

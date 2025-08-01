@@ -35,8 +35,8 @@ export default function Attendance() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
 
-  // Mock employee ID - in real app, this would come from user context
-  const employeeId = user?.id || "mock-employee-id";
+  // Get employee ID from authenticated user
+  const employeeId = user?.id;
 
   const { data: attendanceRecords = [], isLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ["/api/attendance", employeeId],

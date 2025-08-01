@@ -37,8 +37,8 @@ export default function Alerts() {
   const [lateToleranceMinutes, setLateToleranceMinutes] = useState(5);
   const [maxLatesPerMonth, setMaxLatesPerMonth] = useState(3);
 
-  // Mock institution ID - in real app, this would come from user context
-  const institutionId = user?.institutionId || "mock-institution-id";
+  // Get institution ID from authenticated user
+  const institutionId = user?.institutionId;
 
   const { data: alerts = [], isLoading } = useQuery({
     queryKey: ["/api/alerts", institutionId],

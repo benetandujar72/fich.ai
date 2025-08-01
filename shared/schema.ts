@@ -330,11 +330,19 @@ export const insertSettingSchema = createInsertSchema(settings).omit({
   updatedAt: true,
 });
 
+export const insertAcademicYearSchema = createInsertSchema(academicYears).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Institution = typeof institutions.$inferSelect;
 export type InsertInstitution = z.infer<typeof insertInstitutionSchema>;
+export type AcademicYear = typeof academicYears.$inferSelect;
+export type InsertAcademicYear = z.infer<typeof insertAcademicYearSchema>;
+export type Department = typeof departments.$inferSelect;
 export type Employee = typeof employees.$inferSelect;
 export type InsertEmployee = z.infer<typeof insertEmployeeSchema>;
 export type Schedule = typeof schedules.$inferSelect;

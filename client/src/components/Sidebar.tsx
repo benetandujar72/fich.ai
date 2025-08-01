@@ -10,7 +10,9 @@ import {
   BarChart3, 
   Settings,
   GraduationCap,
-  LogOut
+  LogOut,
+  Building,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,7 +26,8 @@ export default function Sidebar({ className }: SidebarProps) {
   const { language } = useLanguage();
   const { user } = useAuth();
 
-  const navigation = [
+  // Base navigation items available to all users
+  const baseNavigation = [
     { 
       name: t("dashboard", language), 
       href: "/dashboard", 
@@ -62,6 +65,24 @@ export default function Sidebar({ className }: SidebarProps) {
       testId: "nav-settings"
     },
   ];
+
+  // Additional management items for admins and superadmins
+  const managementNavigation = [
+    ...(user?.role === "superadmin" ? [{
+      name: language === "ca" ? "Institucions" : "Instituciones", 
+      href: "/institutions", 
+      icon: Building,
+      testId: "nav-institutions"
+    }] : []),
+    ...(user?.role === "admin" || user?.role === "superadmin" ? [{
+      name: language === "ca" ? "Cursos Acadèmics" : "Cursos Académicos", 
+      href: "/academic-years", 
+      icon: BookOpen,
+      testId: "nav-academic-years"
+    }] : []),
+  ];
+
+  const navigation = [...baseNavigation, ...managementNavigation];
 
   const handleLogout = () => {
     window.location.href = "/api/logout";

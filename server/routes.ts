@@ -27,6 +27,178 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Dashboard routes
+  app.get('/api/dashboard/stats/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const stats = await storage.getDashboardStats(institutionId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Institution management routes
+  app.get('/api/institutions', isAuthenticated, async (req, res) => {
+    try {
+      const institutions = await storage.getInstitutions();
+      res.json(institutions);
+    } catch (error) {
+      console.error("Error fetching institutions:", error);
+      res.status(500).json({ message: "Failed to fetch institutions" });
+    }
+  });
+
+  app.post('/api/institutions', isAuthenticated, async (req, res) => {
+    try {
+      const institution = await storage.createInstitution(req.body);
+      res.json(institution);
+    } catch (error) {
+      console.error("Error creating institution:", error);
+      res.status(500).json({ message: "Failed to create institution" });
+    }
+  });
+
+  // Academic years routes
+  app.get('/api/academic-years/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const academicYears = await storage.getAcademicYears(institutionId);
+      res.json(academicYears);
+    } catch (error) {
+      console.error("Error fetching academic years:", error);
+      res.status(500).json({ message: "Failed to fetch academic years" });
+    }
+  });
+
+  app.post('/api/academic-years', isAuthenticated, async (req, res) => {
+    try {
+      const academicYear = await storage.createAcademicYear(req.body);
+      res.json(academicYear);
+    } catch (error) {
+      console.error("Error creating academic year:", error);
+      res.status(500).json({ message: "Failed to create academic year" });
+    }
+  });
+
+  // Employee routes
+  app.get('/api/employees/:institutionId/:searchQuery?', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId, searchQuery } = req.params;
+      const employees = await storage.getEmployees(institutionId, searchQuery);
+      res.json(employees);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      res.status(500).json({ message: "Failed to fetch employees" });
+    }
+  });
+
+  app.post('/api/employees', isAuthenticated, async (req, res) => {
+    try {
+      const employee = await storage.createEmployee(req.body);
+      res.json(employee);
+    } catch (error) {
+      console.error("Error creating employee:", error);
+      res.status(500).json({ message: "Failed to create employee" });
+    }
+  });
+
+  app.patch('/api/employees/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const employee = await storage.updateEmployee(id, req.body);
+      res.json(employee);
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      res.status(500).json({ message: "Failed to update employee" });
+    }
+  });
+
+  app.delete('/api/employees/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteEmployee(id);
+      res.json({ message: "Employee deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      res.status(500).json({ message: "Failed to delete employee" });
+    }
+  });
+
+  // Attendance routes
+  app.get('/api/attendance/:employeeId', isAuthenticated, async (req, res) => {
+    try {
+      const { employeeId } = req.params;
+      const { startDate, endDate } = req.query;
+      const records = await storage.getAttendanceRecords(
+        employeeId, 
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching attendance records:", error);
+      res.status(500).json({ message: "Failed to fetch attendance records" });
+    }
+  });
+
+  app.post('/api/attendance', isAuthenticated, async (req, res) => {
+    try {
+      const record = await storage.createAttendanceRecord(req.body);
+      res.json(record);
+    } catch (error) {
+      console.error("Error creating attendance record:", error);
+      res.status(400).json({ message: "Invalid attendance data", error: error.message });
+    }
+  });
+
+  // Alerts routes
+  app.get('/api/alerts/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const alerts = await storage.getActiveAlerts(institutionId);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
+  app.patch('/api/alerts/:id/resolve', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.claims?.sub;
+      const alert = await storage.resolveAlert(id, userId);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error resolving alert:", error);
+      res.status(500).json({ message: "Failed to resolve alert" });
+    }
+  });
+
+  // Settings routes
+  app.get('/api/settings/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const settings = await storage.getSettings(institutionId);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.post('/api/settings', isAuthenticated, async (req, res) => {
+    try {
+      const setting = await storage.upsertSetting(req.body);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating setting:", error);
+      res.status(500).json({ message: "Failed to update setting" });
+    }
+  });
+
+  // Dashboard routes
   app.get("/api/dashboard/stats/:institutionId", isAuthenticated, async (req, res) => {
     try {
       const { institutionId } = req.params;

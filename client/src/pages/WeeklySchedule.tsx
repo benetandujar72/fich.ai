@@ -30,6 +30,14 @@ export default function WeeklySchedule() {
   // Get weekly schedule data
   const { data: scheduleData, isLoading, error } = useQuery({
     queryKey: ['/api/schedule/weekly', user?.id, format(currentWeek, 'yyyy-MM-dd')],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const response = await fetch(`/api/schedule/weekly/${user.id}/${format(currentWeek, 'yyyy-MM-dd')}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: !!user?.id,
   });
 

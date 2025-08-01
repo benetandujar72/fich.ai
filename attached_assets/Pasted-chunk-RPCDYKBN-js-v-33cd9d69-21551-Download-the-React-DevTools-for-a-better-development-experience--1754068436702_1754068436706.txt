@@ -1,0 +1,121 @@
+chunk-RPCDYKBN.js?v=33cd9d69:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+WeeklySchedule.tsx:37 WeeklySchedule - User ID: b10222e6-7aa4-4d92-b496-9985dc7ecffa
+WeeklySchedule.tsx:38 WeeklySchedule - Schedule Data: undefined
+WeeklySchedule.tsx:39 WeeklySchedule - Error: null
+WeeklySchedule.tsx:40 WeeklySchedule - Loading: true
+WeeklySchedule.tsx:37 WeeklySchedule - User ID: b10222e6-7aa4-4d92-b496-9985dc7ecffa
+WeeklySchedule.tsx:38 WeeklySchedule - Schedule Data: undefined
+WeeklySchedule.tsx:39 WeeklySchedule - Error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+WeeklySchedule.tsx:40 WeeklySchedule - Loading: false
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64
+react_jsx-dev-runtime.js?v=33cd9d69:64 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:29:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33cd9d69:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=fu_UPOSScCheDL_U7SPnp:50:42)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=33cd9d69:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=33cd9d69:61:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33cd9d69:2805:3)
+    at App
+printWarning @ react_jsx-dev-runtime.js?v=33cd9d69:64

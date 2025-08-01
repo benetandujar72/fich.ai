@@ -1163,11 +1163,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Weekly schedule routes
-  app.get("/api/schedule/weekly/:userId", isAuthenticated, async (req, res) => {
+  // Weekly schedule routes  
+  app.get("/api/schedule/weekly/:userId/:weekStart", isAuthenticated, async (req, res) => {
     try {
-      const { userId } = req.params;
-      const weekStart = req.query.weekStart as string;
+      const { userId, weekStart } = req.params;
       
       console.log(`API Route - Getting schedule for userId: ${userId}, weekStart: ${weekStart}`);
       

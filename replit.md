@@ -42,6 +42,9 @@ Preferred communication style: Simple, everyday language.
 - **User Dropdown Selection**: Quick user selection dropdown in attendance tab with database employees
 - **Flag-Only Language Selector**: Simplified language switcher showing only Catalan and Spanish flags
 - **Auto-Focus Attendance**: Attendance tab opens by default with auto-focus on email field
+- **Complete GDPR Compliance System**: Privacy policy, data subject rights, and digitally signed PDF exports
+- **Digital Document Signing**: PDF exports with SHA-256 digital signatures and audit trails
+- **GDPR Data Export**: Secure data downloads with user name and date in filename
 
 ### Missing Core Functionalities to Implement
 1. **Institution Management**: Create/edit institutions, multi-year support

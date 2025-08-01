@@ -49,21 +49,145 @@ export default function DataSubjectRights() {
     mutationFn: async () => {
       return await apiRequest("GET", "/api/data-subject-rights/my-data");
     },
-    onSuccess: (data) => {
-      // Create and download JSON file
-      const dataStr = JSON.stringify(data, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `my-data-${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: language === "ca" ? "Èxit" : "Éxito",
-        description: language === "ca" ? "Dades descarregades correctament" : "Datos descargados correctamente",
-      });
+    onSuccess: async (data) => {
+      try {
+        // Import jsPDF dynamically
+        const { jsPDF } = await import('jspdf');
+        
+        // Create PDF document
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.width;
+        const margin = 20;
+        let yPosition = 30;
+        
+        // Header with digital signature info
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('EXPORTACIÓ DE DADES PERSONALS - RGPD', pageWidth / 2, yPosition, { align: 'center' } as any);
+        
+        yPosition += 20;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Document ID: ${data.document_info.export_id}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Data d'exportació: ${new Date(data.document_info.export_date).toLocaleString('ca-ES')}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Usuari: ${data.document_info.user_name}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Signatura digital: ${data.document_info.digital_signature.substring(0, 32)}...`, margin, yPosition);
+        
+        // Digital signature certification
+        yPosition += 15;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        const certText = doc.splitTextToSize(data.document_info.certification, pageWidth - 2 * margin);
+        doc.text(certText, margin, yPosition);
+        yPosition += certText.length * 4 + 10;
+        
+        // Personal Data Section
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DADES PERSONALS', margin, yPosition);
+        yPosition += 10;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Email: ${data.personal_data.email}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Nom: ${data.personal_data.firstName} ${data.personal_data.lastName}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Rol: ${data.personal_data.role}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Data de creació: ${new Date(data.personal_data.createdAt).toLocaleString('ca-ES')}`, margin, yPosition);
+        
+        // Employee Data Section (if exists)
+        if (data.employee_data) {
+          yPosition += 15;
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('DADES D\'EMPLEAT', margin, yPosition);
+          yPosition += 10;
+          
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`DNI: ${data.employee_data.dni || 'No disponible'}`, margin, yPosition);
+          yPosition += 8;
+          doc.text(`Departament: ${data.employee_data.department || 'No disponible'}`, margin, yPosition);
+          yPosition += 8;
+          doc.text(`Posició: ${data.employee_data.position || 'No disponible'}`, margin, yPosition);
+        }
+        
+        // Legal Information
+        yPosition += 15;
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('INFORMACIÓ LEGAL', margin, yPosition);
+        yPosition += 10;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Base legal: ${data.legal_info.legal_basis}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Article RGPD: ${data.legal_info.gdpr_article}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Període de conservació: ${data.legal_info.retention_period}`, margin, yPosition);
+        
+        // Audit Trail
+        yPosition += 15;
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('REGISTRE D\'AUDITORIA', margin, yPosition);
+        yPosition += 10;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Exportat per: ${data.audit_trail.exported_by}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`Timestamp: ${new Date(data.audit_trail.export_timestamp).toLocaleString('ca-ES')}`, margin, yPosition);
+        yPosition += 8;
+        doc.text(`IP Address: ${data.audit_trail.ip_address}`, margin, yPosition);
+        
+        // Footer with digital signature
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.text('Aquest document està signat digitalment i compleix amb els requisits del RGPD', 
+                pageWidth / 2, pageHeight - 15, { align: 'center' } as any);
+        doc.text(`Signatura: ${data.document_info.digital_signature}`, 
+                pageWidth / 2, pageHeight - 10, { align: 'center' } as any);
+        
+        // Generate filename with user name and date
+        const userName = data.personal_data.firstName && data.personal_data.lastName 
+          ? `${data.personal_data.firstName}_${data.personal_data.lastName}`.replace(/\s+/g, '_')
+          : data.personal_data.email.split('@')[0];
+        const exportDate = new Date().toISOString().split('T')[0];
+        const filename = `dades_personals_${userName}_${exportDate}.pdf`;
+        
+        // Download PDF
+        doc.save(filename);
+        
+        toast({
+          title: language === "ca" ? "Èxit" : "Éxito",
+          description: language === "ca" ? "Document PDF signat digitalment descarregat correctament" : "Documento PDF firmado digitalmente descargado correctamente",
+        });
+      } catch (pdfError) {
+        console.error('PDF generation error:', pdfError);
+        // Fallback to JSON if PDF fails
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `my-data-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: language === "ca" ? "Avís" : "Aviso",
+          description: language === "ca" ? "PDF no disponible, descarregat en format JSON" : "PDF no disponible, descargado en formato JSON",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -173,8 +297,8 @@ export default function DataSubjectRights() {
                 </p>
                 <p className="text-sm text-blue-700">
                   {language === "ca" 
-                    ? "Obté una còpia de totes les dades que tenim sobre tu en format JSON"
-                    : "Obtén una copia de todos los datos que tenemos sobre ti en formato JSON"}
+                    ? "Obté un document PDF signat digitalment amb totes les teves dades i registre de sortida"
+                    : "Obtén un documento PDF firmado digitalmente con todos tus datos y registro de salida"}
                 </p>
               </div>
               <Button

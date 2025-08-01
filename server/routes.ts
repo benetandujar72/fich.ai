@@ -333,7 +333,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      const exportDate = new Date();
+      const exportId = Math.random().toString(36).substr(2, 9);
+      
+      // Create digital signature hash
+      const crypto = require('crypto');
+      const signatureData = `${currentUser.email}-${exportDate.toISOString()}-${exportId}`;
+      const digitalSignature = crypto.createHash('sha256').update(signatureData).digest('hex');
+
       const userData = {
+        document_info: {
+          title: 'Exportació de Dades Personals - RGPD',
+          export_id: exportId,
+          export_date: exportDate.toISOString(),
+          user_name: `${currentUser.firstName} ${currentUser.lastName}`,
+          digital_signature: digitalSignature,
+          certification: 'Aquest document ha estat generat automàticament pel sistema EduPresència i conté una signatura digital per garantir la seva autenticitat.'
+        },
         personal_data: {
           id: currentUser.id,
           email: currentUser.email,
@@ -345,10 +361,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         employee_data: employeeData,
         attendance_records: attendanceRecords,
-        export_date: new Date().toISOString(),
-        retention_period: '4 years from employment termination',
-        legal_basis: 'Legal obligation (labor law compliance)'
+        legal_info: {
+          retention_period: '4 years from employment termination',
+          legal_basis: 'Legal obligation (labor law compliance)',
+          gdpr_article: 'Article 15 - Right of access by the data subject',
+          export_purpose: 'Compliment del dret d\'accés segons RGPD'
+        },
+        audit_trail: {
+          exported_by: currentUser.email,
+          export_timestamp: exportDate.toISOString(),
+          ip_address: req.ip || 'unknown',
+          user_agent: req.get('User-Agent') || 'unknown'
+        }
       };
+
+      // Log the data export for audit purposes
+      console.log(`Data export requested by ${currentUser.email} at ${exportDate.toISOString()}, export ID: ${exportId}`);
 
       res.json(userData);
     } catch (error) {

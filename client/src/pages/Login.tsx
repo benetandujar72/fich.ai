@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -39,6 +39,16 @@ export default function Login() {
   const [showQuickPassword, setShowQuickPassword] = useState(false);
   const [attendanceResult, setAttendanceResult] = useState<any>(null);
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update clock every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -248,6 +258,25 @@ export default function Login() {
                   <p className="text-sm text-muted-foreground">
                     {language === "ca" ? "Registra l'entrada o sortida sense entrar al sistema" : "Registra entrada o salida sin entrar al sistema"}
                   </p>
+                  
+                  {/* Digital Clock */}
+                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                    <div className="text-3xl font-mono font-bold text-primary">
+                      {currentTime.toLocaleTimeString("ca-ES", {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {currentTime.toLocaleDateString("ca-ES", {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
                 </div>
 
                 <Form {...quickForm}>

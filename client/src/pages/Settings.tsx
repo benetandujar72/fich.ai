@@ -54,6 +54,14 @@ export default function Settings() {
   });
 
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true);
+  const [showAddAdminForm, setShowAddAdminForm] = useState(false);
+  const [newAdminData, setNewAdminData] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
+    role: "admin",
+    password: "prof123"
+  });
 
   const { data: settings = [] } = useQuery({
     queryKey: ["/api/settings", institutionId],
@@ -95,6 +103,37 @@ export default function Settings() {
   const { data: adminUsers = [], isLoading: usersLoading } = useQuery({
     queryKey: ["/api/users/admins", institutionId],
     enabled: !!institutionId,
+  });
+
+  const createAdminMutation = useMutation({
+    mutationFn: async (adminData: typeof newAdminData) => {
+      return await apiRequest("POST", `/api/users/admins`, {
+        ...adminData,
+        institutionId
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users/admins"] });
+      toast({
+        title: t("success", language),
+        description: language === "ca" ? "Administrador creat correctament" : "Administrador creado correctamente",
+      });
+      setShowAddAdminForm(false);
+      setNewAdminData({
+        email: "",
+        firstName: "",
+        lastName: "",
+        role: "admin",
+        password: "prof123"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("error", language),
+        description: error.message || (language === "ca" ? "Error creant l'administrador" : "Error creando el administrador"),
+        variant: "destructive",
+      });
+    },
   });
 
   const getRoleBadge = (role: string) => {
@@ -277,7 +316,10 @@ export default function Settings() {
             <CardTitle>
               {t("user_management", language)}
             </CardTitle>
-            <Button data-testid="add-admin-button">
+            <Button 
+              onClick={() => setShowAddAdminForm(true)}
+              data-testid="add-admin-button"
+            >
               <UserPlus className="mr-2 h-4 w-4" />
               {language === "ca" ? "Afegir administrador" : "Añadir administrador"}
             </Button>
@@ -391,6 +433,116 @@ export default function Settings() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Admin Dialog */}
+      {showAddAdminForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">
+                {language === "ca" ? "Afegir administrador" : "Añadir administrador"}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAddAdminForm(false)}
+                data-testid="close-admin-form"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="admin-email">Email</Label>
+                <Input
+                  id="admin-email"
+                  type="email"
+                  value={newAdminData.email}
+                  onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+                  placeholder="administrador@centre.edu"
+                  data-testid="admin-email-input"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="admin-firstname">
+                  {language === "ca" ? "Nom" : "Nombre"}
+                </Label>
+                <Input
+                  id="admin-firstname"
+                  value={newAdminData.firstName}
+                  onChange={(e) => setNewAdminData({...newAdminData, firstName: e.target.value})}
+                  data-testid="admin-firstname-input"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="admin-lastname">
+                  {language === "ca" ? "Cognoms" : "Apellidos"}
+                </Label>
+                <Input
+                  id="admin-lastname"
+                  value={newAdminData.lastName}
+                  onChange={(e) => setNewAdminData({...newAdminData, lastName: e.target.value})}
+                  data-testid="admin-lastname-input"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="admin-role">
+                  {language === "ca" ? "Rol" : "Rol"}
+                </Label>
+                <Select 
+                  value={newAdminData.role}
+                  onValueChange={(value) => setNewAdminData({...newAdminData, role: value})}
+                >
+                  <SelectTrigger id="admin-role" data-testid="admin-role-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">
+                      {language === "ca" ? "Administrador" : "Administrador"}
+                    </SelectItem>
+                    <SelectItem value="superadmin">
+                      {language === "ca" ? "Superadministrador" : "Superadministrador"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="bg-gray-50 p-3 rounded">
+                <p className="text-sm text-gray-600">
+                  {language === "ca" 
+                    ? "Contrasenya per defecte: prof123"
+                    : "Contraseña por defecto: prof123"}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowAddAdminForm(false)}
+                data-testid="cancel-admin-button"
+              >
+                {language === "ca" ? "Cancel·lar" : "Cancelar"}
+              </Button>
+              <Button
+                onClick={() => createAdminMutation.mutate(newAdminData)}
+                disabled={createAdminMutation.isPending || !newAdminData.email || !newAdminData.firstName}
+                data-testid="save-admin-button"
+              >
+                {createAdminMutation.isPending ? (
+                  language === "ca" ? "Creant..." : "Creando..."
+                ) : (
+                  language === "ca" ? "Crear" : "Crear"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

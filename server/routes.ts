@@ -228,6 +228,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/users/admins', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const currentUser = await storage.getUser(userId);
+      
+      if (!currentUser || (currentUser.role !== 'superadmin' && currentUser.role !== 'admin')) {
+        return res.status(403).json({ message: 'Insufficient permissions' });
+      }
+
+      const { email, firstName, lastName, role, password, institutionId } = req.body;
+
+      // Validate required fields
+      if (!email || !firstName || !lastName || !role || !institutionId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists with this email' });
+      }
+
+      // Create user
+      const hashedPassword = await bcrypt.hash(password || 'prof123', 10);
+      const newUser = await storage.createUser({
+        email,
+        firstName,
+        lastName,
+        role,
+        passwordHash: hashedPassword,
+        institutionId
+      });
+
+      res.json({ id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName, role: newUser.role });
+    } catch (error) {
+      console.error('Error creating admin user:', error);
+      res.status(500).json({ message: 'Failed to create admin user' });
+    }
+  });
+
   // All users route for quick attendance dropdown
   app.get("/api/users/all", async (req, res) => {
     try {

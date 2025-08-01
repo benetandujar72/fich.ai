@@ -26,7 +26,8 @@ import {
   UserPlus,
   Edit,
   Trash2,
-  Save
+  Save,
+  Users
 } from "lucide-react";
 
 interface CenterSettings {
@@ -311,14 +312,14 @@ export default function Settings() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : adminUsers.length === 0 ? (
+                ) : (adminUsers as any[]).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                       {language === "ca" ? "No hi ha usuaris administradors" : "No hay usuarios administradores"}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  adminUsers.map((admin: any) => (
+                  (adminUsers as any[]).map((admin: any) => (
                     <TableRow key={admin.id} data-testid={`admin-${admin.id}`}>
                       <TableCell>
                         <div className="flex items-center">

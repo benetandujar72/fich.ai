@@ -24,7 +24,8 @@ import {
   Info, 
   X,
   CheckCircle,
-  UserX
+  UserX,
+  Shield
 } from "lucide-react";
 import type { Alert } from "@shared/schema";
 
@@ -64,6 +65,8 @@ export default function Alerts() {
       });
     },
   });
+
+
 
   const saveConfigMutation = useMutation({
     mutationFn: async () => {
@@ -130,11 +133,7 @@ export default function Alerts() {
     }
   };
 
-  // Fetch real alerts from database
-  const { data: activeAlerts = [], isLoading: alertsLoading } = useQuery({
-    queryKey: ["/api/alerts", institutionId],
-    enabled: !!institutionId,
-  });
+
 
   // Real alert history will be loaded from database
 
@@ -206,7 +205,7 @@ export default function Alerts() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {mockActiveAlerts.length === 0 ? (
+          {(alerts as any[]).length === 0 ? (
             <div className="text-center py-8">
               <CheckCircle className="mx-auto h-12 w-12 text-secondary mb-4" />
               <p className="text-gray-600">
@@ -215,7 +214,7 @@ export default function Alerts() {
             </div>
           ) : (
             <div className="space-y-4">
-              {alertsLoading ? (
+              {isLoading ? (
                 <div className="space-y-3">
                   {[...Array(3)].map((_, i) => (
                     <div key={i} className="animate-pulse border-l-4 border-gray-200 p-4 rounded-r-lg">
@@ -229,13 +228,13 @@ export default function Alerts() {
                     </div>
                   ))}
                 </div>
-              ) : activeAlerts.length === 0 ? (
+              ) : (alerts as any[]).length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Shield className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>{language === "ca" ? "No hi ha alertes actives" : "No hay alertas activas"}</p>
                 </div>
               ) : (
-                activeAlerts.map((alert: any) => (
+                (alerts as any[]).map((alert: any) => (
                   <div 
                     key={alert.id}
                     className={`border-l-4 p-4 rounded-r-lg ${getAlertColor(alert.type)}`}

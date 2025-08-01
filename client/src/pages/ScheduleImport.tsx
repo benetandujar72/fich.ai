@@ -26,6 +26,7 @@ import {
   Copy
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { UntisStats } from "@/components/UntisStats";
 
 export default function ScheduleImport() {
   const { language } = useLanguage();
@@ -165,10 +166,14 @@ export default function ScheduleImport() {
         </div>
 
         <Tabs defaultValue="import" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="import" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               {language === "ca" ? "Importar" : "Importar"}
+            </TabsTrigger>
+            <TabsTrigger value="statistics" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              {language === "ca" ? "Estadístiques" : "Estadísticas"}
             </TabsTrigger>
             <TabsTrigger value="copy" className="flex items-center gap-2">
               <Copy className="h-4 w-4" />
@@ -334,6 +339,31 @@ export default function ScheduleImport() {
                         <li>• {importResults.updated?.schedules || 0} {language === "ca" ? "horaris" : "horarios"}</li>
                       </ul>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="statistics" className="space-y-6">
+            {user?.institutionId && selectedAcademicYear && (
+              <UntisStats institutionId={user.institutionId} academicYearId={selectedAcademicYear} />
+            )}
+          </TabsContent>
+
+          <TabsContent value="statistics" className="space-y-6">
+            {user?.institutionId && selectedAcademicYear ? (
+              <UntisStats institutionId={user.institutionId} academicYearId={selectedAcademicYear} />
+            ) : (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>
+                      {language === "ca" 
+                        ? "Selecciona un curs acadèmic per veure les estadístiques"
+                        : "Selecciona un curso académico para ver las estadísticas"}
+                    </p>
                   </div>
                 </CardContent>
               </Card>

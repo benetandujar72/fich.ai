@@ -95,7 +95,60 @@ export const employees = pgTable("employees", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Employee schedules
+// Subjects/Materies
+export const subjects = pgTable("subjects", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(),
+  code: varchar("code").notNull(), // e.g., "ANG 1.1", "MATES 1"
+  name: varchar("name").notNull(), // Full subject name
+  department: varchar("department"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Classes/Groups (S1A, S1B, etc.)
+export const classGroups = pgTable("class_groups", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(),
+  code: varchar("code").notNull(), // e.g., "S1A", "S2B"
+  level: varchar("level").notNull(), // e.g., "1ESO", "2ESO"
+  section: varchar("section").notNull(), // e.g., "A", "B"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Classrooms/Aules
+export const classrooms = pgTable("classrooms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  code: varchar("code").notNull(), // e.g., "111", "GYM", "PATI"
+  name: varchar("name"), // Optional full name
+  capacity: integer("capacity"),
+  type: varchar("type"), // normal, gym, lab, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// GP Untis Schedule Sessions
+export const untisScheduleSessions = pgTable("untis_schedule_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(),
+  classeId: varchar("classe_id"), // CLASSE field from CSV
+  groupCode: varchar("group_code").notNull(), // GRUP field (S1A, S1B)
+  teacherCode: varchar("teacher_code").notNull(), // DOCENT field
+  subjectCode: varchar("subject_code").notNull(), // MATÈRIA field
+  classroomCode: varchar("classroom_code"), // AULA field (can be empty)
+  dayOfWeek: integer("day_of_week").notNull(), // DIA field (1-5)
+  hourPeriod: integer("hour_period").notNull(), // HORA field
+  employeeId: varchar("employee_id"), // Linked to employees table
+  subjectId: varchar("subject_id"), // Linked to subjects table
+  classGroupId: varchar("class_group_id"), // Linked to class_groups table
+  classroomId: varchar("classroom_id"), // Linked to classrooms table
+  importedAt: timestamp("imported_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Employee schedules (simplified - derived from Untis data)
 export const schedules = pgTable("schedules", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   employeeId: varchar("employee_id").notNull(),
@@ -242,6 +295,65 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   employee: one(employees, {
     fields: [users.id],
     references: [employees.userId],
+  }),
+}));
+
+export const subjectsRelations = relations(subjects, ({ one, many }) => ({
+  institution: one(institutions, {
+    fields: [subjects.institutionId],
+    references: [institutions.id],
+  }),
+  academicYear: one(academicYears, {
+    fields: [subjects.academicYearId],
+    references: [academicYears.id],
+  }),
+  scheduleSessions: many(untisScheduleSessions),
+}));
+
+export const classGroupsRelations = relations(classGroups, ({ one, many }) => ({
+  institution: one(institutions, {
+    fields: [classGroups.institutionId],
+    references: [institutions.id],
+  }),
+  academicYear: one(academicYears, {
+    fields: [classGroups.academicYearId],
+    references: [academicYears.id],
+  }),
+  scheduleSessions: many(untisScheduleSessions),
+}));
+
+export const classroomsRelations = relations(classrooms, ({ one, many }) => ({
+  institution: one(institutions, {
+    fields: [classrooms.institutionId],
+    references: [institutions.id],
+  }),
+  scheduleSessions: many(untisScheduleSessions),
+}));
+
+export const untisScheduleSessionsRelations = relations(untisScheduleSessions, ({ one }) => ({
+  institution: one(institutions, {
+    fields: [untisScheduleSessions.institutionId],
+    references: [institutions.id],
+  }),
+  academicYear: one(academicYears, {
+    fields: [untisScheduleSessions.academicYearId],
+    references: [academicYears.id],
+  }),
+  employee: one(employees, {
+    fields: [untisScheduleSessions.employeeId],
+    references: [employees.id],
+  }),
+  subject: one(subjects, {
+    fields: [untisScheduleSessions.subjectId],
+    references: [subjects.id],
+  }),
+  classGroup: one(classGroups, {
+    fields: [untisScheduleSessions.classGroupId],
+    references: [classGroups.id],
+  }),
+  classroom: one(classrooms, {
+    fields: [untisScheduleSessions.classroomId],
+    references: [classrooms.id],
   }),
 }));
 
@@ -420,8 +532,37 @@ export const insertAcademicYearSchema = createInsertSchema(academicYears).omit({
   createdAt: true,
 });
 
+export const insertSubjectSchema = createInsertSchema(subjects).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertClassGroupSchema = createInsertSchema(classGroups).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertClassroomSchema = createInsertSchema(classrooms).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUntisScheduleSessionSchema = createInsertSchema(untisScheduleSessions).omit({
+  id: true,
+  createdAt: true,
+  importedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
+export type Subject = typeof subjects.$inferSelect;
+export type InsertSubject = typeof subjects.$inferInsert;
+export type ClassGroup = typeof classGroups.$inferSelect;
+export type InsertClassGroup = typeof classGroups.$inferInsert;
+export type Classroom = typeof classrooms.$inferSelect;
+export type InsertClassroom = typeof classrooms.$inferInsert;
+export type UntisScheduleSession = typeof untisScheduleSessions.$inferSelect;
+export type InsertUntisScheduleSession = typeof untisScheduleSessions.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Institution = typeof institutions.$inferSelect;
 export type InsertInstitution = z.infer<typeof insertInstitutionSchema>;

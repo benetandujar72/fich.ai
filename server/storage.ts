@@ -14,6 +14,10 @@ import {
   emailSettings,
   absenceJustifications,
   alertNotifications,
+  subjects,
+  classGroups,
+  classrooms,
+  untisScheduleSessions,
   type User,
   type UpsertUser,
   type Institution,
@@ -42,9 +46,18 @@ import {
   type InsertAbsenceJustification,
   type AlertNotification,
   type InsertAlertNotification,
+  type Subject,
+  type InsertSubject,
+  type ClassGroup,
+  type InsertClassGroup,
+  type Classroom,
+  type InsertClassroom,
+  type UntisScheduleSession,
+  type InsertUntisScheduleSession,
 } from "@shared/schema";
+import { logger } from './logger';
 import { db } from "./db";
-import { eq, and, gte, lte, desc, asc, or, sql, count } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -237,7 +250,8 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: absenceJustifications.id,
         employeeId: absenceJustifications.employeeId,
-        employeeName: sql<string>`${employees.firstName} || ' ' || ${employees.lastName}`.as('employeeName'),
+        employeeName: employees.fullName,
+        updatedAt: absenceJustifications.updatedAt,
         date: absenceJustifications.date,
         reason: absenceJustifications.reason,
         status: absenceJustifications.status,
@@ -656,7 +670,7 @@ export class DatabaseStorage implements IStorage {
     const [updatedUser] = await db
       .update(users)
       .set({
-        hashedPassword,
+        passwordHash: hashedPassword,
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
@@ -688,8 +702,8 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(absenceJustifications.employeeId, employeeId),
-          gte(absenceJustifications.date, startDate),
-          lte(absenceJustifications.date, endDate)
+          sql`${absenceJustifications.date} >= ${startDate.toISOString().split('T')[0]}`,
+          sql`${absenceJustifications.date} <= ${endDate.toISOString().split('T')[0]}`
         )
       );
 
@@ -710,7 +724,7 @@ export class DatabaseStorage implements IStorage {
       const dateStr = d.toISOString().split('T')[0];
       const dayData = dailyAttendance.get(dateStr);
       const justification = justifications.find(j => 
-        j.date.toISOString().split('T')[0] === dateStr
+        j.date === dateStr
       );
 
       let checkInTime = null;
@@ -887,7 +901,7 @@ export class DatabaseStorage implements IStorage {
 
   // Automated alert settings operations
   async getAutomatedAlertSettings(institutionId: string): Promise<any> {
-    const settings = await db
+    const alertSettings = await db
       .select()
       .from(settings)
       .where(
@@ -898,7 +912,7 @@ export class DatabaseStorage implements IStorage {
       )
       .limit(1);
 
-    return settings.length > 0 ? settings[0].value : null;
+    return alertSettings.length > 0 ? alertSettings[0].value : null;
   }
 
   async updateAutomatedAlertSettings(institutionId: string, alertSettings: any): Promise<any> {
@@ -929,11 +943,8 @@ export class DatabaseStorage implements IStorage {
       const [created] = await db
         .insert(settings)
         .values({
-          institutionId,
           key: 'automated_alerts',
           value: alertSettings,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         })
         .returning();
       return created.value;
@@ -999,6 +1010,278 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     //   subject,
     //   text: body
     // });
+  }
+
+  // GP Untis Import Functions
+  async parseUntisCSV(csvContent: string, institutionId: string, academicYearId: string) {
+    logger.scheduleImport('CSV_PARSE_START', `Starting GP Untis CSV parse for institution ${institutionId}`);
+    
+    const lines = csvContent.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+    const parsedSessions: any[] = [];
+    const teachers = new Set<string>();
+    const subjects = new Set<string>();
+    const classGroups = new Set<string>();
+    const classrooms = new Set<string>();
+
+    try {
+      for (const line of lines) {
+        const [classe, grup, docent, materia, aula, dia, hora] = line.split(',').map(s => s.trim());
+        
+        if (!grup || !docent || !materia || !dia || !hora) {
+          logger.warn('SCHEDULE_IMPORT', `Skipping invalid line: ${line}`);
+          continue;
+        }
+
+        // Extract unique values
+        teachers.add(docent);
+        subjects.add(materia);
+        classGroups.add(grup);
+        if (aula && aula !== '') classrooms.add(aula);
+
+        parsedSessions.push({
+          institutionId,
+          academicYearId,
+          classeId: classe || null,
+          groupCode: grup,
+          teacherCode: docent,
+          subjectCode: materia,
+          classroomCode: aula || null,
+          dayOfWeek: parseInt(dia),
+          hourPeriod: parseInt(hora),
+        });
+      }
+
+      logger.scheduleImport('CSV_PARSE_SUCCESS', `Parsed ${parsedSessions.length} sessions`, {
+        teachers: teachers.size,
+        subjects: subjects.size,
+        classGroups: classGroups.size,
+        classrooms: classrooms.size
+      });
+
+      return {
+        sessions: parsedSessions,
+        summary: {
+          teachers: Array.from(teachers),
+          subjects: Array.from(subjects),
+          classGroups: Array.from(classGroups),
+          classrooms: Array.from(classrooms)
+        }
+      };
+    } catch (error) {
+      logger.scheduleImportError('CSV_PARSE_ERROR', error as Error, { linesProcessed: parsedSessions.length });
+      throw error;
+    }
+  }
+
+  async importUntisSchedule(csvContent: string, institutionId: string, academicYearId: string) {
+    logger.scheduleImport('IMPORT_START', `Starting GP Untis import for institution ${institutionId}`);
+    
+    try {
+      // Parse CSV content
+      const { sessions, summary } = await this.parseUntisCSV(csvContent, institutionId, academicYearId);
+
+      // Clear existing schedule sessions for this academic year
+      logger.scheduleImport('CLEANUP', 'Removing existing schedule sessions');
+      await db.delete(untisScheduleSessions)
+        .where(
+          and(
+            eq(untisScheduleSessions.institutionId, institutionId),
+            eq(untisScheduleSessions.academicYearId, academicYearId)
+          )
+        );
+
+      // Create/update subjects
+      logger.scheduleImport('SUBJECTS_SYNC', `Syncing ${summary.subjects.length} subjects`);
+      for (const subjectCode of summary.subjects) {
+        await db.insert(subjects)
+          .values({
+            institutionId,
+            academicYearId,
+            code: subjectCode,
+            name: subjectCode, // Use code as name for now
+          })
+          .onConflictDoNothing();
+      }
+
+      // Create/update class groups
+      logger.scheduleImport('GROUPS_SYNC', `Syncing ${summary.classGroups.length} class groups`);
+      for (const groupCode of summary.classGroups) {
+        const level = groupCode.replace(/[ABC]$/, ''); // S1A -> S1
+        const section = groupCode.slice(-1); // S1A -> A
+        
+        await db.insert(classGroups)
+          .values({
+            institutionId,
+            academicYearId,
+            code: groupCode,
+            level,
+            section,
+          })
+          .onConflictDoNothing();
+      }
+
+      // Create/update classrooms
+      logger.scheduleImport('CLASSROOMS_SYNC', `Syncing ${summary.classrooms.length} classrooms`);
+      for (const classroomCode of summary.classrooms) {
+        await db.insert(classrooms)
+          .values({
+            institutionId,
+            code: classroomCode,
+            name: classroomCode,
+          })
+          .onConflictDoNothing();
+      }
+
+      // Insert schedule sessions with proper linking
+      logger.scheduleImport('SESSIONS_INSERT', `Inserting ${sessions.length} schedule sessions`);
+      const insertedSessions = await db.insert(untisScheduleSessions)
+        .values(sessions)
+        .returning();
+
+      // Update links to existing employees
+      logger.scheduleImport('EMPLOYEE_LINKING', 'Linking sessions to existing employees');
+      const employeeCount = await this.linkUntisScheduleToEmployees(institutionId, academicYearId);
+
+      logger.scheduleImport('IMPORT_SUCCESS', `Import completed successfully`, {
+        sessionsImported: insertedSessions.length,
+        employeesLinked: employeeCount,
+        summary
+      });
+
+      return {
+        success: true,
+        sessionsImported: insertedSessions.length,
+        employeesLinked: employeeCount,
+        summary
+      };
+
+    } catch (error) {
+      logger.scheduleImportError('IMPORT_FAILED', error as Error);
+      throw error;
+    }
+  }
+
+  async linkUntisScheduleToEmployees(institutionId: string, academicYearId: string) {
+    logger.scheduleImport('EMPLOYEE_LINKING_START', 'Starting employee linking process');
+    
+    try {
+      // Get all employees for this institution
+      const employeesList = await db.select().from(employees)
+        .where(eq(employees.institutionId, institutionId));
+
+      let linkedCount = 0;
+
+      // Link schedule sessions to employees by matching names
+      for (const employee of employeesList) {
+        const fullNameParts = employee.fullName.split(' ');
+        const lastName = fullNameParts[fullNameParts.length - 1];
+        const firstName = fullNameParts[0];
+        
+        // Try different name matching patterns
+        const namePatterns = [
+          employee.fullName.toUpperCase(),
+          `${firstName.charAt(0)}.${lastName}`.toUpperCase(),
+          `${lastName}`.toUpperCase(),
+          `${firstName} ${lastName}`.toUpperCase(),
+        ];
+
+        for (const pattern of namePatterns) {
+          const updated = await db.update(untisScheduleSessions)
+            .set({ employeeId: employee.id })
+            .where(
+              and(
+                eq(untisScheduleSessions.institutionId, institutionId),
+                eq(untisScheduleSessions.academicYearId, academicYearId),
+                eq(untisScheduleSessions.teacherCode, pattern),
+                isNull(untisScheduleSessions.employeeId)
+              )
+            )
+            .returning({ id: untisScheduleSessions.id });
+
+          if (updated.length > 0) {
+            linkedCount += updated.length;
+            logger.scheduleImport('EMPLOYEE_LINKED', `Linked ${updated.length} sessions to ${employee.fullName} using pattern: ${pattern}`);
+            break; // Stop trying other patterns for this employee
+          }
+        }
+      }
+
+      logger.scheduleImport('EMPLOYEE_LINKING_SUCCESS', `Linked ${linkedCount} sessions to employees`);
+      return linkedCount;
+
+    } catch (error) {
+      logger.scheduleImportError('EMPLOYEE_LINKING_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  async getUntisScheduleSessions(institutionId: string, academicYearId: string) {
+    logger.dbQuery('SELECT', 'untis_schedule_sessions', { institutionId, academicYearId });
+    
+    try {
+      return await db.select().from(untisScheduleSessions)
+        .where(
+          and(
+            eq(untisScheduleSessions.institutionId, institutionId),
+            eq(untisScheduleSessions.academicYearId, academicYearId)
+          )
+        )
+        .orderBy(
+          asc(untisScheduleSessions.dayOfWeek),
+          asc(untisScheduleSessions.hourPeriod),
+          asc(untisScheduleSessions.groupCode)
+        );
+    } catch (error) {
+      logger.dbError('SELECT', 'untis_schedule_sessions', error as Error, { institutionId, academicYearId });
+      throw error;
+    }
+  }
+
+  async getUntisScheduleStatistics(institutionId: string, academicYearId: string) {
+    logger.dbQuery('SELECT_STATS', 'untis_schedule_sessions', { institutionId, academicYearId });
+    
+    try {
+      const [stats] = await db.select({
+        totalSessions: count(),
+        linkedSessions: count(untisScheduleSessions.employeeId),
+        uniqueTeachers: sql<number>`COUNT(DISTINCT ${untisScheduleSessions.teacherCode})`,
+        uniqueSubjects: sql<number>`COUNT(DISTINCT ${untisScheduleSessions.subjectCode})`,
+        uniqueGroups: sql<number>`COUNT(DISTINCT ${untisScheduleSessions.groupCode})`,
+      }).from(untisScheduleSessions)
+        .where(
+          and(
+            eq(untisScheduleSessions.institutionId, institutionId),
+            eq(untisScheduleSessions.academicYearId, academicYearId)
+          )
+        );
+
+      return stats;
+    } catch (error) {
+      logger.dbError('SELECT_STATS', 'untis_schedule_sessions', error as Error, { institutionId, academicYearId });
+      throw error;
+    }
+  }
+
+  async getActiveAcademicYear(institutionId: string): Promise<AcademicYear | undefined> {  
+    logger.dbQuery('SELECT', 'academic_years', { institutionId, isActive: true });
+    
+    try {
+      const [activeYear] = await db
+        .select()
+        .from(academicYears)
+        .where(
+          and(
+            eq(academicYears.institutionId, institutionId),
+            eq(academicYears.isActive, true)
+          )
+        )
+        .limit(1);
+      
+      return activeYear || undefined;
+    } catch (error) {
+      logger.dbError('SELECT', 'academic_years', error as Error, { institutionId });
+      throw error;
+    }
   }
 }
 

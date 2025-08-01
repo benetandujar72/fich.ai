@@ -483,54 +483,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GP Untis schedule import routes
-  app.post('/api/schedule-import/preview', isAuthenticated, async (req, res) => {
+  app.post('/api/schedule-import/preview', isAuthenticated, async (req: any, res) => {
     try {
-      // This would normally parse the GP Untis file
-      // For now, returning mock preview data
-      const mockPreview = {
-        teachers: [
-          { code: "MAT01", name: "Maria Tur", email: "maria.tur@bitacola.edu" },
-          { code: "CAT02", name: "Joan Pons", email: "joan.pons@bitacola.edu" }
-        ],
-        subjects: [
-          { code: "MAT", name: "Matemàtiques", department: "Ciències" },
-          { code: "CAT", name: "Català", department: "Llengües" }
-        ],
-        schedules: [
-          { teacher: "MAT01", subject: "MAT", day: "Monday", startTime: "08:00", endTime: "09:00", group: "1ESO-A" }
-        ],
-        conflicts: []
-      };
+      const { csvContent } = req.body;
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
       
-      res.json(mockPreview);
+      if (!user || !user.institutionId) {
+        return res.status(400).json({ message: "User institution not found" });
+      }
+
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: "No active academic year found" });
+      }
+
+      // Parse CSV and return preview
+      const preview = await storage.parseUntisCSV(csvContent, user.institutionId, activeYear.id);
+      res.json(preview);
     } catch (error) {
-      console.error("Error previewing import:", error);
-      res.status(500).json({ message: "Failed to preview import" });
+      console.error("Error previewing GP Untis schedule:", error);
+      res.status(500).json({ message: "Failed to preview schedule" });
     }
   });
 
-  app.post('/api/schedule-import/execute', isAuthenticated, async (req, res) => {
+  app.post('/api/schedule-import/execute', isAuthenticated, async (req: any, res) => {
     try {
-      // This would normally execute the actual import
-      // For now, returning mock results
-      const mockResults = {
-        created: {
-          teachers: 2,
-          subjects: 5,
-          schedules: 25
-        },
-        updated: {
-          teachers: 0,
-          subjects: 1,
-          schedules: 3
-        },
-        errors: []
-      };
+      const { csvContent } = req.body;
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
       
-      res.json(mockResults);
+      if (!user || !user.institutionId) {
+        return res.status(400).json({ message: "User institution not found" });
+      }
+
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: "No active academic year found" });
+      }
+
+      // Import schedule
+      const result = await storage.importUntisSchedule(csvContent, user.institutionId, activeYear.id);
+      res.json(result);
     } catch (error) {
-      console.error("Error executing import:", error);
-      res.status(500).json({ message: "Failed to execute import" });
+      console.error("Error importing GP Untis schedule:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Failed to import schedule", error: errorMessage });
+    }
+  });
+
+  // Additional GP Untis endpoints
+  app.get('/api/schedule-import/sessions/:institutionId/:academicYearId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId, academicYearId } = req.params;
+      const sessions = await storage.getUntisScheduleSessions(institutionId, academicYearId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching schedule sessions:", error);
+      res.status(500).json({ message: "Failed to fetch schedule sessions" });
+    }
+  });
+
+  app.get('/api/schedule-import/statistics/:institutionId/:academicYearId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId, academicYearId } = req.params;
+      const stats = await storage.getUntisScheduleStatistics(institutionId, academicYearId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching schedule statistics:", error);
+      res.status(500).json({ message: "Failed to fetch schedule statistics" });
     }
   });
 

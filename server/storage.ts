@@ -1916,40 +1916,32 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
           eq(weeklySchedule.academicYearId, academicYearId)
         ));
 
-      // Get all Untis sessions
-      const sessions = await db.select()
-        .from(untisScheduleSessions)
-        .where(and(
-          eq(untisScheduleSessions.institutionId, institutionId),
-          eq(untisScheduleSessions.academicYearId, academicYearId)
-        ));
+      // Generate weekly schedule directly from Untis sessions using SQL for better performance
+      const result = await db.execute(sql`
+        INSERT INTO weekly_schedule (id, employee_id, institution_id, academic_year_id, day_of_week, hour_period, subject_code, subject_name, group_code, classroom_code, is_lective_hour, created_at, updated_at)
+        SELECT 
+          gen_random_uuid(),
+          uss.employee_id,
+          uss.institution_id,
+          uss.academic_year_id,
+          uss.day_of_week,
+          uss.hour_period,
+          uss.subject_code,
+          uss.subject_code,
+          uss.group_code,
+          uss.classroom_code,
+          true,
+          NOW(),
+          NOW()
+        FROM untis_schedule_sessions uss
+        WHERE uss.institution_id = ${institutionId}
+        AND uss.academic_year_id = ${academicYearId}
+        AND uss.employee_id IS NOT NULL
+      `);
 
-      const weeklyScheduleData = [];
-
-      for (const session of sessions) {
-        // Convert Untis session to weekly schedule format
-        const scheduleEntry = {
-          employeeId: session.employeeId || '',
-          institutionId,
-          academicYearId,
-          dayOfWeek: session.dayOfWeek || 1,
-          hourPeriod: session.hourPeriod || 1,
-          subjectCode: session.subjectCode,
-          subjectName: session.subjectCode, // Use subjectCode since subjectName doesn't exist
-          groupCode: session.groupCode,
-          classroomCode: session.classroomCode,
-          isLectiveHour: true // Default to lective, can be configured later
-        };
-
-        weeklyScheduleData.push(scheduleEntry);
-      }
-
-      if (weeklyScheduleData.length > 0) {
-        await db.insert(weeklySchedule).values(weeklyScheduleData);
-      }
-
-      logger.scheduleImport('WEEKLY_SCHEDULE_GENERATED', `Generated ${weeklyScheduleData.length} weekly schedule entries`);
-      return weeklyScheduleData.length;
+      const insertedCount = result.rowCount || 0;
+      console.log('WEEKLY_SCHEDULE_GENERATED', `Generated ${insertedCount} weekly schedule entries from Untis data`);
+      return insertedCount;
     } catch (error) {
       console.error('GENERATE_WEEKLY_SCHEDULE_ERROR', error);
       throw error;

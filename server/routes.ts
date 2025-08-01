@@ -1260,6 +1260,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Regenerate weekly schedules from GP Untis data
+  app.post("/api/schedule/regenerate/:institutionId/:academicYearId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId, academicYearId } = req.params;
+      const generatedCount = await storage.generateWeeklyScheduleFromUntis(institutionId, academicYearId);
+      res.json({ 
+        success: true, 
+        message: `Generated ${generatedCount} weekly schedule entries from GP Untis data`,
+        count: generatedCount 
+      });
+    } catch (error) {
+      console.error("Error regenerating weekly schedules:", error);
+      res.status(500).json({ message: "Failed to regenerate weekly schedules" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -28,10 +28,16 @@ export default function WeeklySchedule() {
   const locale = language === "ca" ? ca : es;
 
   // Get weekly schedule data
-  const { data: scheduleData, isLoading } = useQuery({
+  const { data: scheduleData, isLoading, error } = useQuery({
     queryKey: ['/api/schedule/weekly', user?.id, format(currentWeek, 'yyyy-MM-dd')],
     enabled: !!user?.id,
   });
+
+  // Debug log
+  console.log('WeeklySchedule - User ID:', user?.id);
+  console.log('WeeklySchedule - Schedule Data:', scheduleData);
+  console.log('WeeklySchedule - Error:', error);
+  console.log('WeeklySchedule - Loading:', isLoading);
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Start on Monday
   const weekDays = Array.from({ length: 5 }, (_, i) => addDays(weekStart, i)); // Monday to Friday

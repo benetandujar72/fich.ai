@@ -1717,6 +1717,9 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       .from(weeklySchedule)
       .where(eq(weeklySchedule.employeeId, employee.id));
 
+      console.log(`WeeklySchedule API - Found ${schedule.length} sessions for employee ${employee.id} (${user.email})`);
+      console.log('WeeklySchedule API - First session:', schedule[0]);
+      
       return schedule;
     } catch (error) {
       console.error('GET_WEEKLY_SCHEDULE_ERROR', error);

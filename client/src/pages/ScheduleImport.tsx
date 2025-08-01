@@ -155,12 +155,7 @@ export default function ScheduleImport() {
     setImportResults(null);
 
     try {
-      const response = await apiRequest('/api/schedule-import/test-real', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiRequest('/api/schedule-import/test-real', 'POST', {});
 
       setImportResults(response);
       

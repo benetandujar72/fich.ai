@@ -34,7 +34,8 @@ Preferred communication style: Simple, everyday language.
 ### ✅ Latest Implemented Features (January 2025)
 - **Quick Attendance System**: Direct login screen attendance marking without system entry
 - **Smart Work Cycle Management**: Automatic check-in/check-out detection based on last records
-- **GP Untis Schedule Import**: Complete import system for teachers, subjects, and schedules
+- **GP Untis Schedule Import**: Complete import system for teachers, subjects, and schedules with real TXT format support
+- **Real GP Untis File Integration**: Parser for actual HORARIS_1754043300200.TXT format with test button
 - **Cross-Academic Year Data Transfer**: Copy teachers and subjects between academic years
 - **QR Code & NFC Preparation**: Frontend placeholders for future QR/NFC attendance methods
 - **Enhanced Attendance UI**: Color-coded attendance modal with detailed timestamps and employee info
@@ -45,6 +46,7 @@ Preferred communication style: Simple, everyday language.
 - **Complete GDPR Compliance System**: Privacy policy, data subject rights, and digitally signed PDF exports
 - **Digital Document Signing**: PDF exports with SHA-256 digital signatures and audit trails
 - **GDPR Data Export**: Secure data downloads with user name and date in filename
+- **Accessibility Improvements**: Fixed dialog accessibility warnings with proper DialogTitle components
 
 ### Pending Tasks (CONFIG Identifiers)
 **CONFIG-001: Email Notification System** ✓ STARTING

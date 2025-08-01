@@ -149,6 +149,42 @@ export default function ScheduleImport() {
     }
   });
 
+  // Test with real uploaded file function
+  const handleTestRealFile = async () => {
+    setIsImporting(true);
+    setImportResults(null);
+
+    try {
+      const response = await apiRequest('/api/schedule-import/test-real', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      setImportResults(response);
+      
+      // Refresh statistics
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/schedule-import/statistics', user?.institutionId, selectedAcademicYear] 
+      });
+      
+      toast({
+        title: language === "ca" ? "Prova completada" : "Prueba completada",
+        description: `${response.sessionsImported} sessions del fitxer real importades correctament`,
+      });
+    } catch (error) {
+      console.error('Test import error:', error);
+      toast({
+        title: language === "ca" ? "Error de prova" : "Error de prueba",
+        description: error instanceof Error ? error.message : "Error desconegut",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
       <div className="container mx-auto py-6 space-y-6">
@@ -195,6 +231,28 @@ export default function ScheduleImport() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
+                  {/* Test with real file section */}
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                      {language === "ca" ? "Prova amb fitxer real GP Untis" : "Prueba con archivo real GP Untis"}
+                    </h4>
+                    <p className="text-sm text-blue-600 dark:text-blue-300 mb-3">
+                      {language === "ca" 
+                        ? "Prova la importació amb l'arxiu HORARIS_1754043300200.TXT que has pujat"
+                        : "Prueba la importación con el archivo HORARIS_1754043300200.TXT que has subido"}
+                    </p>
+                    <Button
+                      onClick={handleTestRealFile}
+                      variant="outline"
+                      size="sm"
+                      className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-900/40"
+                      disabled={isImporting}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      {language === "ca" ? "Provar fitxer real TXT" : "Probar archivo real TXT"}
+                    </Button>
+                  </div>
+
                   <div>
                     <Label htmlFor="academic-year">
                       {language === "ca" ? "Curs acadèmic" : "Curso académico"}

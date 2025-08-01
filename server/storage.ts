@@ -943,7 +943,8 @@ export class DatabaseStorage implements IStorage {
       const [created] = await db
         .insert(settings)
         .values({
-          key: 'automated_alerts',
+          institutionId,
+          keys: 'automated_alerts',
           value: alertSettings,
         })
         .returning();
@@ -1280,6 +1281,101 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       return activeYear || undefined;
     } catch (error) {
       logger.dbError('SELECT', 'academic_years', error as Error, { institutionId });
+      throw error;
+    }
+  }
+
+  async importUntisScheduleFromTXT(txtContent: string, institutionId: string, academicYearId: string) {
+    logger.scheduleImport('TXT_IMPORT_START', `Starting GP Untis TXT import for institution ${institutionId}`);
+    
+    try {
+      const lines = txtContent.trim().split('\n');
+      const sessions: any[] = [];
+      const teachers = new Set<string>();
+      const subjects = new Set<string>();
+      const classGroups = new Set<string>();
+      const classrooms = new Set<string>();
+      
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        
+        // Parse TXT format: sessionId,"groupCode","teacherCode","subjectCode","roomCode",dayNum,hourNum,,
+        const parts = line.split(',');
+        if (parts.length < 7) continue;
+        
+        const sessionId = parts[0];
+        const groupCode = parts[1]?.replace(/"/g, '') || '';
+        const teacherCode = parts[2]?.replace(/"/g, '') || '';
+        const subjectCode = parts[3]?.replace(/"/g, '') || '';
+        const roomCode = parts[4]?.replace(/"/g, '') || '';
+        const dayNum = parseInt(parts[5]) || 0;
+        const hourNum = parseInt(parts[6]) || 0;
+        
+        if (!sessionId || !groupCode || !teacherCode || !subjectCode) continue;
+        
+        // Collect unique values
+        teachers.add(teacherCode);
+        subjects.add(subjectCode);
+        classGroups.add(groupCode);
+        if (roomCode) classrooms.add(roomCode);
+        
+        sessions.push({
+          institutionId,
+          academicYearId,
+          sessionId: sessionId.trim(),
+          groupCode: groupCode.trim(),
+          teacherCode: teacherCode.trim(),
+          subjectCode: subjectCode.trim(),
+          classroomCode: roomCode.trim() || null,
+          dayOfWeek: dayNum,
+          hourPeriod: hourNum,
+          employeeId: null, // Will be linked later
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
+      if (sessions.length === 0) {
+        throw new Error('No valid schedule sessions found in the TXT file');
+      }
+      
+      logger.scheduleImport('TXT_PARSE_SUCCESS', `Parsed ${sessions.length} sessions from TXT`, {
+        teachers: teachers.size,
+        subjects: subjects.size,
+        classGroups: classGroups.size,
+        classrooms: classrooms.size
+      });
+      
+      // Clear existing sessions for this academic year
+      await db.delete(untisScheduleSessions)
+        .where(
+          and(
+            eq(untisScheduleSessions.institutionId, institutionId),
+            eq(untisScheduleSessions.academicYearId, academicYearId)
+          )
+        );
+      
+      // Insert new sessions
+      const insertedSessions = await db.insert(untisScheduleSessions)
+        .values(sessions)
+        .returning();
+      
+      // Try to link sessions to employees
+      const employeeCount = await this.linkUntisScheduleToEmployees(institutionId, academicYearId);
+      
+      return {
+        success: true,
+        sessionsImported: insertedSessions.length,
+        employeesLinked: employeeCount,
+        summary: {
+          teachers: Array.from(teachers),
+          subjects: Array.from(subjects),
+          classGroups: Array.from(classGroups),
+          classrooms: Array.from(classrooms)
+        }
+      };
+    } catch (error) {
+      logger.scheduleImportError('TXT_IMPORT_ERROR', error as Error);
       throw error;
     }
   }

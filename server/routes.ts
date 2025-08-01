@@ -557,6 +557,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test import with real TXT file
+  app.post('/api/schedule-import/test-real', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user?.institutionId) {
+        return res.status(401).json({ message: 'Institution not found' });
+      }
+
+      // Read the real uploaded TXT file
+      const fs = require('fs');
+      const filePath = './attached_assets/HORARIS_1754043300200.TXT';
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: 'Test file not found' });
+      }
+
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: 'No active academic year found' });
+      }
+
+      // Import the real TXT file
+      const result = await storage.importUntisScheduleFromTXT(fileContent, user.institutionId, activeYear.id);
+      res.json({
+        message: 'Import successful with real GP Untis TXT format',
+        ...result
+      });
+    } catch (error) {
+      console.error("Error testing real GP Untis import:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Failed to test real import", error: errorMessage });
+    }
+  });
+
   app.post('/api/settings', isAuthenticated, async (req, res) => {
     try {
       const setting = await storage.upsertSetting(req.body);

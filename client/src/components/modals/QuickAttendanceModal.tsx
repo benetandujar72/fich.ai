@@ -2,7 +2,9 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
 import { 
   Dialog, 
-  DialogContent 
+  DialogContent,
+  DialogTitle,
+  DialogDescription 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Clock, LogIn, LogOut } from "lucide-react";
@@ -37,6 +39,12 @@ export default function QuickAttendanceModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md" data-testid="quick-attendance-modal">
+        <DialogTitle className="sr-only">
+          Control d'assistència ràpid
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          Marca la teva entrada o sortida de manera ràpida
+        </DialogDescription>
         <div className="text-center p-6">
           <Clock className="h-16 w-16 text-primary mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-text mb-2">

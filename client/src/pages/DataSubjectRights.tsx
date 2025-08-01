@@ -49,7 +49,7 @@ export default function DataSubjectRights() {
     mutationFn: async () => {
       return await apiRequest("GET", "/api/data-subject-rights/my-data");
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data: any) => {
       try {
         // Import jsPDF dynamically
         const { jsPDF } = await import('jspdf');

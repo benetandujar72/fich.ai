@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const exportId = Math.random().toString(36).substr(2, 9);
       
       // Create digital signature hash
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
       const signatureData = `${currentUser.email}-${exportDate.toISOString()}-${exportId}`;
       const digitalSignature = crypto.createHash('sha256').update(signatureData).digest('hex');
 
@@ -792,6 +792,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating setting:", error);
       res.status(500).json({ message: "Failed to update setting" });
+    }
+  });
+
+  // Network settings routes
+  app.get("/api/attendance-network-settings/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const networkSettings = await storage.getAttendanceNetworkSettings(institutionId);
+      res.json(networkSettings || {
+        institutionId,
+        allowedNetworks: [],
+        requireNetworkValidation: false,
+        description: ""
+      });
+    } catch (error) {
+      console.error("Error fetching network settings:", error);
+      res.status(500).json({ message: "Failed to fetch network settings" });
+    }
+  });
+
+  app.put("/api/attendance-network-settings/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { allowedNetworks, requireNetworkValidation, description } = req.body;
+      
+      const networkSettings = await storage.upsertAttendanceNetworkSettings({
+        institutionId,
+        allowedNetworks: allowedNetworks || [],
+        requireNetworkValidation: requireNetworkValidation || false,
+        description: description || ""
+      });
+      
+      res.json(networkSettings);
+    } catch (error) {
+      console.error("Error updating network settings:", error);
+      res.status(500).json({ message: "Failed to update network settings" });
+    }
+  });
+
+  // Check attendance permission based on IP
+  app.post("/api/attendance/check-permission", async (req, res) => {
+    try {
+      const { institutionId } = req.body;
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      
+      const isAllowed = await storage.isIPAllowedForAttendance(institutionId, clientIP);
+      
+      res.json({ 
+        allowed: isAllowed, 
+        clientIP,
+        message: isAllowed 
+          ? "Accés autoritzat des de la xarxa local" 
+          : "Fitxatge només disponible des de la xarxa local del centre"
+      });
+    } catch (error) {
+      console.error("Error checking attendance permission:", error);
+      res.status(500).json({ message: "Failed to check attendance permission" });
     }
   });
 

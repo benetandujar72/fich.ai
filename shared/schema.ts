@@ -12,6 +12,7 @@ import {
   date,
   time,
   pgEnum,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -177,7 +178,22 @@ export const settings = pgTable("settings", {
   key: varchar("key").notNull(),
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  uniqueInstitutionKey: unique().on(table.institutionId, table.key),
+}));
+
+// Network settings for attendance control - only allow attendance from specific networks
+export const attendanceNetworkSettings = pgTable("attendance_network_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  allowedNetworks: text("allowed_networks").array().notNull().default(sql`'{}'`),
+  requireNetworkValidation: boolean("require_network_validation").default(false),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  uniqueInstitution: unique().on(table.institutionId),
+}));
 
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -288,6 +304,13 @@ export const settingsRelations = relations(settings, ({ one }) => ({
   }),
 }));
 
+export const attendanceNetworkSettingsRelations = relations(attendanceNetworkSettings, ({ one }) => ({
+  institution: one(institutions, {
+    fields: [attendanceNetworkSettings.institutionId],
+    references: [institutions.id],
+  }),
+}));
+
 // Insert schemas
 export const insertInstitutionSchema = createInsertSchema(institutions).omit({
   id: true,
@@ -331,6 +354,12 @@ export const insertSettingSchema = createInsertSchema(settings).omit({
   updatedAt: true,
 });
 
+export const insertAttendanceNetworkSettingSchema = createInsertSchema(attendanceNetworkSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertAcademicYearSchema = createInsertSchema(academicYears).omit({
   id: true,
   createdAt: true,
@@ -358,3 +387,5 @@ export type SubstituteAssignment = typeof substituteAssignments.$inferSelect;
 export type InsertSubstituteAssignment = z.infer<typeof insertSubstituteAssignmentSchema>;
 export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = z.infer<typeof insertSettingSchema>;
+export type AttendanceNetworkSetting = typeof attendanceNetworkSettings.$inferSelect;
+export type InsertAttendanceNetworkSetting = z.infer<typeof insertAttendanceNetworkSettingSchema>;

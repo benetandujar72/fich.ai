@@ -10,6 +10,7 @@ import {
   alerts,
   substituteAssignments,
   settings,
+  attendanceNetworkSettings,
   type User,
   type UpsertUser,
   type Institution,
@@ -30,6 +31,8 @@ import {
   type InsertSubstituteAssignment,
   type Setting,
   type InsertSetting,
+  type AttendanceNetworkSetting,
+  type InsertAttendanceNetworkSetting,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, asc, or, sql, count } from "drizzle-orm";
@@ -86,6 +89,11 @@ export interface IStorage {
   getSettings(institutionId: string): Promise<Setting[]>;
   getSetting(institutionId: string, key: string): Promise<Setting | undefined>;
   upsertSetting(setting: InsertSetting): Promise<Setting>;
+
+  // Network settings operations
+  getAttendanceNetworkSettings(institutionId: string): Promise<AttendanceNetworkSetting | undefined>;
+  upsertAttendanceNetworkSettings(settings: InsertAttendanceNetworkSetting): Promise<AttendanceNetworkSetting>;
+  isIPAllowedForAttendance(institutionId: string, clientIP: string): Promise<boolean>;
 
   // Dashboard statistics
   getDashboardStats(institutionId: string): Promise<any>;
@@ -415,6 +423,74 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return upserted;
+  }
+
+  // Attendance network settings operations
+  async getAttendanceNetworkSettings(institutionId: string): Promise<AttendanceNetworkSetting | undefined> {
+    const [networkSettings] = await db
+      .select()
+      .from(attendanceNetworkSettings)
+      .where(eq(attendanceNetworkSettings.institutionId, institutionId));
+    return networkSettings;
+  }
+
+  async upsertAttendanceNetworkSettings(settings: InsertAttendanceNetworkSetting): Promise<AttendanceNetworkSetting> {
+    const [upserted] = await db
+      .insert(attendanceNetworkSettings)
+      .values(settings)
+      .onConflictDoUpdate({
+        target: [attendanceNetworkSettings.institutionId],
+        set: {
+          allowedNetworks: settings.allowedNetworks,
+          requireNetworkValidation: settings.requireNetworkValidation,
+          description: settings.description,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return upserted;
+  }
+
+  // Check if IP is allowed for attendance
+  async isIPAllowedForAttendance(institutionId: string, clientIP: string): Promise<boolean> {
+    const networkSettings = await this.getAttendanceNetworkSettings(institutionId);
+    
+    if (!networkSettings || !networkSettings.requireNetworkValidation) {
+      return true; // No network validation required
+    }
+
+    // Check if client IP is in allowed networks
+    const allowedNetworks = networkSettings.allowedNetworks || [];
+    
+    for (const network of allowedNetworks) {
+      if (this.isIPInNetwork(clientIP, network)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  private isIPInNetwork(ip: string, network: string): boolean {
+    // Simple implementation for IP/CIDR matching
+    if (network.includes('/')) {
+      // CIDR notation (e.g., 192.168.1.0/24)
+      const [networkIP, maskBits] = network.split('/');
+      const mask = parseInt(maskBits);
+      
+      const ipToNumber = (ip: string) => {
+        return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
+      };
+      
+      const ipNum = ipToNumber(ip);
+      const networkNum = ipToNumber(networkIP);
+      const maskNum = ((0xffffffff << (32 - mask)) >>> 0);
+      
+      return (ipNum & maskNum) === (networkNum & maskNum);
+    } else {
+      // Direct IP match
+      return ip === network;
+    }
   }
 
 

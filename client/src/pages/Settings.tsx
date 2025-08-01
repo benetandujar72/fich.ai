@@ -29,6 +29,7 @@ import {
   Save,
   Users
 } from "lucide-react";
+import NetworkSettingsForm from "@/components/NetworkSettingsForm";
 
 interface CenterSettings {
   centerName: string;
@@ -306,6 +307,35 @@ export default function Settings() {
               </ul>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Network Settings Section */}
+      <Card className="p-6">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Shield className="mr-2 h-5 w-5" />
+            {language === "ca" ? "Configuració de Xarxa per Fitxatge" : "Configuración de Red para Fichaje"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <Info className="text-blue-600 mr-3 h-5 w-5 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-blue-800 mb-1">
+                  {language === "ca" ? "Control d'accés per xarxa" : "Control de acceso por red"}
+                </p>
+                <p className="text-sm text-blue-700">
+                  {language === "ca" 
+                    ? "Configura les adreces IP des d'on es permet fer fitxatge. La gestió del sistema és accessible des de qualsevol lloc, però el fitxatge només des de la xarxa local del centre."
+                    : "Configura las direcciones IP desde donde se permite hacer fichaje. La gestión del sistema es accesible desde cualquier lugar, pero el fichaje solo desde la red local del centro."}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <NetworkSettingsForm institutionId={institutionId} language={language} />
         </CardContent>
       </Card>
 

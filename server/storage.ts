@@ -1379,6 +1379,256 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       throw error;
     }
   }
+
+  async importUntisTeachers(txtContent: string, institutionId: string, academicYearId: string) {
+    logger.scheduleImport('TEACHERS_IMPORT_START', `Starting GP Untis teachers import`);
+    
+    try {
+      const lines = txtContent.trim().split('\n');
+      const teachersData: any[] = [];
+      
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        
+        // Parse teacher format: "CODE","FULL_NAME",...,HOURS,...
+        const parts = line.split(',');
+        if (parts.length < 16) continue;
+        
+        const teacherCode = parts[0]?.replace(/"/g, '') || '';
+        const fullName = parts[1]?.replace(/"/g, '') || teacherCode;
+        const hoursStr = parts[15]?.replace(/"/g, '') || '0';
+        const hours = parseFloat(hoursStr) || 0;
+        
+        if (!teacherCode || teacherCode === '?') continue;
+        
+        // Generate email from teacher code
+        const email = `${teacherCode.toLowerCase().replace(/[^a-z0-9]/g, '.')}@insbitacola.cat`;
+        
+        teachersData.push({
+          institutionId,
+          fullName: fullName || teacherCode,
+          email,
+          teacherCode,
+          weeklyHours: hours,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
+      logger.scheduleImport('TEACHERS_PARSE_SUCCESS', `Parsed ${teachersData.length} teachers`);
+      
+      // Insert or update teachers
+      let createdCount = 0;
+      let updatedCount = 0;
+      
+      for (const teacherData of teachersData) {
+        const [existing] = await db.select()
+          .from(employees)
+          .where(
+            and(
+              eq(employees.institutionId, institutionId),
+              eq(employees.email, teacherData.email)
+            )
+          )
+          .limit(1);
+        
+        if (existing) {
+          await db.update(employees)
+            .set({
+              fullName: teacherData.fullName,
+              updatedAt: new Date()
+            })
+            .where(eq(employees.id, existing.id));
+          updatedCount++;
+        } else {
+          await db.insert(employees).values(teacherData);
+          createdCount++;
+        }
+      }
+      
+      return {
+        success: true,
+        teachersProcessed: teachersData.length,
+        created: createdCount,
+        updated: updatedCount
+      };
+    } catch (error) {
+      logger.scheduleImportError('TEACHERS_IMPORT_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  async importUntisSubjects(txtContent: string, institutionId: string, academicYearId: string) {
+    logger.scheduleImport('SUBJECTS_IMPORT_START', `Starting GP Untis subjects import`);
+    
+    try {
+      const lines = txtContent.trim().split('\n');
+      const subjectsData: any[] = [];
+      
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        
+        // Parse subject format: "CODE","NAME","SHORTNAME","ROOM",...
+        const parts = line.split(',');
+        if (parts.length < 4) continue;
+        
+        const subjectCode = parts[0]?.replace(/"/g, '') || '';
+        const subjectName = parts[1]?.replace(/"/g, '') || subjectCode;
+        const shortName = parts[2]?.replace(/"/g, '') || '';
+        const defaultRoom = parts[3]?.replace(/"/g, '') || '';
+        
+        if (!subjectCode) continue;
+        
+        subjectsData.push({
+          institutionId,
+          academicYearId,
+          code: subjectCode,
+          name: subjectName,
+          shortName: shortName || subjectCode,
+          defaultClassroom: defaultRoom || null,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
+      logger.scheduleImport('SUBJECTS_PARSE_SUCCESS', `Parsed ${subjectsData.length} subjects`);
+      
+      // Clear existing subjects for this academic year
+      await db.delete(subjects)
+        .where(
+          and(
+            eq(subjects.institutionId, institutionId),
+            eq(subjects.academicYearId, academicYearId)
+          )
+        );
+      
+      // Insert new subjects
+      const insertedSubjects = await db.insert(subjects)
+        .values(subjectsData)
+        .returning();
+      
+      return {
+        success: true,
+        subjectsImported: insertedSubjects.length
+      };
+    } catch (error) {
+      logger.scheduleImportError('SUBJECTS_IMPORT_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  async importUntisClassGroups(txtContent: string, institutionId: string, academicYearId: string) {
+    logger.scheduleImport('GROUPS_IMPORT_START', `Starting GP Untis class groups import`);
+    
+    try {
+      const lines = txtContent.trim().split('\n');
+      const groupsData: any[] = [];
+      
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        
+        // Parse group format: "GROUPCODE",...
+        const parts = line.split(',');
+        if (parts.length < 1) continue;
+        
+        const groupCode = parts[0]?.replace(/"/g, '') || '';
+        if (!groupCode) continue;
+        
+        // Determine level and section from group code (e.g., S1A -> level: S1, section: A)
+        const level = groupCode.replace(/[ABC]$/, ''); // S1A -> S1
+        const section = groupCode.slice(-1); // S1A -> A
+        
+        groupsData.push({
+          institutionId,
+          academicYearId,
+          code: groupCode,
+          level,
+          section,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
+      logger.scheduleImport('GROUPS_PARSE_SUCCESS', `Parsed ${groupsData.length} class groups`);
+      
+      // Clear existing groups for this academic year
+      await db.delete(classGroups)
+        .where(
+          and(
+            eq(classGroups.institutionId, institutionId),
+            eq(classGroups.academicYearId, academicYearId)
+          )
+        );
+      
+      // Insert new groups
+      const insertedGroups = await db.insert(classGroups)
+        .values(groupsData)
+        .returning();
+      
+      return {
+        success: true,
+        groupsImported: insertedGroups.length
+      };
+    } catch (error) {
+      logger.scheduleImportError('GROUPS_IMPORT_ERROR', error as Error);
+      throw error;
+    }
+  }
+
+  async importCompleteUntisData(institutionId: string, academicYearId: string) {
+    logger.scheduleImport('COMPLETE_IMPORT_START', `Starting complete GP Untis data import`);
+    
+    try {
+      const fs = await import('fs');
+      
+      // Import teachers
+      const teachersPath = './attached_assets/PROFESSORAT_1754044133486.TXT';
+      if (fs.existsSync(teachersPath)) {
+        const teachersContent = fs.readFileSync(teachersPath, 'utf8');
+        const teachersResult = await this.importUntisTeachers(teachersContent, institutionId, academicYearId);
+        logger.scheduleImport('TEACHERS_IMPORTED', `Teachers: ${teachersResult.created} created, ${teachersResult.updated} updated`);
+      }
+      
+      // Import subjects
+      const subjectsPath = './attached_assets/MATÈRIES_1754044172639.TXT';
+      if (fs.existsSync(subjectsPath)) {
+        const subjectsContent = fs.readFileSync(subjectsPath, 'utf8');
+        const subjectsResult = await this.importUntisSubjects(subjectsContent, institutionId, academicYearId);
+        logger.scheduleImport('SUBJECTS_IMPORTED', `Subjects: ${subjectsResult.subjectsImported} imported`);
+      }
+      
+      // Import class groups
+      const groupsPath = './attached_assets/GRUPS_1754044162024.TXT';
+      if (fs.existsSync(groupsPath)) {
+        const groupsContent = fs.readFileSync(groupsPath, 'utf8');
+        const groupsResult = await this.importUntisClassGroups(groupsContent, institutionId, academicYearId);
+        logger.scheduleImport('GROUPS_IMPORTED', `Groups: ${groupsResult.groupsImported} imported`);
+      }
+      
+      // Import schedule sessions
+      const schedulePath = './attached_assets/HORARIS_1754043300200.TXT';
+      if (fs.existsSync(schedulePath)) {
+        const scheduleContent = fs.readFileSync(schedulePath, 'utf8');
+        const scheduleResult = await this.importUntisScheduleFromTXT(scheduleContent, institutionId, academicYearId);
+        logger.scheduleImport('SCHEDULE_IMPORTED', `Sessions: ${scheduleResult.sessionsImported} imported, ${scheduleResult.employeesLinked} linked`);
+      }
+      
+      // Final employee linking with improved matching
+      const finalLinkCount = await this.linkUntisScheduleToEmployees(institutionId, academicYearId);
+      
+      return {
+        success: true,
+        message: 'Complete GP Untis data import successful',
+        finalEmployeesLinked: finalLinkCount
+      };
+    } catch (error) {
+      logger.scheduleImportError('COMPLETE_IMPORT_ERROR', error as Error);
+      throw error;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

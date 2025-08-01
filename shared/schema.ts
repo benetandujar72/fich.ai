@@ -95,18 +95,22 @@ export const employees = pgTable("employees", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Subjects/Materies
+// Subjects/Materies (GP Untis compatible)
 export const subjects = pgTable("subjects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   institutionId: varchar("institution_id").notNull(),
   academicYearId: varchar("academic_year_id").notNull(),
   code: varchar("code").notNull(), // e.g., "ANG 1.1", "MATES 1"
   name: varchar("name").notNull(), // Full subject name
+  shortName: varchar("short_name"),
+  defaultClassroom: varchar("default_classroom"),
   department: varchar("department"),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Classes/Groups (S1A, S1B, etc.)
+// Classes/Groups (S1A, S1B, etc.) - GP Untis compatible
 export const classGroups = pgTable("class_groups", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   institutionId: varchar("institution_id").notNull(),
@@ -114,7 +118,9 @@ export const classGroups = pgTable("class_groups", {
   code: varchar("code").notNull(), // e.g., "S1A", "S2B"
   level: varchar("level").notNull(), // e.g., "1ESO", "2ESO"
   section: varchar("section").notNull(), // e.g., "A", "B"
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Classrooms/Aules
@@ -133,6 +139,7 @@ export const untisScheduleSessions = pgTable("untis_schedule_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   institutionId: varchar("institution_id").notNull(),
   academicYearId: varchar("academic_year_id").notNull(),
+  sessionId: varchar("session_id"),
   classeId: varchar("classe_id"), // CLASSE field from CSV
   groupCode: varchar("group_code").notNull(), // GRUP field (S1A, S1B)
   teacherCode: varchar("teacher_code").notNull(), // DOCENT field
@@ -146,6 +153,7 @@ export const untisScheduleSessions = pgTable("untis_schedule_sessions", {
   classroomId: varchar("classroom_id"), // Linked to classrooms table
   importedAt: timestamp("imported_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Employee schedules (simplified - derived from Untis data)

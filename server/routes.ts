@@ -594,6 +594,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete GP Untis data import
+  app.post('/api/schedule-import/complete-import', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user?.institutionId) {
+        return res.status(401).json({ message: 'Institution not found' });
+      }
+
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: 'No active academic year found' });
+      }
+
+      // Import all GP Untis data
+      const result = await storage.importCompleteUntisData(user.institutionId, activeYear.id);
+      res.json({
+        message: 'Complete GP Untis data import successful',
+        ...result
+      });
+    } catch (error) {
+      console.error("Error importing complete GP Untis data:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Failed to import complete data", error: errorMessage });
+    }
+  });
+
+  // Import teachers separately
+  app.post('/api/schedule-import/import-teachers', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user?.institutionId) {
+        return res.status(401).json({ message: 'Institution not found' });
+      }
+
+      const activeYear = await storage.getActiveAcademicYear(user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: 'No active academic year found' });
+      }
+
+      const fs = await import('fs');
+      const teachersPath = './attached_assets/PROFESSORAT_1754044133486.TXT';
+      
+      if (!fs.existsSync(teachersPath)) {
+        return res.status(404).json({ message: 'Teachers file not found' });
+      }
+
+      const teachersContent = fs.readFileSync(teachersPath, 'utf8');
+      const result = await storage.importUntisTeachers(teachersContent, user.institutionId, activeYear.id);
+      
+      res.json({
+        message: 'Teachers import successful',
+        ...result
+      });
+    } catch (error) {
+      console.error("Error importing teachers:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Failed to import teachers", error: errorMessage });
+    }
+  });
+
   app.post('/api/settings', isAuthenticated, async (req, res) => {
     try {
       const setting = await storage.upsertSetting(req.body);

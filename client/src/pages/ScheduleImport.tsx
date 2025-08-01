@@ -23,7 +23,11 @@ import {
   CheckCircle, 
   AlertTriangle,
   Download,
-  Copy
+  Copy,
+  RefreshCw,
+  AlertCircle,
+  Info,
+  Settings
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { UntisStats } from "@/components/UntisStats";
@@ -166,13 +170,82 @@ export default function ScheduleImport() {
       });
       
       toast({
-        title: language === "ca" ? "Prova completada" : "Prueba completada",
-        description: `${result.sessionsImported} sessions del fitxer real importades correctament`,
+        title: language === "ca" ? "Horaris importats" : "Horarios importados",
+        description: `${result.sessionsImported} sessions d'horaris importades correctament`,
       });
     } catch (error) {
       console.error('Test import error:', error);
       toast({
-        title: language === "ca" ? "Error de prova" : "Error de prueba",
+        title: language === "ca" ? "Error d'importació" : "Error de importación",
+        description: error instanceof Error ? error.message : "Error desconegut",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Complete import function
+  const handleCompleteImport = async () => {
+    setIsImporting(true);
+    setImportResults(null);
+
+    try {
+      const response = await apiRequest('POST', '/api/schedule-import/complete-import', {});
+      const result = await response.json();
+
+      setImportResults(result);
+      
+      // Refresh all queries
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/schedule-import/statistics', user?.institutionId, selectedAcademicYear] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/employees', user?.institutionId] 
+      });
+      
+      toast({
+        title: language === "ca" ? "Importació completa exitosa" : "Importación completa exitosa",
+        description: language === "ca" 
+          ? "Tots els arxius GP Untis s'han importat correctament: professorat, matèries, grups i horaris"
+          : "Todos los archivos GP Untis se han importado correctamente: profesorado, materias, grupos y horarios",
+      });
+    } catch (error) {
+      console.error('Complete import error:', error);
+      toast({
+        title: language === "ca" ? "Error d'importació completa" : "Error de importación completa",
+        description: error instanceof Error ? error.message : "Error desconegut",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Import teachers function
+  const handleImportTeachers = async () => {
+    setIsImporting(true);
+    setImportResults(null);
+
+    try {
+      const response = await apiRequest('POST', '/api/schedule-import/import-teachers', {});
+      const result = await response.json();
+
+      setImportResults(result);
+      
+      // Refresh employees query
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/employees', user?.institutionId] 
+      });
+      
+      toast({
+        title: language === "ca" ? "Professorat importat" : "Profesorado importado",
+        description: `${result.created} professors creats, ${result.updated} actualitzats`,
+      });
+    } catch (error) {
+      console.error('Teachers import error:', error);
+      toast({
+        title: language === "ca" ? "Error d'importació de professorat" : "Error de importación de profesorado",
         description: error instanceof Error ? error.message : "Error desconegut",
         variant: "destructive",
       });
@@ -227,26 +300,47 @@ export default function ScheduleImport() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  {/* Test with real file section */}
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
-                      {language === "ca" ? "Prova amb fitxer real GP Untis" : "Prueba con archivo real GP Untis"}
+                  {/* Complete GP Untis import section */}
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
+                      {language === "ca" ? "Importació completa de dades GP Untis" : "Importación completa de datos GP Untis"}
                     </h4>
-                    <p className="text-sm text-blue-600 dark:text-blue-300 mb-3">
+                    <p className="text-sm text-green-600 dark:text-green-300 mb-3">
                       {language === "ca" 
-                        ? "Prova la importació amb l'arxiu HORARIS_1754043300200.TXT que has pujat"
-                        : "Prueba la importación con el archivo HORARIS_1754043300200.TXT que has subido"}
+                        ? "Importa tots els arxius: professorat, matèries, grups i horaris de l'Institut Bitàcola"
+                        : "Importa todos los archivos: profesorado, materias, grupos y horarios del Institut Bitàcola"}
                     </p>
-                    <Button
-                      onClick={handleTestRealFile}
-                      variant="outline"
-                      size="sm"
-                      className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-900/40"
-                      disabled={isImporting}
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      {language === "ca" ? "Provar fitxer real TXT" : "Probar archivo real TXT"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleCompleteImport}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        size="sm"
+                        disabled={isImporting}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {language === "ca" ? "Importació completa" : "Importación completa"}
+                      </Button>
+                      <Button
+                        onClick={handleImportTeachers}
+                        variant="outline"
+                        size="sm"
+                        className="text-green-600 border-green-300 hover:bg-green-100 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/40"
+                        disabled={isImporting}
+                      >
+                        <Users className="h-4 w-4 mr-2" />
+                        {language === "ca" ? "Només professorat" : "Solo profesorado"}
+                      </Button>
+                      <Button
+                        onClick={handleTestRealFile}
+                        variant="outline"
+                        size="sm"
+                        className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-900/40"
+                        disabled={isImporting}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        {language === "ca" ? "Només horaris" : "Solo horarios"}
+                      </Button>
+                    </div>
                   </div>
 
                   <div>

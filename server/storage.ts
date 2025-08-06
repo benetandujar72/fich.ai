@@ -541,36 +541,26 @@ export class DatabaseStorage implements IStorage {
 
   // Check if IP is allowed for attendance
   async isIPAllowedForAttendance(institutionId: string, clientIP: string): Promise<boolean> {
-    console.log(`🔍 IP Check - Institution: ${institutionId}, Client IP: ${clientIP}`);
-    
     let networkSettings = await this.getAttendanceNetworkSettings(institutionId);
     
     // If no settings for specific institution, try global settings (null)
     if (!networkSettings && institutionId !== 'null') {
-      console.log(`🔄 No settings for institution ${institutionId}, trying global settings`);
       networkSettings = await this.getAttendanceNetworkSettings('null');
     }
     
-    console.log(`⚙️ Network settings found:`, networkSettings);
-    
     if (!networkSettings || !networkSettings.requireNetworkValidation) {
-      console.log(`✅ No network validation required`);
       return true; // No network validation required
     }
 
     // Check if client IP is in allowed networks
     const allowedNetworks = networkSettings.allowedNetworks || [];
-    console.log(`🌐 Checking IP ${clientIP} against networks:`, allowedNetworks);
     
     for (const network of allowedNetworks) {
-      console.log(`🔍 Testing network: ${network}`);
       if (this.isIPInNetwork(clientIP, network)) {
-        console.log(`✅ IP ${clientIP} matches network ${network}`);
         return true;
       }
     }
     
-    console.log(`❌ IP ${clientIP} not in any allowed network`);
     return false;
   }
 

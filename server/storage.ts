@@ -989,7 +989,24 @@ export class DatabaseStorage implements IStorage {
 
     // Get alert settings
     const alertSettings = await this.getAutomatedAlertSettings(institutionId);
-    if (!alertSettings || !alertSettings.recipientEmails || alertSettings.recipientEmails.length === 0) {
+    console.log('Alert settings for test:', alertSettings);
+    
+    if (!alertSettings) {
+      throw new Error("No alert settings configured.");
+    }
+    
+    // Parse recipientEmails if it's a string (JSON stored in DB)
+    let recipientEmails = alertSettings.recipientEmails;
+    if (typeof recipientEmails === 'string') {
+      try {
+        recipientEmails = JSON.parse(recipientEmails);
+      } catch (e) {
+        console.error('Error parsing recipientEmails:', e);
+        recipientEmails = [];
+      }
+    }
+    
+    if (!recipientEmails || recipientEmails.length === 0) {
       throw new Error("No recipients configured for alerts.");
     }
 
@@ -1027,7 +1044,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
     // In a real implementation, this would send the actual email
     // For now, we simulate the process
-    console.log(`Test alert sent to: ${alertSettings.recipientEmails.join(', ')}`);
+    console.log(`Test alert sent to: ${recipientEmails.join(', ')}`);
     console.log(`Subject: ${subject}`);
     console.log(`Body preview: ${body.substring(0, 100)}...`);
     

@@ -27,8 +27,16 @@ export default function NetworkSettingsForm({ institutionId, language }: Network
   const { data: networkSettings, isLoading } = useQuery({
     queryKey: ["/api/attendance-network-settings", institutionId],
     enabled: !!institutionId,
-
   });
+
+  // Load existing data when received from server
+  useEffect(() => {
+    if (networkSettings) {
+      setAllowedNetworks(networkSettings.allowedNetworks || []);
+      setRequireValidation(networkSettings.requireNetworkValidation || false);
+      setDescription(networkSettings.description || "");
+    }
+  }, [networkSettings]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {

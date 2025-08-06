@@ -114,17 +114,17 @@ export interface IStorage {
   createSubstituteAssignment(assignment: InsertSubstituteAssignment): Promise<SubstituteAssignment>;
 
   // Settings operations
-  getSettings(institutionId: string): Promise<Setting[]>;
+  getSettings(institutionId: string | null): Promise<Setting[]>;
   getSetting(institutionId: string, key: string): Promise<Setting | undefined>;
   upsertSetting(setting: InsertSetting): Promise<Setting>;
 
   // Network settings operations
-  getAttendanceNetworkSettings(institutionId: string): Promise<AttendanceNetworkSetting | undefined>;
+  getAttendanceNetworkSettings(institutionId: string | null): Promise<AttendanceNetworkSetting | undefined>;
   upsertAttendanceNetworkSettings(settings: InsertAttendanceNetworkSetting): Promise<AttendanceNetworkSetting>;
   isIPAllowedForAttendance(institutionId: string, clientIP: string): Promise<boolean>;
 
   // Email settings operations
-  getEmailSettings(institutionId: string): Promise<EmailSetting | undefined>;
+  getEmailSettings(institutionId: string | null): Promise<EmailSetting | undefined>;
   upsertEmailSettings(settings: InsertEmailSetting): Promise<EmailSetting>;
 
   // Absence justifications operations
@@ -470,8 +470,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Settings operations
-  async getSettings(institutionId: string): Promise<Setting[]> {
-    return await db.select().from(settings).where(eq(settings.institutionId, institutionId));
+  async getSettings(institutionId: string | null): Promise<Setting[]> {
+    return await db.select().from(settings).where(institutionId === null 
+      ? sql`${settings.institutionId} IS NULL`
+      : eq(settings.institutionId, institutionId));
   }
 
   async getSetting(institutionId: string, key: string): Promise<Setting | undefined> {
@@ -514,11 +516,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Attendance network settings operations
-  async getAttendanceNetworkSettings(institutionId: string): Promise<AttendanceNetworkSetting | undefined> {
+  async getAttendanceNetworkSettings(institutionId: string | null): Promise<AttendanceNetworkSetting | undefined> {
     const [networkSettings] = await db
       .select()
       .from(attendanceNetworkSettings)
-      .where(eq(attendanceNetworkSettings.institutionId, institutionId));
+      .where(institutionId === null 
+        ? sql`${attendanceNetworkSettings.institutionId} IS NULL`
+        : eq(attendanceNetworkSettings.institutionId, institutionId));
     return networkSettings;
   }
 
@@ -587,12 +591,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Email settings operations
-  async getEmailSettings(institutionId: string): Promise<EmailSetting | undefined> {
-    const [settings] = await db
+  async getEmailSettings(institutionId: string | null): Promise<EmailSetting | undefined> {
+    const [emailSetting] = await db
       .select()
       .from(emailSettings)
-      .where(eq(emailSettings.institutionId, institutionId));
-    return settings;
+      .where(institutionId === null 
+        ? sql`${emailSettings.institutionId} IS NULL`
+        : eq(emailSettings.institutionId, institutionId));
+    return emailSetting;
   }
 
   async upsertEmailSettings(settings: InsertEmailSetting): Promise<EmailSetting> {

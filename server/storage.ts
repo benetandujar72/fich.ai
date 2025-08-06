@@ -134,7 +134,7 @@ export interface IStorage {
 
   // Alert notifications operations
   createAlertNotification(notification: InsertAlertNotification): Promise<AlertNotification>;
-  getAlertNotifications(institutionId: string): Promise<AlertNotification[]>;
+  getAlertNotifications(institutionId: string | null): Promise<AlertNotification[]>;
 
   // Password management operations
   updateUserPassword(userId: string, newPassword: string): Promise<User>;
@@ -147,6 +147,11 @@ export interface IStorage {
 
   // Dashboard statistics
   getDashboardStats(institutionId: string): Promise<any>;
+
+  // Automated alert settings operations
+  getAutomatedAlertSettings(institutionId: string | null): Promise<any>;
+  updateAutomatedAlertSettings(institutionId: string | null, alertSettings: any): Promise<any>;
+  sendTestAlert(institutionId: string | null): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -671,11 +676,13 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getAlertNotifications(institutionId: string): Promise<AlertNotification[]> {
+  async getAlertNotifications(institutionId: string | null): Promise<AlertNotification[]> {
     return await db
       .select()
       .from(alertNotifications)
-      .where(eq(alertNotifications.institutionId, institutionId))
+      .where(institutionId === null 
+        ? sql`${alertNotifications.institutionId} IS NULL`
+        : eq(alertNotifications.institutionId, institutionId))
       .orderBy(desc(alertNotifications.sentAt));
   }
 
@@ -917,13 +924,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Automated alert settings operations
-  async getAutomatedAlertSettings(institutionId: string): Promise<any> {
+  async getAutomatedAlertSettings(institutionId: string | null): Promise<any> {
     const alertSettings = await db
       .select()
       .from(settings)
       .where(
         and(
-          eq(settings.institutionId, institutionId),
+          institutionId === null 
+            ? sql`${settings.institutionId} IS NULL`
+            : eq(settings.institutionId, institutionId),
           eq(settings.key, 'automated_alerts')
         )
       )
@@ -932,13 +941,15 @@ export class DatabaseStorage implements IStorage {
     return alertSettings.length > 0 ? alertSettings[0].value : null;
   }
 
-  async updateAutomatedAlertSettings(institutionId: string, alertSettings: any): Promise<any> {
+  async updateAutomatedAlertSettings(institutionId: string | null, alertSettings: any): Promise<any> {
     const existingSettings = await db
       .select()
       .from(settings)
       .where(
         and(
-          eq(settings.institutionId, institutionId),
+          institutionId === null 
+            ? sql`${settings.institutionId} IS NULL`
+            : eq(settings.institutionId, institutionId),
           eq(settings.key, 'automated_alerts')
         )
       )
@@ -969,7 +980,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async sendTestAlert(institutionId: string): Promise<void> {
+  async sendTestAlert(institutionId: string | null): Promise<void> {
     // Get email settings first
     const emailSettings = await this.getEmailSettings(institutionId);
     if (!emailSettings || !emailSettings.senderEmail) {
@@ -983,8 +994,8 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Get institution info
-    const institution = await this.getInstitution(institutionId);
-    const centerName = institution?.name || "Centre Educatiu";
+    const institution = institutionId ? await this.getInstitution(institutionId) : null;
+    const centerName = institution?.name || "Sistema Global";
 
     // Prepare test email content
     const subject = `[PROVA] ${centerName} - Test d'Alertes Automàtiques`;

@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 
 interface AbsenceJustificationReviewProps {
-  institutionId: string;
+  institutionId: string | null | undefined;
   language: string;
 }
 
@@ -60,8 +60,8 @@ export default function AbsenceJustificationReview({ institutionId, language }: 
 
   // Fetch pending absence justifications
   const { data: justifications = [], isLoading } = useQuery<AbsenceJustification[]>({
-    queryKey: ["/api/absence-justifications/admin", institutionId],
-    enabled: !!institutionId,
+    queryKey: ["/api/absence-justifications/admin", institutionId || "null"],
+    enabled: institutionId !== undefined,
   });
 
   // Review justification mutation

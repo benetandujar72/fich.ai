@@ -1139,7 +1139,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/automated-alerts-settings/:institutionId', isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
-      const settings = await storage.getAutomatedAlertSettings(institutionId);
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
+      const settings = await storage.getAutomatedAlertSettings(finalInstitutionId);
       res.json(settings || {});
     } catch (error) {
       console.error("Error fetching automated alert settings:", error);
@@ -1150,8 +1151,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/automated-alerts-settings/:institutionId', isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
       const settings = req.body;
-      const updated = await storage.updateAutomatedAlertSettings(institutionId, settings);
+      const updated = await storage.updateAutomatedAlertSettings(finalInstitutionId, settings);
       res.json(updated);
     } catch (error) {
       console.error("Error updating automated alert settings:", error);
@@ -1162,7 +1164,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/automated-alerts-settings/:institutionId/test', isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
-      await storage.sendTestAlert(institutionId);
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
+      await storage.sendTestAlert(finalInstitutionId);
       res.json({ message: "Test alert sent successfully" });
     } catch (error) {
       console.error("Error sending test alert:", error);

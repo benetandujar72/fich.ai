@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 
 interface AutomatedAlertsConfigProps {
-  institutionId: string;
+  institutionId: string | null | undefined;
   language: string;
 }
 
@@ -63,14 +63,15 @@ export default function AutomatedAlertsConfig({ institutionId, language }: Autom
 
   // Fetch current alert settings
   const { data: settings, isLoading } = useQuery<any>({
-    queryKey: ["/api/automated-alerts-settings", institutionId],
-    enabled: !!institutionId,
+    queryKey: ["/api/automated-alerts-settings", institutionId || "null"],
+    enabled: institutionId !== undefined,
   });
 
   // Update settings mutation
   const updateSettingsMutation = useMutation({
     mutationFn: async (settings: AlertSettings) => {
-      return await apiRequest("PUT", `/api/automated-alerts-settings/${institutionId}`, settings);
+      const finalInstitutionId = institutionId || "null";
+      return await apiRequest("PUT", `/api/automated-alerts-settings/${finalInstitutionId}`, settings);
     },
     onSuccess: () => {
       toast({
@@ -95,7 +96,8 @@ export default function AutomatedAlertsConfig({ institutionId, language }: Autom
   // Test alert mutation
   const testAlertMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", `/api/automated-alerts-settings/${institutionId}/test`);
+      const finalInstitutionId = institutionId || "null";
+      return await apiRequest("POST", `/api/automated-alerts-settings/${finalInstitutionId}/test`);
     },
     onSuccess: () => {
       toast({

@@ -450,7 +450,7 @@ export default function Settings() {
       {/* Absence Justification Review - Only for Admins */}
       {permissions.canManageUsers && (
         <AbsenceJustificationReview 
-          institutionId={institutionId || ""} 
+          institutionId={institutionId || null} 
           language={language} 
         />
       )}
@@ -458,7 +458,7 @@ export default function Settings() {
       {/* Automated Alerts Configuration - Only for Admins */}
       {permissions.canManageUsers && (
         <AutomatedAlertsConfig 
-          institutionId={institutionId || ""} 
+          institutionId={institutionId || null} 
           language={language} 
         />
       )}
@@ -707,16 +707,7 @@ export default function Settings() {
         </div>
       )}
 
-      {/* Password Change Modal */}
-      {passwordChangeUser && (
-        <PasswordChangeModal
-          isOpen={!!passwordChangeUser}
-          onClose={() => setPasswordChangeUser(null)}
-          userId={passwordChangeUser.id}
-          userEmail={passwordChangeUser.email}
-          language={language}
-        />
-      )}
+      {/* Password Change Modal - handled by PasswordChangeModal component itself */}
     </main>
   );
 }

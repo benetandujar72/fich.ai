@@ -920,9 +920,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/attendance-network-settings/:institutionId", isAuthenticated, async (req, res) => {
     try {
       const { institutionId } = req.params;
-      const networkSettings = await storage.getAttendanceNetworkSettings(institutionId);
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
+      const networkSettings = await storage.getAttendanceNetworkSettings(finalInstitutionId);
       res.json(networkSettings || {
-        institutionId,
+        institutionId: finalInstitutionId,
         allowedNetworks: [],
         requireNetworkValidation: false,
         description: ""
@@ -938,8 +939,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { institutionId } = req.params;
       const { allowedNetworks, requireNetworkValidation, description } = req.body;
       
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
       const networkSettings = await storage.upsertAttendanceNetworkSettings({
-        institutionId,
+        institutionId: finalInstitutionId,
         allowedNetworks: allowedNetworks || [],
         requireNetworkValidation: requireNetworkValidation || false,
         description: description || ""

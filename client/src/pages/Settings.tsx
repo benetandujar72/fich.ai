@@ -52,7 +52,7 @@ export default function Settings() {
   const queryClient = useQueryClient();
   
   // Get institution ID from authenticated user
-  const institutionId = user?.institutionId;
+  const institutionId = user?.institutionId || null;
 
   const [centerSettings, setCenterSettings] = useState<CenterSettings>({
     centerName: "Centre Educatiu Exemple",
@@ -384,7 +384,7 @@ export default function Settings() {
             </div>
           </div>
           
-          <EmailSettingsForm institutionId={institutionId} language={language} />
+          <EmailSettingsForm institutionId={institutionId || undefined} language={language} />
         </CardContent>
       </Card>
 

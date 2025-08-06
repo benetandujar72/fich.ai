@@ -10,8 +10,14 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Trash2, Wifi, Shield, Network } from "lucide-react";
 
+interface NetworkSettings {
+  allowedNetworks: string[];
+  requireNetworkValidation: boolean;
+  description: string;
+}
+
 interface NetworkSettingsFormProps {
-  institutionId: string | undefined;
+  institutionId: string | null | undefined;
   language: string;
 }
 
@@ -24,9 +30,15 @@ export default function NetworkSettingsForm({ institutionId, language }: Network
   const [description, setDescription] = useState("");
   const [newNetwork, setNewNetwork] = useState("");
 
-  const { data: networkSettings, isLoading } = useQuery({
-    queryKey: ["/api/attendance-network-settings", institutionId],
-    enabled: !!institutionId,
+  const { data: networkSettings, isLoading } = useQuery<NetworkSettings>({
+    queryKey: ["/api/attendance-network-settings", institutionId || "null"],
+    queryFn: async () => {
+      const response = await fetch(`/api/attendance-network-settings/${institutionId || "null"}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch network settings');
+      }
+      return response.json();
+    },
   });
 
   // Load existing data when received from server
@@ -40,14 +52,14 @@ export default function NetworkSettingsForm({ institutionId, language }: Network
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("PUT", `/api/attendance-network-settings/${institutionId}`, data);
+      return await apiRequest("PUT", `/api/attendance-network-settings/${institutionId || "null"}`, data);
     },
     onSuccess: () => {
       toast({
         title: language === "ca" ? "Èxit" : "Éxito",
         description: language === "ca" ? "Configuració de xarxa guardada" : "Configuración de red guardada",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance-network-settings", institutionId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance-network-settings", institutionId || "null"] });
     },
     onError: (error: any) => {
       toast({

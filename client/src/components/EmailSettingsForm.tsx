@@ -9,7 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Mail, Server, User, Lock, Eye, EyeOff } from "lucide-react";
 
 interface EmailSettingsFormProps {
-  institutionId: string | undefined;
+  institutionId: string | null | undefined;
   language: string;
 }
 
@@ -37,9 +37,15 @@ export default function EmailSettingsForm({ institutionId, language }: EmailSett
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["/api/email-settings", institutionId],
-    enabled: !!institutionId,
+  const { data: settings, isLoading } = useQuery<EmailSettings>({
+    queryKey: ["/api/email-settings", institutionId || "null"],
+    queryFn: async () => {
+      const response = await fetch(`/api/email-settings/${institutionId || "null"}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch email settings');
+      }
+      return response.json();
+    },
   });
 
   useEffect(() => {
@@ -57,14 +63,14 @@ export default function EmailSettingsForm({ institutionId, language }: EmailSett
 
   const updateMutation = useMutation({
     mutationFn: async (data: EmailSettings) => {
-      return await apiRequest("PUT", `/api/email-settings/${institutionId}`, data);
+      return await apiRequest("PUT", `/api/email-settings/${institutionId || "null"}`, data);
     },
     onSuccess: () => {
       toast({
         title: language === "ca" ? "Èxit" : "Éxito",
         description: language === "ca" ? "Configuració d'email guardada" : "Configuración de email guardada",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/email-settings", institutionId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/email-settings", institutionId || "null"] });
     },
     onError: (error: any) => {
       toast({
@@ -77,7 +83,7 @@ export default function EmailSettingsForm({ institutionId, language }: EmailSett
 
   const testEmailMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", `/api/email-settings/${institutionId}/test`, emailSettings);
+      return await apiRequest("POST", `/api/email-settings/${institutionId || "null"}/test`, emailSettings);
     },
     onSuccess: () => {
       toast({

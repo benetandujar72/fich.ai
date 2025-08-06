@@ -890,7 +890,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/settings/:institutionId", isAuthenticated, async (req, res) => {
     try {
       const { institutionId } = req.params;
-      const settings = await storage.getSettings(institutionId);
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
+      const settings = await storage.getSettings(finalInstitutionId);
       res.json(settings);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -903,8 +904,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { institutionId, key } = req.params;
       const { value } = req.body;
       
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
       const setting = await storage.upsertSetting({
-        institutionId,
+        institutionId: finalInstitutionId,
         key,
         value: String(value),
       });
@@ -979,9 +981,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/email-settings/:institutionId", isAuthenticated, async (req, res) => {
     try {
       const { institutionId } = req.params;
-      const settings = await storage.getEmailSettings(institutionId);
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
+      const settings = await storage.getEmailSettings(finalInstitutionId);
       res.json(settings || {
-        institutionId,
+        institutionId: finalInstitutionId,
         smtpHost: "",
         smtpPort: 587,
         smtpUser: "",
@@ -1000,8 +1003,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { institutionId } = req.params;
       const emailConfig = req.body;
       
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
       const settings = await storage.upsertEmailSettings({
-        institutionId,
+        institutionId: finalInstitutionId,
         ...emailConfig
       });
       
@@ -1015,6 +1019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/email-settings/:institutionId/test", isAuthenticated, async (req, res) => {
     try {
       const { institutionId } = req.params;
+      const finalInstitutionId = institutionId === "null" ? null : institutionId;
       const emailConfig = req.body;
       
       // Simple test email sending (mock implementation)

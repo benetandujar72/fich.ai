@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,13 +55,13 @@ export default function Settings() {
   const institutionId = user?.institutionId || null;
 
   const [centerSettings, setCenterSettings] = useState<CenterSettings>({
-    centerName: "Centre Educatiu Exemple",
-    academicYear: "2024-2025",
+    centerName: "",
+    academicYear: "2025-2026",
     timezone: "Europe/Barcelona",
     defaultLanguage: "ca",
   });
 
-  const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true);
+  const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(false);
   const [showAddAdminForm, setShowAddAdminForm] = useState(false);
   const [passwordChangeUser, setPasswordChangeUser] = useState<{ id: string; email: string } | null>(null);
   const [newAdminData, setNewAdminData] = useState({
@@ -72,20 +72,50 @@ export default function Settings() {
     password: "prof123"
   });
 
-  const { data: settings = [] } = useQuery({
-    queryKey: ["/api/settings", institutionId],
-    enabled: !!institutionId,
+  const { data: settings = [], isLoading: settingsLoading } = useQuery({
+    queryKey: ["/api/settings", institutionId || "null"],
+    queryFn: async () => {
+      const response = await fetch(`/api/settings/${institutionId || "null"}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch settings');
+      }
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    },
   });
+
+  // Load existing center settings when data is received
+  useEffect(() => {
+    if (settings && Array.isArray(settings) && settings.length > 0) {
+      const settingsObj = settings.reduce((acc: any, setting: any) => {
+        acc[setting.key] = setting.value;
+        return acc;
+      }, {});
+      
+      setCenterSettings({
+        centerName: settingsObj.centerName || "",
+        academicYear: settingsObj.academicYear || "2025-2026",
+        timezone: settingsObj.timezone || "Europe/Barcelona",
+        defaultLanguage: settingsObj.defaultLanguage || "ca",
+      });
+      
+      setAutoDeleteEnabled(settingsObj.autoDeleteEnabled === "true" || false);
+    }
+  }, [settings]);
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (settingsData: CenterSettings) => {
       const promises = Object.entries(settingsData).map(([key, value]) =>
-        apiRequest("PUT", `/api/settings/${institutionId}/${key}`, { value })
+        apiRequest("PUT", `/api/settings/${institutionId || "null"}/${key}`, { value })
+      );
+      // Also save autoDeleteEnabled
+      promises.push(
+        apiRequest("PUT", `/api/settings/${institutionId || "null"}/autoDeleteEnabled`, { value: autoDeleteEnabled.toString() })
       );
       await Promise.all(promises);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/settings", institutionId || "null"] });
       toast({
         title: t("success", language),
         description: language === "ca" ? "Configuració guardada correctament" : "Configuración guardada correctamente",
@@ -384,7 +414,7 @@ export default function Settings() {
             </div>
           </div>
           
-          <EmailSettingsForm institutionId={institutionId || undefined} language={language} />
+          <EmailSettingsForm institutionId={institutionId} language={language} />
         </CardContent>
       </Card>
 

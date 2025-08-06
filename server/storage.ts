@@ -938,7 +938,22 @@ export class DatabaseStorage implements IStorage {
       )
       .limit(1);
 
-    return alertSettings.length > 0 ? alertSettings[0].value : null;
+    if (alertSettings.length === 0) {
+      return null;
+    }
+
+    // Parse JSON string from database
+    const value = alertSettings[0].value;
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        console.error('Error parsing automated alert settings JSON:', e);
+        return null;
+      }
+    }
+    
+    return value;
   }
 
   async updateAutomatedAlertSettings(institutionId: string | null, alertSettings: any): Promise<any> {
@@ -995,16 +1010,8 @@ export class DatabaseStorage implements IStorage {
       throw new Error("No alert settings configured.");
     }
     
-    // Parse recipientEmails if it's a string (JSON stored in DB)
-    let recipientEmails = alertSettings.recipientEmails;
-    if (typeof recipientEmails === 'string') {
-      try {
-        recipientEmails = JSON.parse(recipientEmails);
-      } catch (e) {
-        console.error('Error parsing recipientEmails:', e);
-        recipientEmails = [];
-      }
-    }
+    // Now alertSettings is already parsed as an object
+    const recipientEmails = alertSettings.recipientEmails || [];
     
     if (!recipientEmails || recipientEmails.length === 0) {
       throw new Error("No recipients configured for alerts.");
@@ -1047,6 +1054,12 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     console.log(`Test alert sent to: ${recipientEmails.join(', ')}`);
     console.log(`Subject: ${subject}`);
     console.log(`Body preview: ${body.substring(0, 100)}...`);
+    
+    return { 
+      message: 'Test alert sent successfully',
+      recipients: recipientEmails,
+      subject 
+    };
     
     // In production, integrate with actual email service like SendGrid, SES, or SMTP
     // Example pseudo-code:

@@ -120,6 +120,7 @@ export default function AutomatedAlertsConfig({ institutionId, language }: Autom
 
   useEffect(() => {
     if (settings && typeof settings === 'object') {
+      console.log('Loading alert settings:', settings);
       setAlertSettings({
         enabled: (settings as any).enabled || false,
         delayThresholdMinutes: (settings as any).delayThresholdMinutes || 15,

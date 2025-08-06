@@ -554,7 +554,7 @@ export class DatabaseStorage implements IStorage {
     
     // If no settings for specific institution, try global settings (null)
     if (!networkSettings && institutionId !== 'null') {
-      networkSettings = await this.getAttendanceNetworkSettings('null');
+      networkSettings = await this.getAttendanceNetworkSettings(null);
     }
     
     if (!networkSettings || !networkSettings.requireNetworkValidation) {

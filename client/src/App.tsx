@@ -26,13 +26,102 @@ import Communications from "@/pages/Communications";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import QuickAttendanceModal from "@/components/modals/QuickAttendanceModal";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const { language } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Get last attendance record to determine button states
+  const { data: attendanceRecords } = useQuery({
+    queryKey: ["/api/attendance", user?.id],
+    enabled: !!user?.id && isAuthenticated,
+  });
+
+  const lastAttendanceRecord = Array.isArray(attendanceRecords) && attendanceRecords.length > 0 
+    ? attendanceRecords[attendanceRecords.length - 1] 
+    : null;
+
+  // Quick attendance mutation
+  const quickAttendanceMutation = useMutation({
+    mutationFn: async (data: { type: "check_in" | "check_out"; timestamp: Date }) => {
+      return await apiRequest("POST", "/api/attendance", {
+        ...data,
+        method: "quick",
+        location: "quick_attendance_modal"
+      });
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate all attendance-related queries
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
+      toast({
+        title: "Éxito",
+        description: variables.type === "check_in" 
+          ? (language === "ca" ? "Entrada registrada correctament" : "Entrada registrada correctamente")
+          : (language === "ca" ? "Sortida registrada correctament" : "Salida registrada correctamente"),
+      });
+      setIsQuickAttendanceOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || (language === "ca" ? "Error registrant el fitxatge" : "Error registrando el fichaje"),
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Button state logic
+  const shouldDisableCheckIn = () => {
+    if (!lastAttendanceRecord) return false;
+    const today = new Date().toDateString();
+    const lastDate = new Date(lastAttendanceRecord.timestamp).toDateString();
+    if (today !== lastDate) return false;
+    return lastAttendanceRecord.type === 'check_in';
+  };
+  
+  const shouldDisableCheckOut = () => {
+    if (!lastAttendanceRecord) return true;
+    const today = new Date().toDateString();
+    const lastDate = new Date(lastAttendanceRecord.timestamp).toDateString();
+    if (today !== lastDate) return true;
+    return lastAttendanceRecord.type === 'check_out';
+  };
+
+  const handleQuickCheckIn = () => {
+    if (!shouldDisableCheckIn()) {
+      quickAttendanceMutation.mutate({
+        type: "check_in",
+        timestamp: new Date()
+      });
+    }
+  };
+
+  const handleQuickCheckOut = () => {
+    if (!shouldDisableCheckOut()) {
+      quickAttendanceMutation.mutate({
+        type: "check_out",
+        timestamp: new Date()
+      });
+    }
+  };
 
   const getPageTitle = (path: string) => {
     const titles = {
@@ -216,20 +305,17 @@ function Router() {
       <QuickAttendanceModal 
         isOpen={isQuickAttendanceOpen}
         onClose={() => setIsQuickAttendanceOpen(false)}
-        onCheckIn={() => {
-          // This would be handled by the individual page components
-          setIsQuickAttendanceOpen(false);
-        }}
-        onCheckOut={() => {
-          // This would be handled by the individual page components
-          setIsQuickAttendanceOpen(false);
-        }}
-        currentTime={new Date().toLocaleTimeString("ca-ES", {
+        onCheckIn={handleQuickCheckIn}
+        onCheckOut={handleQuickCheckOut}
+        currentTime={currentTime.toLocaleTimeString("ca-ES", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: false,
         })}
+        shouldDisableCheckIn={shouldDisableCheckIn()}
+        shouldDisableCheckOut={shouldDisableCheckOut()}
+        isLoading={quickAttendanceMutation.isPending}
       />
     </div>
   );

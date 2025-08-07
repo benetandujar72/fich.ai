@@ -7,7 +7,7 @@ import {
   DialogDescription 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Clock, LogIn, LogOut } from "lucide-react";
+import { Clock, LogIn, LogOut, Loader2 } from "lucide-react";
 
 interface QuickAttendanceModalProps {
   isOpen: boolean;
@@ -15,6 +15,9 @@ interface QuickAttendanceModalProps {
   onCheckIn: () => void;
   onCheckOut: () => void;
   currentTime: string;
+  shouldDisableCheckIn?: boolean;
+  shouldDisableCheckOut?: boolean;
+  isLoading?: boolean;
 }
 
 export default function QuickAttendanceModal({ 
@@ -22,18 +25,19 @@ export default function QuickAttendanceModal({
   onClose, 
   onCheckIn, 
   onCheckOut, 
-  currentTime 
+  currentTime,
+  shouldDisableCheckIn = false,
+  shouldDisableCheckOut = false,
+  isLoading = false
 }: QuickAttendanceModalProps) {
   const { language } = useLanguage();
 
   const handleCheckIn = () => {
     onCheckIn();
-    onClose();
   };
 
   const handleCheckOut = () => {
     onCheckOut();
-    onClose();
   };
 
   return (
@@ -57,19 +61,39 @@ export default function QuickAttendanceModal({
           <div className="space-y-3">
             <Button 
               onClick={handleCheckIn}
-              className="w-full bg-secondary text-white py-3 px-6 text-lg font-medium hover:bg-green-700"
+              disabled={shouldDisableCheckIn || isLoading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 text-lg font-medium disabled:bg-gray-400"
               data-testid="modal-checkin-button"
             >
-              <LogIn className="mr-2 h-5 w-5" />
-              {language === "ca" ? "Entrada" : "Entrada"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {language === "ca" ? "Registrant..." : "Registrando..."}
+                </>
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-5 w-5" />
+                  {language === "ca" ? "Entrada" : "Entrada"}
+                </>
+              )}
             </Button>
             <Button 
               onClick={handleCheckOut}
-              className="w-full bg-error text-white py-3 px-6 text-lg font-medium hover:bg-red-700"
+              disabled={shouldDisableCheckOut || isLoading}
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 text-lg font-medium disabled:bg-gray-400"
               data-testid="modal-checkout-button"
             >
-              <LogOut className="mr-2 h-5 w-5" />
-              {language === "ca" ? "Sortida" : "Salida"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {language === "ca" ? "Registrant..." : "Registrando..."}
+                </>
+              ) : (
+                <>
+                  <LogOut className="mr-2 h-5 w-5" />
+                  {language === "ca" ? "Sortida" : "Salida"}
+                </>
+              )}
             </Button>
           </div>
           

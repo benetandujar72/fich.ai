@@ -49,6 +49,9 @@ export default function Attendance() {
   const { data: attendanceRecords = [], isLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ["/api/attendance", employeeId],
     enabled: !!employeeId,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Get the last attendance record to determine button states

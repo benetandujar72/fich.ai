@@ -67,10 +67,13 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     return date;
   });
 
-  // Fetch weekly attendance data
+  // Fetch weekly attendance data with proper caching
   const { data: weeklyAttendance = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/attendance/weekly", employeeId, weekStart.toISOString()],
     enabled: !!employeeId,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Submit absence justification
@@ -89,7 +92,7 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
           ? "La justificació d'absència ha estat enviada per a revisió" 
           : "La justificación de ausencia ha sido enviada para revisión",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly", employeeId] });
       queryClient.invalidateQueries({ queryKey: ["/api/absence-justifications"] });
       setShowJustificationModal(false);
       setJustificationReason("");

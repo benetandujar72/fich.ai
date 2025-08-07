@@ -52,12 +52,14 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
   const [justificationReason, setJustificationReason] = useState("");
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
-  // Get current week's Monday
+  // Get current week's Monday at 00:00:00 to prevent constant re-renders
   const getWeekStart = (date: Date) => {
     const d = new Date(date);
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Sunday
-    return new Date(d.setDate(diff));
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0); // Normalize to start of day to prevent infinite loops
+    return d;
   };
 
   // Memoize weekStart to prevent recalculation on every render
@@ -68,14 +70,24 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     return date;
   });
 
+  // Memoize the query key to prevent unnecessary re-renders
+  const queryKey = useMemo(() => [
+    "/api/attendance/weekly", 
+    employeeId, 
+    weekStart.toISOString()
+  ], [employeeId, weekStart]);
+
   // Fetch weekly attendance data with proper caching
   const { data: weeklyAttendance = [], isLoading } = useQuery<any[]>({
-    queryKey: ["/api/attendance/weekly", employeeId, weekStart.toISOString()],
+    queryKey,
     enabled: !!employeeId,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 2 * 60 * 60 * 1000, // 2 hours - very long cache
-    gcTime: 4 * 60 * 60 * 1000, // 4 hours garbage collection
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: 5 * 60 * 60 * 1000, // 5 hours - very long cache to prevent loops
+    gcTime: 8 * 60 * 60 * 1000, // 8 hours garbage collection
+    retry: false, // Disable retries to prevent loops
   });
   
   // console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());

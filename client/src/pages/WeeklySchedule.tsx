@@ -41,13 +41,6 @@ export default function WeeklySchedule() {
     enabled: !!user?.id,
   });
 
-  // Debug log
-  console.log('WeeklySchedule - User ID:', user?.id);
-  console.log('WeeklySchedule - Schedule Data:', scheduleData);
-  console.log('WeeklySchedule - Schedule Data Length:', Array.isArray(scheduleData) ? scheduleData.length : 'Not array');
-  console.log('WeeklySchedule - Current Week:', format(currentWeek, 'yyyy-MM-dd'));
-  console.log('WeeklySchedule - Error:', error);
-  console.log('WeeklySchedule - Loading:', isLoading);
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Start on Monday
   const weekDays = Array.from({ length: 5 }, (_, i) => addDays(weekStart, i)); // Monday to Friday

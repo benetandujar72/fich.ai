@@ -142,19 +142,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/attendance', isAuthenticated, async (req, res) => {
-    try {
-      const attendanceData = {
-        ...req.body,
-        timestamp: req.body.timestamp ? new Date(req.body.timestamp) : new Date()
-      };
-      const record = await storage.createAttendanceRecord(attendanceData);
-      res.json(record);
-    } catch (error: any) {
-      console.error("Error creating attendance record:", error);
-      res.status(400).json({ message: "Invalid attendance data", error: error.message });
-    }
-  });
 
   // Alerts routes
   app.get('/api/alerts/:institutionId', isAuthenticated, async (req, res) => {
@@ -434,13 +421,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Employee not found" });
       }
 
+      // Check network permission before allowing attendance
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      const isAllowed = await storage.isIPAllowedForAttendance(employee.institutionId, clientIP);
+      
+      if (!isAllowed) {
+        return res.status(403).json({ 
+          message: "Fitxatge només disponible des de la xarxa local del centre",
+          allowed: false,
+          clientIP 
+        });
+      }
+
       const now = new Date();
       const attendanceRecord = await storage.createAttendanceRecord({
         employeeId,
         type,
         timestamp: now,
         method: "web",
-        location: "login_screen"
+        location: "quick_attendance"
       });
 
       // Calculate if attendance is on time, late, or early
@@ -808,6 +807,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/attendance", isAuthenticated, async (req, res) => {
     try {
       const validatedData = insertAttendanceRecordSchema.parse(req.body);
+      
+      // Check network permission before allowing attendance
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      const employee = await storage.getEmployee(validatedData.employeeId);
+      
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      
+      const isAllowed = await storage.isIPAllowedForAttendance(employee.institutionId, clientIP);
+      
+      if (!isAllowed) {
+        return res.status(403).json({ 
+          message: "Fitxatge només disponible des de la xarxa local del centre",
+          allowed: false,
+          clientIP 
+        });
+      }
+      
       const record = await storage.createAttendanceRecord(validatedData);
       res.status(201).json(record);
     } catch (error) {

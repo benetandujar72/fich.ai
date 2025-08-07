@@ -16,6 +16,7 @@ import {
   Info,
   BarChart3
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const { language } = useLanguage();
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const permissions = usePermissions();
   const { getRoleDisplayName } = useRoleDisplay();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [, setLocation] = useLocation();
 
   // Get institution ID from authenticated user
   const institutionId = user?.institutionId;
@@ -110,19 +112,22 @@ export default function Dashboard() {
       title: language === "ca" ? "Afegir nou empleat" : "Añadir nuevo empleado",
       icon: UserPlus,
       color: "bg-primary hover:bg-blue-700",
-      testId: "action-add-employee"
+      testId: "action-add-employee",
+      onClick: () => setLocation("/employees")
     },
     permissions.canImportSchedules && {
       title: language === "ca" ? "Importar horaris" : "Importar horarios",
       icon: FolderInput,
       color: "bg-secondary hover:bg-green-700",
-      testId: "action-import-schedules"
+      testId: "action-import-schedules",
+      onClick: () => setLocation("/schedule-import")
     },
     (permissions.canGenerateInstitutionReports || permissions.canGeneratePersonalReports) && {
       title: language === "ca" ? "Generar informe" : "Generar informe",
       icon: Download,
       color: "bg-accent hover:bg-orange-600",
-      testId: "action-generate-report"
+      testId: "action-generate-report",
+      onClick: () => setLocation("/reports")
     },
   ].filter(Boolean);
 
@@ -164,8 +169,9 @@ export default function Dashboard() {
                   <Button
                     key={action.title}
                     variant="outline"
-                    className={`h-24 ${action.color} text-white border-none`}
+                    className={`h-24 ${action.color} text-white border-none cursor-pointer transition-all hover:scale-105`}
                     data-testid={action.testId}
+                    onClick={action.onClick}
                   >
                     <div className="flex flex-col items-center space-y-2">
                       <action.icon className="w-6 h-6" />

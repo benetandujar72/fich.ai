@@ -74,17 +74,10 @@ export default function Attendance() {
 
   const attendanceMutation = useMutation({
     mutationFn: async (data: { type: "check_in" | "check_out"; employeeId: string; timestamp: Date }) => {
-      // Check network permission first
-      const isAllowed = await checkNetworkPermission();
-      if (!isAllowed) {
-        throw new Error(language === "ca" 
-          ? "Fitxatge només disponible des de la xarxa local del centre"
-          : "Fichaje solo disponible desde la red local del centro");
-      }
-      
       return await apiRequest("POST", "/api/attendance", {
         ...data,
         method: "web",
+        location: "attendance_page"
       });
     },
     onSuccess: (data, variables) => {
@@ -153,26 +146,54 @@ export default function Attendance() {
     );
   };
 
-  const mockSchedule = [
-    {
-      time: "08:00 - 09:00",
-      subject: language === "ca" ? "Matemàtiques - 3r A" : "Matemáticas - 3º A",
-      status: "completed",
-      testId: "schedule-math"
+  // Get today's schedule data
+  const { data: todaySchedule } = useQuery({
+    queryKey: ['/api/schedule/weekly', user?.id, format(new Date(), 'yyyy-MM-dd')],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const response = await fetch(`/api/schedule/weekly/${user.id}/${format(new Date(), 'yyyy-MM-dd')}`);
+      if (!response.ok) {
+        return [];
+      }
+      return response.json();
     },
-    {
-      time: "09:00 - 10:00",
-      subject: language === "ca" ? "Ciències - 3r B" : "Ciencias - 3º B",
-      status: "current",
-      testId: "schedule-science"
-    },
-    {
-      time: "10:30 - 11:30",
-      subject: language === "ca" ? "Tutoria - 3r A" : "Tutoría - 3º A",
-      status: "pending",
-      testId: "schedule-tutoring"
-    },
-  ];
+    enabled: !!user?.id,
+  });
+
+  // Convert schedule data to display format
+  const formatScheduleForToday = (scheduleData: any[]) => {
+    if (!scheduleData || !Array.isArray(scheduleData)) return [];
+    
+    const today = new Date();
+    const currentDay = today.getDay() === 0 ? 7 : today.getDay(); // Convert Sunday from 0 to 7
+    const currentTime = today.toTimeString().slice(0, 5); // HH:MM format
+    
+    return scheduleData
+      .filter((session: any) => session.dayOfWeek === currentDay)
+      .sort((a: any, b: any) => a.hourPeriod - b.hourPeriod)
+      .map((session: any, index: number) => {
+        const startHour = 7 + session.hourPeriod; // Assuming school starts at 8:00 (hour 1 = 8:00)
+        const endHour = startHour + 1;
+        const timeSlot = `${startHour.toString().padStart(2, '0')}:00 - ${endHour.toString().padStart(2, '0')}:00`;
+        
+        // Determine status based on current time
+        let status = 'pending';
+        if (currentTime > `${endHour}:00`) {
+          status = 'completed';
+        } else if (currentTime >= `${startHour}:00` && currentTime <= `${endHour}:00`) {
+          status = 'current';
+        }
+        
+        return {
+          time: timeSlot,
+          subject: `${session.subjectName || session.subjectCode} - ${session.groupCode}`,
+          status,
+          testId: `schedule-${session.subjectCode}-${index}`
+        };
+      });
+  };
+
+  const processedSchedule = formatScheduleForToday(todaySchedule);
 
   if (isLoading) {
     return (
@@ -311,7 +332,7 @@ export default function Attendance() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {mockSchedule.map((item, index) => (
+              {processedSchedule.length > 0 ? processedSchedule.map((item, index) => (
                 <div 
                   key={index} 
                   className={`flex items-center justify-between p-3 rounded-lg ${
@@ -352,7 +373,16 @@ export default function Attendance() {
                     }
                   </Badge>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>
+                    {language === "ca" 
+                      ? "No hi ha classes programades per avui" 
+                      : "No hay clases programadas para hoy"}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200">

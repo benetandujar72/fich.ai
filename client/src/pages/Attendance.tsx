@@ -76,7 +76,7 @@ export default function Attendance() {
   };
 
   const attendanceMutation = useMutation({
-    mutationFn: async (data: { type: "check_in" | "check_out"; employeeId: string; timestamp: Date }) => {
+    mutationFn: async (data: { type: "check_in" | "check_out"; timestamp: Date }) => {
       return await apiRequest("POST", "/api/attendance", {
         ...data,
         method: "web",
@@ -122,33 +122,15 @@ export default function Attendance() {
   });
 
   const handleCheckIn = () => {
-    if (!employeeId) {
-      toast({
-        title: t("error", language),
-        description: language === "ca" ? "No s'ha trobat l'identificador d'empleat" : "No se ha encontrado el identificador de empleado",
-        variant: "destructive",
-      });
-      return;
-    }
     attendanceMutation.mutate({
       type: "check_in",
-      employeeId,
       timestamp: new Date(),
     });
   };
 
   const handleCheckOut = () => {
-    if (!employeeId) {
-      toast({
-        title: t("error", language),
-        description: language === "ca" ? "No s'ha trobat l'identificador d'empleat" : "No se ha encontrado el identificador de empleado",
-        variant: "destructive",
-      });
-      return;
-    }
     attendanceMutation.mutate({
       type: "check_out",
-      employeeId,
       timestamp: new Date(),
     });
   };

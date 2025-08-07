@@ -145,20 +145,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create attendance record
   app.post('/api/attendance', isAuthenticated, async (req, res) => {
     try {
-      const { type, employeeId, timestamp, method, location } = req.body;
+      const { type, timestamp, method, location } = req.body;
+      const userId = (req.user as any)?.id;
       
-      if (!type || !employeeId || !timestamp) {
-        return res.status(400).json({ message: "Missing required fields: type, employeeId, timestamp" });
+      if (!type || !timestamp) {
+        return res.status(400).json({ message: "Missing required fields: type, timestamp" });
       }
 
-      // Get employee details for validation
-      const employee = await storage.getEmployee(employeeId);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get employee associated with the current user
+      const employee = await storage.getEmployeeByUserId(userId);
       if (!employee) {
-        return res.status(404).json({ message: "Employee not found" });
+        return res.status(404).json({ 
+          message: "No employee record found for this user",
+          error: "Employee record required for attendance tracking" 
+        });
       }
 
       const attendanceRecord = await storage.createAttendanceRecord({
-        employeeId,
+        employeeId: employee.id,
         type,
         timestamp: new Date(timestamp),
         method: method || "web",
@@ -168,7 +176,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(attendanceRecord);
     } catch (error) {
       console.error("Error creating attendance record:", error);
-      res.status(500).json({ message: "Failed to create attendance record" });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ 
+        message: "Failed to create attendance record",
+        error: errorMessage 
+      });
     }
   });
 

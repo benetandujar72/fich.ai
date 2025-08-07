@@ -52,6 +52,9 @@ function Router() {
   const { data: attendanceRecords } = useQuery({
     queryKey: ["/api/attendance", user?.id],
     enabled: !!user?.id && isAuthenticated,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const lastAttendanceRecord = Array.isArray(attendanceRecords) && attendanceRecords.length > 0 

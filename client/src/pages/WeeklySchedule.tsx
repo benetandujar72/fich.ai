@@ -39,6 +39,9 @@ export default function WeeklySchedule() {
       return response.json();
     },
     enabled: !!user?.id,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 30 * 60 * 1000, // 30 minutes
   });
 
 

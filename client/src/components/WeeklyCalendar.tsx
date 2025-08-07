@@ -73,8 +73,11 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     enabled: !!employeeId,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
+  
+  console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());
 
   // Submit absence justification
   const justificationMutation = useMutation({

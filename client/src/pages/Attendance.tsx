@@ -62,8 +62,9 @@ export default function Attendance() {
   const shouldDisableCheckIn = lastAttendanceRecord?.type === 'check_in';
   const shouldDisableCheckOut = !lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out';
 
-  // Check network permission before attendance
+  // Check network permission before attendance (memoized to prevent repeated calls)
   const checkNetworkPermission = async () => {
+    console.log('[DEBUG] checkNetworkPermission called at:', new Date().toLocaleTimeString());
     try {
       const response = await apiRequest("POST", "/api/attendance/check-permission", {
         institutionId: user?.institutionId
@@ -113,12 +114,27 @@ export default function Attendance() {
     return () => clearInterval(timer);
   }, []);
 
-  // Check network permission on component mount
+  // Check network permission on component mount (run only once)
   useEffect(() => {
-    if (user?.institutionId) {
-      checkNetworkPermission();
+    let mounted = true;
+    console.log('[DEBUG] useEffect checkNetworkPermission triggered. institutionId:', user?.institutionId, 'networkPermission:', networkPermission);
+    
+    if (user?.institutionId && !networkPermission && mounted) {
+      checkNetworkPermission().then(result => {
+        if (mounted) {
+          console.log('[DEBUG] Network permission check completed:', result);
+        }
+      }).catch(error => {
+        if (mounted) {
+          console.error('Network permission check failed:', error);
+        }
+      });
     }
-  }, [user?.institutionId]);
+    return () => { 
+      mounted = false; 
+      console.log('[DEBUG] useEffect cleanup - attendance component');
+    };
+  }, []); // Run only once on mount
 
   const timeString = currentTime.toLocaleTimeString("ca-ES", {
     hour: "2-digit",
@@ -164,6 +180,9 @@ export default function Attendance() {
       return response.json();
     },
     enabled: !!user?.id,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 30 * 60 * 1000, // 30 minutes
   });
 
   // Convert schedule data to display format

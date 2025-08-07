@@ -1013,26 +1013,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Check attendance permission based on IP
-  app.post("/api/attendance/check-permission", async (req, res) => {
-    try {
-      const { institutionId } = req.body;
-      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-      
-      const isAllowed = await storage.isIPAllowedForAttendance(institutionId, clientIP);
-      
-      res.json({ 
-        allowed: isAllowed, 
-        clientIP,
-        message: isAllowed 
-          ? "Accés autoritzat des de la xarxa local" 
-          : "Fitxatge només disponible des de la xarxa local del centre"
-      });
-    } catch (error) {
-      console.error("Error checking attendance permission:", error);
-      res.status(500).json({ message: "Failed to check attendance permission" });
-    }
-  });
 
   // Email settings routes
   app.get("/api/email-settings/:institutionId", isAuthenticated, async (req, res) => {

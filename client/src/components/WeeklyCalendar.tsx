@@ -74,8 +74,8 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     enabled: !!employeeId,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 15 * 60 * 1000, // 15 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 2 * 60 * 60 * 1000, // 2 hours - very long cache
+    gcTime: 4 * 60 * 60 * 1000, // 4 hours garbage collection
   });
   
   // console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());

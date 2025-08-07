@@ -72,9 +72,10 @@ function Router() {
       });
     },
     onSuccess: (data, variables) => {
-      // Invalidate specific attendance queries only
+      // Force refetch of attendance data to update button states
       queryClient.invalidateQueries({ queryKey: ["/api/attendance", user?.id] });
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly", user?.id] });
+      // Update all weekly calendar components
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
       toast({
         title: "Éxito",
         description: variables.type === "check_in" 
@@ -109,9 +110,22 @@ function Router() {
     return lastAttendanceRecord.type === 'check_out';
   }, [lastAttendanceRecord]);
 
-  // Memoize button states to prevent constant recalculation
-  const checkInDisabled = useMemo(() => shouldDisableCheckIn(), [shouldDisableCheckIn]);
-  const checkOutDisabled = useMemo(() => shouldDisableCheckOut(), [shouldDisableCheckOut]);
+  // Memoize button states based on attendance records (force recalculation when records change)
+  const checkInDisabled = useMemo(() => {
+    if (!lastAttendanceRecord) return false;
+    const today = new Date().toDateString();
+    const lastDate = new Date(lastAttendanceRecord.timestamp).toDateString();
+    if (today !== lastDate) return false;
+    return lastAttendanceRecord.type === 'check_in';
+  }, [lastAttendanceRecord]);
+  
+  const checkOutDisabled = useMemo(() => {
+    if (!lastAttendanceRecord) return true;
+    const today = new Date().toDateString();
+    const lastDate = new Date(lastAttendanceRecord.timestamp).toDateString();
+    if (today !== lastDate) return true;
+    return lastAttendanceRecord.type === 'check_out';
+  }, [lastAttendanceRecord]);
 
   const handleQuickCheckIn = useCallback(() => {
     if (!checkInDisabled) {

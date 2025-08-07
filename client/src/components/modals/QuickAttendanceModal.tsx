@@ -62,7 +62,11 @@ export default function QuickAttendanceModal({
             <Button 
               onClick={handleCheckIn}
               disabled={shouldDisableCheckIn || isLoading}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 text-lg font-medium disabled:bg-gray-400"
+              className={`w-full py-3 px-6 text-lg font-medium ${
+                shouldDisableCheckIn || isLoading
+                  ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }`}
               data-testid="modal-checkin-button"
             >
               {isLoading ? (
@@ -74,13 +78,22 @@ export default function QuickAttendanceModal({
                 <>
                   <LogIn className="mr-2 h-5 w-5" />
                   {language === "ca" ? "Entrada" : "Entrada"}
+                  {shouldDisableCheckIn && (
+                    <span className="ml-2 text-xs">
+                      ({language === "ca" ? "Ja fitxat" : "Ya fichado"})
+                    </span>
+                  )}
                 </>
               )}
             </Button>
             <Button 
               onClick={handleCheckOut}
               disabled={shouldDisableCheckOut || isLoading}
-              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 text-lg font-medium disabled:bg-gray-400"
+              className={`w-full py-3 px-6 text-lg font-medium ${
+                shouldDisableCheckOut || isLoading
+                  ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
               data-testid="modal-checkout-button"
             >
               {isLoading ? (
@@ -92,6 +105,11 @@ export default function QuickAttendanceModal({
                 <>
                   <LogOut className="mr-2 h-5 w-5" />
                   {language === "ca" ? "Sortida" : "Salida"}
+                  {shouldDisableCheckOut && (
+                    <span className="ml-2 text-xs">
+                      ({language === "ca" ? "Primer fitxa entrada" : "Primero ficha entrada"})
+                    </span>
+                  )}
                 </>
               )}
             </Button>

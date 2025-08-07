@@ -126,19 +126,19 @@ export default function Attendance() {
     return () => clearInterval(timer);
   }, []);
 
-  // Check network permission on component mount (run only once when institutionId changes)
+  // Check network permission ONLY ONCE on mount
   useEffect(() => {
     let mounted = true;
     
+    // Only run if we haven't checked yet and have institution ID
     if (user?.institutionId && !isPermissionChecked && mounted) {
-      // console.log('[DEBUG] Checking network permission for institution:', user.institutionId);
       checkNetworkPermission();
     }
     
     return () => {
       mounted = false;
     };
-  }, [user?.institutionId]); // Remove checkNetworkPermission from deps to prevent loops
+  }, []); // EMPTY dependency array - run only once on mount
 
   const timeString = currentTime.toLocaleTimeString("ca-ES", {
     hour: "2-digit",
@@ -175,7 +175,7 @@ export default function Attendance() {
   // Get today's date once to prevent constant re-queries
   const todayDate = useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
   
-  // Get today's schedule data
+  // Get today's schedule data (HEAVILY CACHED to prevent loops)
   const { data: todaySchedule } = useQuery({
     queryKey: ['/api/schedule/weekly', user?.id, todayDate],
     queryFn: async () => {
@@ -189,7 +189,8 @@ export default function Attendance() {
     enabled: !!user?.id,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 60 * 60 * 1000, // 1 hour - much longer cache
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours garbage collection
   });
 
   // Convert schedule data to display format

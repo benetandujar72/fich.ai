@@ -24,7 +24,10 @@ import {
   Clock,
   Wifi,
   WifiOff,
-  AlertTriangle
+  AlertTriangle,
+  Timer,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import { ca, es } from "date-fns/locale";
@@ -32,6 +35,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import QuickAttendanceModal from "@/components/modals/QuickAttendanceModal";
 import WeeklyCalendar from "@/components/WeeklyCalendar";
 import type { AttendanceRecord } from "@shared/schema";
+import { 
+  calculateExpectedTimes, 
+  getTodayDayOfWeek, 
+  getAttendanceStatus,
+  isProduction,
+  hasCheckedInToday,
+  hasCheckedOutToday,
+  type ScheduleSession 
+} from "@/lib/scheduleUtils";
 
 export default function Attendance() {
   const { language } = useLanguage();
@@ -63,8 +75,13 @@ export default function Attendance() {
     ? attendanceRecords.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
     : null;
 
-  const shouldDisableCheckIn = lastAttendanceRecord?.type === 'check_in';
-  const shouldDisableCheckOut = !lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out';
+  // Production restrictions - only allow one check-in/out per day
+  const isProd = isProduction();
+  const hasCheckedInTodayAlready = isProd && hasCheckedInToday(attendanceRecords);
+  const hasCheckedOutTodayAlready = isProd && hasCheckedOutToday(attendanceRecords);
+  
+  const shouldDisableCheckIn = lastAttendanceRecord?.type === 'check_in' || hasCheckedInTodayAlready;
+  const shouldDisableCheckOut = (!lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out') || hasCheckedOutTodayAlready;
 
   // DISABLED: Network permission check to stop infinite loops
   // const checkNetworkPermission = useCallback(async () => {
@@ -167,34 +184,48 @@ export default function Attendance() {
     gcTime: 2 * 60 * 60 * 1000, // 2 hours garbage collection
   });
 
+  // Calculate expected times for today using the new utility functions
+  const todayDayOfWeek = getTodayDayOfWeek();
+  const todayExpectedTimes = calculateExpectedTimes(todaySchedule || [], todayDayOfWeek);
+  
+  // Get today's attendance records for validation
+  const todayAttendanceRecords = attendanceRecords.filter(record => 
+    format(new Date(record.timestamp), 'yyyy-MM-dd') === todayDate
+  );
+  
+  const todayCheckIn = todayAttendanceRecords.find(r => r.type === 'check_in');
+  const todayCheckOut = todayAttendanceRecords.find(r => r.type === 'check_out');
+  
+  // Get attendance status with color coding
+  const attendanceStatus = getAttendanceStatus(
+    todayCheckIn?.timestamp ? todayCheckIn.timestamp.toString() : null,
+    todayCheckOut?.timestamp ? todayCheckOut.timestamp.toString() : null,
+    todayExpectedTimes.expectedEntry,
+    todayExpectedTimes.expectedExit
+  );
+
   // Convert schedule data to display format
   const formatScheduleForToday = (scheduleData: any[]) => {
     if (!scheduleData || !Array.isArray(scheduleData)) return [];
     
     const today = new Date();
     const currentDay = today.getDay() === 0 ? 7 : today.getDay(); // Convert Sunday from 0 to 7
-    const currentTime = today.toTimeString().slice(0, 5); // HH:MM format
     
     return scheduleData
       .filter((session: any) => session.dayOfWeek === currentDay)
       .sort((a: any, b: any) => a.hourPeriod - b.hourPeriod)
       .map((session: any, index: number) => {
-        const startHour = 7 + session.hourPeriod; // Assuming school starts at 8:00 (hour 1 = 8:00)
-        const endHour = startHour + 1;
-        const timeSlot = `${startHour.toString().padStart(2, '0')}:00 - ${endHour.toString().padStart(2, '0')}:00`;
-        
-        // Determine status based on current time
-        let status = 'pending';
-        if (currentTime > `${endHour}:00`) {
-          status = 'completed';
-        } else if (currentTime >= `${startHour}:00` && currentTime <= `${endHour}:00`) {
-          status = 'current';
-        }
+        // Use the TIME_PERIODS mapping from scheduleUtils
+        const timePeriods = {
+          1: "08:00-09:00", 2: "09:00-10:00", 3: "10:00-11:00", 4: "11:30-12:30",
+          5: "12:30-13:30", 6: "13:30-14:30", 7: "15:30-16:30", 8: "16:30-17:30"
+        };
+        const timeSlot = timePeriods[session.hourPeriod as keyof typeof timePeriods] || "--:--";
         
         return {
           time: timeSlot,
           subject: `${session.subjectName || session.subjectCode} - ${session.groupCode}`,
-          status,
+          status: session.isLectiveHour ? 'lective' : 'non-lective',
           testId: `schedule-${session.subjectCode}-${index}`
         };
       });
@@ -241,7 +272,10 @@ export default function Attendance() {
         {/* Quick Check-in */}
         <Card data-testid="quick-checkin-card">
           <CardHeader>
-            <CardTitle>{t("quick_checkin", language)}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Timer className="h-5 w-5" />
+              {t("quick_checkin", language)}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center mb-6">
@@ -249,6 +283,46 @@ export default function Attendance() {
                 {timeString}
               </div>
               <p className="text-gray-600">{t("current_time", language)}</p>
+              
+              {/* Today's Expected Times */}
+              {todayExpectedTimes.hasScheduleToday && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-3">
+                    {language === "ca" ? "Horaris previstos d'avui" : "Horarios previstos de hoy"}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center">
+                      <div className={`text-lg font-bold ${attendanceStatus.entryColor === 'green' ? 'text-green-600' : attendanceStatus.entryColor === 'red' ? 'text-red-600' : 'text-gray-600'}`}>
+                        {todayExpectedTimes.expectedEntry || "--:--"}
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                        {attendanceStatus.entryColor === 'green' && <CheckCircle className="h-3 w-3 text-green-600" />}
+                        {attendanceStatus.entryColor === 'red' && <XCircle className="h-3 w-3 text-red-600" />}
+                        {language === "ca" ? "Entrada" : "Entrada"}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className={`text-lg font-bold ${attendanceStatus.exitColor === 'green' ? 'text-green-600' : attendanceStatus.exitColor === 'red' ? 'text-red-600' : 'text-gray-600'}`}>
+                        {todayExpectedTimes.expectedExit || "--:--"}
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                        {attendanceStatus.exitColor === 'green' && <CheckCircle className="h-3 w-3 text-green-600" />}
+                        {attendanceStatus.exitColor === 'red' && <XCircle className="h-3 w-3 text-red-600" />}
+                        {language === "ca" ? "Sortida" : "Salida"}
+                      </div>
+                    </div>
+                  </div>
+                  {isProd && (
+                    <div className="mt-2 text-center">
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        {language === "ca" 
+                          ? "⚠️ Producció: Només pots fitxar una vegada al dia" 
+                          : "⚠️ Producción: Solo puedes fichar una vez al día"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -261,7 +335,9 @@ export default function Attendance() {
                 className={`w-full py-4 px-6 text-lg font-medium ${
                   shouldDisableCheckIn
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : "bg-green-600 text-white hover:bg-green-700"
+                    : attendanceStatus.entryColor === 'green' 
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-orange-600 text-white hover:bg-orange-700"
                 }`}
                 data-testid="checkin-button"
               >
@@ -269,7 +345,10 @@ export default function Attendance() {
                 {t("checkin_entry", language)}
                 {shouldDisableCheckIn && (
                   <span className="ml-2 text-xs">
-                    ({language === "ca" ? "Ja has fitxat l'entrada" : "Ya has fichado la entrada"})
+                    ({hasCheckedInTodayAlready 
+                      ? (language === "ca" ? "Ja has fitxat l'entrada avui" : "Ya has fichado la entrada hoy")
+                      : (language === "ca" ? "Ja has fitxat l'entrada" : "Ya has fichado la entrada")
+                    })
                   </span>
                 )}
               </Button>
@@ -282,7 +361,9 @@ export default function Attendance() {
                 className={`w-full py-4 px-6 text-lg font-medium ${
                   shouldDisableCheckOut
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : "bg-red-600 text-white hover:bg-red-700"
+                    : attendanceStatus.exitColor === 'green' 
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-red-600 text-white hover:bg-red-700"
                 }`}
                 data-testid="checkout-button"
               >
@@ -290,7 +371,10 @@ export default function Attendance() {
                 {t("checkin_exit", language)}
                 {shouldDisableCheckOut && (
                   <span className="ml-2 text-xs">
-                    ({language === "ca" ? "Primer has de fitxar l'entrada" : "Primero debes fichar la entrada"})
+                    ({hasCheckedOutTodayAlready
+                      ? (language === "ca" ? "Ja has fitxat la sortida avui" : "Ya has fichado la salida hoy")
+                      : (language === "ca" ? "Primer has de fitxar l'entrada" : "Primero debes fichar la entrada")
+                    })
                   </span>
                 )}
               </Button>
@@ -300,7 +384,18 @@ export default function Attendance() {
               <h4 className="font-medium text-text mb-3">
                 {t("alternative_methods", language)}
               </h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsQuickAttendanceOpen(true)}
+                  className="py-3 px-4 text-center hover:bg-blue-50 border-blue-200"
+                  data-testid="quick-attendance-button"
+                >
+                  <div>
+                    <Timer className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                    <p className="text-sm text-blue-700 font-medium">{language === "ca" ? "Fitxatge Ràpid" : "Fichaje Rápido"}</p>
+                  </div>
+                </Button>
                 <Button 
                   variant="outline"
                   className="py-3 px-4 text-center hover:bg-gray-50"
@@ -337,16 +432,16 @@ export default function Attendance() {
                 <div 
                   key={index} 
                   className={`flex items-center justify-between p-3 rounded-lg ${
-                    item.status === "completed" ? "bg-secondary/10" :
-                    item.status === "current" ? "bg-primary/10 border-l-4 border-primary" :
+                    item.status === "lective" ? "bg-blue-50 dark:bg-blue-950/20 border-l-4 border-l-blue-500" :
+                    item.status === "non-lective" ? "bg-orange-50 dark:bg-orange-950/20 border-l-4 border-l-orange-500" :
                     "bg-gray-50"
                   }`}
                   data-testid={item.testId}
                 >
                   <div className="flex items-center">
                     <Clock className={`mr-3 h-4 w-4 ${
-                      item.status === "completed" ? "text-secondary" :
-                      item.status === "current" ? "text-primary" :
+                      item.status === "lective" ? "text-blue-600" :
+                      item.status === "non-lective" ? "text-orange-600" :
                       "text-gray-400"
                     }`} />
                     <div>
@@ -355,22 +450,16 @@ export default function Attendance() {
                     </div>
                   </div>
                   <Badge 
-                    variant={
-                      item.status === "completed" ? "default" :
-                      item.status === "current" ? "default" :
-                      "secondary"
-                    }
+                    variant="secondary"
                     className={
-                      item.status === "completed" ? "bg-secondary text-white" :
-                      item.status === "current" ? "bg-primary text-white" :
-                      "bg-gray-400 text-white"
+                      item.status === "lective" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" :
+                      item.status === "non-lective" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300" :
+                      "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
                     }
                   >
-                    {item.status === "completed" ? 
-                      (language === "ca" ? "Completat" : "Completado") :
-                     item.status === "current" ?
-                      (language === "ca" ? "Actual" : "Actual") :
-                      (language === "ca" ? "Pendent" : "Pendiente")
+                    {item.status === "lective" ? 
+                      (language === "ca" ? "Lectiva" : "Lectiva") :
+                      (language === "ca" ? "No lectiva" : "No lectiva")
                     }
                   </Badge>
                 </div>
@@ -391,14 +480,38 @@ export default function Attendance() {
                 <span className="text-gray-600">
                   {language === "ca" ? "Hores lectives:" : "Horas lectivas:"}
                 </span>
-                <span className="font-medium text-text">6h</span>
+                <span className="font-medium text-text">
+                  {processedSchedule.filter(s => s.status === 'lective').length}h
+                </span>
               </div>
               <div className="flex justify-between text-sm mt-2">
                 <span className="text-gray-600">
                   {language === "ca" ? "Hores no lectives:" : "Horas no lectivas:"}
                 </span>
-                <span className="font-medium text-text">2h</span>
+                <span className="font-medium text-text">
+                  {processedSchedule.filter(s => s.status === 'non-lective').length}h
+                </span>
               </div>
+              {todayExpectedTimes.hasScheduleToday && (
+                <div className="mt-4 p-3 rounded-lg border border-dashed border-blue-300 bg-blue-50/50 dark:bg-blue-950/10">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">
+                      {language === "ca" ? "Entrada prevista:" : "Entrada prevista:"}
+                    </span>
+                    <span className="font-bold text-blue-900 dark:text-blue-200">
+                      {todayExpectedTimes.expectedEntry || "--:--"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm mt-1">
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">
+                      {language === "ca" ? "Sortida prevista:" : "Salida prevista:"}
+                    </span>
+                    <span className="font-bold text-blue-900 dark:text-blue-200">
+                      {todayExpectedTimes.expectedExit || "--:--"}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -482,6 +595,8 @@ export default function Attendance() {
         shouldDisableCheckIn={shouldDisableCheckIn}
         shouldDisableCheckOut={shouldDisableCheckOut}
         isLoading={attendanceMutation.isPending}
+        expectedTimes={todayExpectedTimes}
+        attendanceStatus={attendanceStatus}
       />
     </main>
   );

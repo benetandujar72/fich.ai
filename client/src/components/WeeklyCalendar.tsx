@@ -23,6 +23,11 @@ import {
   Clock,
   MessageCircle
 } from "lucide-react";
+import { 
+  calculateExpectedTimes, 
+  getAttendanceStatus,
+  type ScheduleSession 
+} from "@/lib/scheduleUtils";
 
 interface WeeklyCalendarProps {
   employeeId: string;
@@ -31,7 +36,7 @@ interface WeeklyCalendarProps {
 
 interface DayAttendance {
   date: string;
-  status: 'complete' | 'partial' | 'absent' | 'justified';
+  status: 'complete' | 'partial' | 'absent' | 'justified' | 'present-on-time' | 'present-late';
   checkIn?: string;
   checkOut?: string;
   totalHours?: number;
@@ -40,6 +45,11 @@ interface DayAttendance {
     reason: string;
     status: 'pending' | 'approved' | 'rejected';
     adminResponse?: string;
+  };
+  attendanceValidation?: {
+    entryOnTime: boolean;
+    exitOnTime: boolean;
+    hasIncidents: boolean;
   };
 }
 
@@ -85,9 +95,18 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    staleTime: 5 * 60 * 60 * 1000, // 5 hours - very long cache to prevent loops
-    gcTime: 8 * 60 * 60 * 1000, // 8 hours garbage collection
+    staleTime: 2 * 60 * 1000, // 2 minutes - shorter cache for immediate updates
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection  
     retry: false, // Disable retries to prevent loops
+  });
+
+  // Fetch schedule data for attendance validation
+  const { data: scheduleData = [] } = useQuery<ScheduleSession[]>({
+    queryKey: ["/api/schedule/weekly", employeeId, weekStart.toISOString().split('T')[0]],
+    enabled: !!employeeId,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 30 * 60 * 1000, // 30 minutes for schedule data
   });
   
   // console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());
@@ -108,7 +127,7 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
           ? "La justificació d'absència ha estat enviada per a revisió" 
           : "La justificación de ausencia ha sido enviada para revisión",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly", employeeId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
       queryClient.invalidateQueries({ queryKey: ["/api/absence-justifications"] });
       setShowJustificationModal(false);
       setJustificationReason("");
@@ -146,22 +165,42 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
       };
     }
 
+    // Calculate expected times for this day
+    const dayOfWeek = date.getDay() === 0 ? 7 : date.getDay(); // Monday = 1
+    const expectedTimes = calculateExpectedTimes(scheduleData, dayOfWeek);
+    
+    // Get attendance status for validation
+    const attendanceStatus = getAttendanceStatus(
+      attendance.checkInTime,
+      attendance.checkOutTime,
+      expectedTimes.expectedEntry,
+      expectedTimes.expectedExit
+    );
+
+    const attendanceValidation = {
+      entryOnTime: attendanceStatus.entryColor === 'green',
+      exitOnTime: attendanceStatus.exitColor === 'green',
+      hasIncidents: attendanceStatus.overallColor === 'red'
+    };
+
     if (attendance.checkInTime && attendance.checkOutTime) {
       return {
         date: dateStr,
-        status: 'complete',
+        status: attendanceValidation.hasIncidents ? 'present-late' : 'present-on-time',
         checkIn: attendance.checkInTime,
         checkOut: attendance.checkOutTime,
-        totalHours: attendance.totalHours
+        totalHours: attendance.totalHours,
+        attendanceValidation
       };
     }
 
     if (attendance.checkInTime && !attendance.checkOutTime) {
       return {
         date: dateStr,
-        status: 'partial',
+        status: attendanceValidation.entryOnTime === false ? 'present-late' : 'partial',
         checkIn: attendance.checkInTime,
-        totalHours: attendance.totalHours
+        totalHours: attendance.totalHours,
+        attendanceValidation
       };
     }
 
@@ -171,13 +210,16 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'complete':
+      case 'present-on-time':
         return 'bg-green-100 border-green-300 text-green-800';
+      case 'present-late':
+        return 'bg-red-100 border-red-300 text-red-800';
       case 'partial':
-        return 'bg-yellow-100 border-yellow-300 text-yellow-800';
+        return 'bg-orange-100 border-orange-300 text-orange-800';
       case 'justified':
         return 'bg-blue-100 border-blue-300 text-blue-800';
       case 'absent':
-        return 'bg-red-100 border-red-300 text-red-800';
+        return 'bg-gray-100 border-gray-300 text-gray-800';
       default:
         return 'bg-gray-100 border-gray-300 text-gray-800';
     }
@@ -186,7 +228,10 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'complete':
+      case 'present-on-time':
         return <CheckCircle className="h-4 w-4" />;
+      case 'present-late':
+        return <AlertTriangle className="h-4 w-4" />;
       case 'partial':
         return <Clock className="h-4 w-4" />;
       case 'justified':
@@ -202,6 +247,10 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     switch (status) {
       case 'complete':
         return language === "ca" ? "Complet" : "Completo";
+      case 'present-on-time':
+        return language === "ca" ? "Present (OK)" : "Presente (OK)";
+      case 'present-late':
+        return language === "ca" ? "Present (Incidència)" : "Presente (Incidencia)";
       case 'partial':
         return language === "ca" ? "Parcial" : "Parcial";
       case 'justified':

@@ -5,20 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Calendar, Clock, BookOpen, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Clock, BookOpen, Users, ChevronLeft, ChevronRight, Timer } from "lucide-react";
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay } from "date-fns";
 import { ca, es } from "date-fns/locale";
+import { calculateExpectedTimes, getTodayDayOfWeek, type ScheduleSession } from "@/lib/scheduleUtils";
 
-interface ScheduleSession {
-  id: string;
-  dayOfWeek: number;
-  hourPeriod: number;
-  subjectCode: string;
-  subjectName: string;
-  groupCode: string;
-  classroomCode: string;
-  isLectiveHour: boolean;
-}
+// ScheduleSession interface moved to scheduleUtils.ts
 
 export default function WeeklySchedule() {
   const { user } = useAuth();
@@ -87,6 +79,11 @@ export default function WeeklySchedule() {
 
   const { lective, nonLective } = getTotalHours();
 
+  // Calculate expected times for today
+  const todayDayOfWeek = getTodayDayOfWeek();
+  const todayExpectedTimes = calculateExpectedTimes(scheduleData || [], todayDayOfWeek);
+  const isToday = isSameDay(new Date(), new Date());
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -136,6 +133,45 @@ export default function WeeklySchedule() {
             </Button>
           </div>
         </div>
+
+        {/* Today's Expected Times */}
+        {isToday && todayExpectedTimes.hasScheduleToday && (
+          <Card className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
+                <Timer className="h-5 w-5" />
+                {language === "ca" ? "Horaris previstos d'avui" : "Horarios previstos de hoy"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border">
+                  <div className="text-lg font-bold text-green-700 dark:text-green-400">
+                    {todayExpectedTimes.expectedEntry || "--:--"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {language === "ca" ? "Entrada prevista" : "Entrada prevista"}
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border">
+                  <div className="text-lg font-bold text-blue-700 dark:text-blue-400">
+                    {todayExpectedTimes.expectedExit || "--:--"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {language === "ca" ? "Sortida prevista" : "Salida prevista"}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 text-center">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  {language === "ca" 
+                    ? "Horaris calculats segons la primera i última classe del dia" 
+                    : "Horarios calculados según la primera y última clase del día"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Hours summary */}
         <div className="grid grid-cols-3 gap-4 mb-6">

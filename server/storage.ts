@@ -706,21 +706,30 @@ export class DatabaseStorage implements IStorage {
   // Weekly attendance operations
   async getWeeklyAttendance(employeeId: string, startDate: Date, endDate: Date): Promise<any[]> {
     try {
+      // Adjust dates to cover the full day range in local timezone
+      const localStartDate = new Date(startDate);
+      localStartDate.setHours(0, 0, 0, 0); // Start of first day
+      
+      const localEndDate = new Date(endDate);
+      localEndDate.setHours(23, 59, 59, 999); // End of last day
+
       console.log(`[getWeeklyAttendance] Query parameters:`, {
         employeeId,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
+        originalStartDate: startDate.toISOString(),
+        originalEndDate: endDate.toISOString(),
+        localStartDate: localStartDate.toISOString(),
+        localEndDate: localEndDate.toISOString()
       });
 
-      // Get attendance records for the week
+      // Get attendance records for the week using date range that covers full days
       const records = await db
         .select()
         .from(attendanceRecords)
         .where(
           and(
             eq(attendanceRecords.employeeId, employeeId),
-            gte(attendanceRecords.timestamp, startDate),
-            lte(attendanceRecords.timestamp, endDate)
+            gte(attendanceRecords.timestamp, localStartDate),
+            lte(attendanceRecords.timestamp, localEndDate)
           )
         )
         .orderBy(attendanceRecords.timestamp);
@@ -760,7 +769,7 @@ export class DatabaseStorage implements IStorage {
     
     console.log(`[getWeeklyAttendance] Daily attendance map:`, Object.fromEntries(dailyAttendance));
 
-    // Process each day's data - fix the date iteration bug
+    // Process each day's data - iterate through the original date range
     const weeklyData = [];
     const currentDate = new Date(startDate);
     while (currentDate <= endDate) {
@@ -772,7 +781,8 @@ export class DatabaseStorage implements IStorage {
       
       console.log(`[getWeeklyAttendance] Processing day ${dateStr}:`, {
         dayData: dayData ? `Found ${dayData.records.length} records` : 'No records',
-        justification: justification ? 'Found justification' : 'No justification'
+        justification: justification ? 'Found justification' : 'No justification',
+        availableDates: Array.from(dailyAttendance.keys())
       });
 
       let checkInTime = null;

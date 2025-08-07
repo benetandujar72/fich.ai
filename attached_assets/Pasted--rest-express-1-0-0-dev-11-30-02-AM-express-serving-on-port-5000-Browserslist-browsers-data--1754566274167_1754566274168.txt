@@ -1,0 +1,269 @@
+
+> rest-express@1.0.0 dev
+11:30:02 AM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+11:30:11 AM [express] GET /api/auth/user 304 in 176ms :: {"id":"1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855"…
+11:30:11 AM [express] GET /api/dashboard/recent-activity/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in …
+Fetched 10 attendance records for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855 (employee 27c082f9-fdb8-48b4-88de-c49d9c604c07)
+11:30:11 AM [express] GET /api/attendance/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855 304 in 229ms :: [{"id"…
+11:30:11 AM [express] GET /api/dashboard/stats/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 298ms :: {…
+[getWeeklyAttendance] Query parameters: {
+  employeeId: '1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855',
+  startDate: '2025-08-03T22:00:00.000Z',
+  endDate: '2025-08-09T22:00:00.000Z'
+}
+API Route - Getting schedule for userId: 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855, weekStart: 2025-08-07
+API Route - Getting schedule for userId: 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855, weekStart: 2025-08-03
+[getWeeklyAttendance] Found 0 attendance records: []
+[getWeeklyAttendance] Daily attendance map: {}
+[getWeeklyAttendance] Processing day 2025-08-03: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-04: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-05: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-06: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-07: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-08: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-09: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Returning weekly data: [
+  {
+    date: '2025-08-03',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-04',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-05',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-06',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-07',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-08',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-09',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  }
+]
+11:30:27 AM [express] GET /api/attendance/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-08-03T22:0…
+WeeklySchedule API - Using academic year: 2025-2026 51c809e8-6bc8-433a-bc01-d3a4bb391d9b
+WeeklySchedule API - Using academic year: 2025-2026 51c809e8-6bc8-433a-bc01-d3a4bb391d9b
+WeeklySchedule API - Found 13 sessions for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07 (a.aparicio@insbitacola.cat) in academic year 2025-2026
+WeeklySchedule API - First session: {
+  "id": "ab469926-1be0-45da-b71b-77ce5b311b3c",
+  "dayOfWeek": 3,
+  "hourPeriod": 3,
+  "subjectCode": "TUT ESO",
+  "subjectName": "TUT ESO",
+  "groupCode": "S4B",
+  "classroomCode": "212",
+  "isLectiveHour": true
+}
+API Route - Found 13 schedule entries
+WeeklySchedule API - Found 13 sessions for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07 (a.aparicio@insbitacola.cat) in academic year 2025-2026
+WeeklySchedule API - First session: {
+  "id": "ab469926-1be0-45da-b71b-77ce5b311b3c",
+  "dayOfWeek": 3,
+  "hourPeriod": 3,
+  "subjectCode": "TUT ESO",
+  "subjectName": "TUT ESO",
+  "groupCode": "S4B",
+  "classroomCode": "212",
+  "isLectiveHour": true
+}
+API Route - Found 13 schedule entries
+11:30:27 AM [express] GET /api/schedule/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-08-07 304 in…
+11:30:27 AM [express] GET /api/schedule/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-08-03 304 in…
+API Route - Getting schedule for userId: 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855, weekStart: 2025-08-10
+[getWeeklyAttendance] Query parameters: {
+  employeeId: '1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855',
+  startDate: '2025-08-10T22:00:00.000Z',
+  endDate: '2025-08-16T22:00:00.000Z'
+}
+[getWeeklyAttendance] Found 0 attendance records: []
+[getWeeklyAttendance] Daily attendance map: {}
+[getWeeklyAttendance] Processing day 2025-08-10: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-11: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-12: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-13: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-14: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-15: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-16: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Returning weekly data: [
+  {
+    date: '2025-08-10',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-11',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-12',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-13',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-14',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-15',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-16',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  }
+]
+WeeklySchedule API - Using academic year: 2025-2026 51c809e8-6bc8-433a-bc01-d3a4bb391d9b
+11:30:30 AM [express] GET /api/attendance/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-08-10T22:0…
+WeeklySchedule API - Found 13 sessions for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07 (a.aparicio@insbitacola.cat) in academic year 2025-2026
+WeeklySchedule API - First session: {
+  "id": "ab469926-1be0-45da-b71b-77ce5b311b3c",
+  "dayOfWeek": 3,
+  "hourPeriod": 3,
+  "subjectCode": "TUT ESO",
+  "subjectName": "TUT ESO",
+  "groupCode": "S4B",
+  "classroomCode": "212",
+  "isLectiveHour": true
+}
+API Route - Found 13 schedule entries
+11:30:30 AM [express] GET /api/schedule/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-08-10 200 in…
+API Route - Getting schedule for userId: 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855, weekStart: 2025-07-27
+[getWeeklyAttendance] Query parameters: {
+  employeeId: '1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855',
+  startDate: '2025-07-27T22:00:00.000Z',
+  endDate: '2025-08-02T22:00:00.000Z'
+}
+[getWeeklyAttendance] Found 0 attendance records: []
+[getWeeklyAttendance] Daily attendance map: {}
+[getWeeklyAttendance] Processing day 2025-07-27: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-07-28: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-07-29: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-07-30: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-07-31: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-01: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Processing day 2025-08-02: { dayData: 'No records', justification: 'No justification' }
+[getWeeklyAttendance] Returning weekly data: [
+  {
+    date: '2025-07-27',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-07-28',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-07-29',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-07-30',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-07-31',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-01',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  },
+  {
+    date: '2025-08-02',
+    checkInTime: null,
+    checkOutTime: null,
+    totalHours: null,
+    justification: null
+  }
+]
+WeeklySchedule API - Using academic year: 2025-2026 51c809e8-6bc8-433a-bc01-d3a4bb391d9b
+11:30:32 AM [express] GET /api/attendance/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-07-27T22:0…
+WeeklySchedule API - Found 13 sessions for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07 (a.aparicio@insbitacola.cat) in academic year 2025-2026
+WeeklySchedule API - First session: {
+  "id": "ab469926-1be0-45da-b71b-77ce5b311b3c",
+  "dayOfWeek": 3,
+  "hourPeriod": 3,
+  "subjectCode": "TUT ESO",
+  "subjectName": "TUT ESO",
+  "groupCode": "S4B",
+  "classroomCode": "212",
+  "isLectiveHour": true
+}
+API Route - Found 13 schedule entries
+11:30:32 AM [express] GET /api/schedule/weekly/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/2025-07-27 200 in…

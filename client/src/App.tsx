@@ -74,8 +74,10 @@ function Router() {
     onSuccess: (data, variables) => {
       // Force refetch of attendance data to update button states
       queryClient.invalidateQueries({ queryKey: ["/api/attendance", user?.id] });
-      // Update all weekly calendar components
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
+      // Update all weekly calendar components with user ID for immediate updates
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly", user?.id] });
+      // Also invalidate schedule queries for attendance validation
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule/weekly", user?.id] });
       toast({
         title: "Éxito",
         description: variables.type === "check_in" 

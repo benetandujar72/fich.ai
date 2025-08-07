@@ -95,8 +95,8 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    staleTime: 2 * 60 * 1000, // 2 minutes - shorter cache for immediate updates
-    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection  
+    staleTime: 30 * 1000, // 30 seconds - very short cache for immediate updates
+    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection  
     retry: false, // Disable retries to prevent loops
   });
 
@@ -127,7 +127,8 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
           ? "La justificació d'absència ha estat enviada per a revisió" 
           : "La justificación de ausencia ha sido enviada para revisión",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
+      // Invalidate with employee ID for immediate updates
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly", employeeId] });
       queryClient.invalidateQueries({ queryKey: ["/api/absence-justifications"] });
       setShowJustificationModal(false);
       setJustificationReason("");

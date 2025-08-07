@@ -67,7 +67,7 @@ function Router() {
     mutationFn: async (data: { type: "check_in" | "check_out"; timestamp: Date }) => {
       return await apiRequest("POST", "/api/attendance", {
         ...data,
-        method: "quick",
+        method: "web",
         location: "quick_attendance_modal"
       });
     },

@@ -142,6 +142,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create attendance record
+  app.post('/api/attendance', isAuthenticated, async (req, res) => {
+    try {
+      const { type, employeeId, timestamp, method, location } = req.body;
+      
+      if (!type || !employeeId || !timestamp) {
+        return res.status(400).json({ message: "Missing required fields: type, employeeId, timestamp" });
+      }
+
+      // Get employee details for validation
+      const employee = await storage.getEmployee(employeeId);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+
+      const attendanceRecord = await storage.createAttendanceRecord({
+        employeeId,
+        type,
+        timestamp: new Date(timestamp),
+        method: method || "web",
+        location: location || "attendance_page"
+      });
+
+      res.json(attendanceRecord);
+    } catch (error) {
+      console.error("Error creating attendance record:", error);
+      res.status(500).json({ message: "Failed to create attendance record" });
+    }
+  });
+
+  // Check network permission for attendance
+  app.post('/api/attendance/check-permission', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.body;
+      
+      if (!institutionId) {
+        return res.status(400).json({ message: "Institution ID is required" });
+      }
+
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      const isAllowed = await storage.isIPAllowedForAttendance(institutionId, clientIP);
+      
+      res.json({
+        allowed: isAllowed,
+        message: isAllowed 
+          ? "Accés autoritzat des de la xarxa local del centre"
+          : "Fitxatge només disponible des de la xarxa local del centre",
+        clientIP
+      });
+    } catch (error) {
+      console.error("Error checking network permission:", error);
+      res.status(500).json({ 
+        allowed: false,
+        message: "Error verificant permisos de xarxa" 
+      });
+    }
+  });
+
 
   // Alerts routes
   app.get('/api/alerts/:institutionId', isAuthenticated, async (req, res) => {

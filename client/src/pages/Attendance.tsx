@@ -62,10 +62,11 @@ export default function Attendance() {
   // Check network permission before attendance
   const checkNetworkPermission = async () => {
     try {
-      const result = await apiRequest("POST", "/api/attendance/check-permission", {
+      const response = await apiRequest("POST", "/api/attendance/check-permission", {
         institutionId: user?.institutionId
       });
-      setNetworkPermission(result as { allowed: boolean; message: string });
+      const result = await response.json() as { allowed: boolean; message: string };
+      setNetworkPermission(result);
       return result.allowed;
     } catch (error) {
       console.error("Error checking network permission:", error);
@@ -121,6 +122,14 @@ export default function Attendance() {
   });
 
   const handleCheckIn = () => {
+    if (!employeeId) {
+      toast({
+        title: t("error", language),
+        description: language === "ca" ? "No s'ha trobat l'identificador d'empleat" : "No se ha encontrado el identificador de empleado",
+        variant: "destructive",
+      });
+      return;
+    }
     attendanceMutation.mutate({
       type: "check_in",
       employeeId,
@@ -129,6 +138,14 @@ export default function Attendance() {
   };
 
   const handleCheckOut = () => {
+    if (!employeeId) {
+      toast({
+        title: t("error", language),
+        description: language === "ca" ? "No s'ha trobat l'identificador d'empleat" : "No se ha encontrado el identificador de empleado",
+        variant: "destructive",
+      });
+      return;
+    }
     attendanceMutation.mutate({
       type: "check_out",
       employeeId,

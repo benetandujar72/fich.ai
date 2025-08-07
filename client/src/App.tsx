@@ -26,7 +26,7 @@ import Communications from "@/pages/Communications";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -48,13 +48,14 @@ function Router() {
     return () => clearInterval(timer);
   }, []);
 
-  // Get last attendance record to determine button states
+  // Get last attendance record to determine button states (memoized to prevent re-renders)
   const { data: attendanceRecords } = useQuery({
     queryKey: ["/api/attendance", user?.id],
     enabled: !!user?.id && isAuthenticated,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes - longer cache
+    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
   });
 
   const lastAttendanceRecord = Array.isArray(attendanceRecords) && attendanceRecords.length > 0 
@@ -71,9 +72,9 @@ function Router() {
       });
     },
     onSuccess: (data, variables) => {
-      // Invalidate all attendance-related queries
+      // Invalidate specific attendance queries only
       queryClient.invalidateQueries({ queryKey: ["/api/attendance", user?.id] });
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly", user?.id] });
       toast({
         title: "Éxito",
         description: variables.type === "check_in" 
@@ -91,40 +92,44 @@ function Router() {
     },
   });
 
-  // Button state logic
-  const shouldDisableCheckIn = () => {
+  // Button state logic (memoized to prevent recalculations)
+  const shouldDisableCheckIn = useCallback(() => {
     if (!lastAttendanceRecord) return false;
     const today = new Date().toDateString();
     const lastDate = new Date(lastAttendanceRecord.timestamp).toDateString();
     if (today !== lastDate) return false;
     return lastAttendanceRecord.type === 'check_in';
-  };
+  }, [lastAttendanceRecord]);
   
-  const shouldDisableCheckOut = () => {
+  const shouldDisableCheckOut = useCallback(() => {
     if (!lastAttendanceRecord) return true;
     const today = new Date().toDateString();
     const lastDate = new Date(lastAttendanceRecord.timestamp).toDateString();
     if (today !== lastDate) return true;
     return lastAttendanceRecord.type === 'check_out';
-  };
+  }, [lastAttendanceRecord]);
 
-  const handleQuickCheckIn = () => {
-    if (!shouldDisableCheckIn()) {
+  // Memoize button states to prevent constant recalculation
+  const checkInDisabled = useMemo(() => shouldDisableCheckIn(), [shouldDisableCheckIn]);
+  const checkOutDisabled = useMemo(() => shouldDisableCheckOut(), [shouldDisableCheckOut]);
+
+  const handleQuickCheckIn = useCallback(() => {
+    if (!checkInDisabled) {
       quickAttendanceMutation.mutate({
         type: "check_in",
         timestamp: new Date()
       });
     }
-  };
+  }, [checkInDisabled, quickAttendanceMutation]);
 
-  const handleQuickCheckOut = () => {
-    if (!shouldDisableCheckOut()) {
+  const handleQuickCheckOut = useCallback(() => {
+    if (!checkOutDisabled) {
       quickAttendanceMutation.mutate({
         type: "check_out",
         timestamp: new Date()
       });
     }
-  };
+  }, [checkOutDisabled, quickAttendanceMutation]);
 
   const getPageTitle = (path: string) => {
     const titles = {
@@ -316,8 +321,8 @@ function Router() {
           second: "2-digit",
           hour12: false,
         })}
-        shouldDisableCheckIn={shouldDisableCheckIn()}
-        shouldDisableCheckOut={shouldDisableCheckOut()}
+        shouldDisableCheckIn={checkInDisabled}
+        shouldDisableCheckOut={checkOutDisabled}
         isLoading={quickAttendanceMutation.isPending}
       />
     </div>

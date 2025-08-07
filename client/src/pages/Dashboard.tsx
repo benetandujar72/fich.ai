@@ -36,11 +36,17 @@ export default function Dashboard() {
   }>({
     queryKey: ["/api/dashboard/stats", institutionId],
     enabled: !!institutionId,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  const { data: recentActivity = [], isLoading: activityLoading } = useQuery({
+  const { data: recentActivity = [], isLoading: activityLoading } = useQuery<any[]>({
     queryKey: ["/api/dashboard/recent-activity", institutionId],
     enabled: !!institutionId,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   useEffect(() => {
@@ -98,7 +104,7 @@ export default function Dashboard() {
     },
     {
       title: t("attendance_rate", language),
-      value: stats?.totalEmployees > 0 ? Math.round((stats?.presentEmployees / stats?.totalEmployees) * 100) : 0,
+      value: (stats?.totalEmployees && stats?.totalEmployees > 0) ? Math.round(((stats?.presentEmployees || 0) / stats.totalEmployees) * 100) : 0,
       suffix: "%",
       icon: BarChart3,
       color: "text-primary",
@@ -129,7 +135,13 @@ export default function Dashboard() {
       testId: "action-generate-report",
       onClick: () => setLocation("/reports")
     },
-  ].filter(Boolean);
+  ].filter(Boolean) as Array<{
+    title: string;
+    icon: typeof UserPlus;
+    color: string;
+    testId: string;
+    onClick: () => void;
+  }>;
 
   return (
     <main className="p-6">
@@ -218,13 +230,13 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
-              ) : recentActivity.length === 0 ? (
+              ) : (recentActivity as any[]).length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground">
                   <Info className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>{language === "ca" ? "No hi ha activitat recent" : "No hay actividad reciente"}</p>
                 </div>
               ) : (
-                recentActivity.map((activity: any) => (
+                (recentActivity as any[]).map((activity: any) => (
                   <div key={activity.id} className="flex items-start space-x-3 mb-4">
                     <div className="p-2 rounded-full bg-primary/10">
                       <Clock className="w-4 h-4 text-primary" />

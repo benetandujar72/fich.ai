@@ -63,17 +63,21 @@ export default function Attendance() {
   const shouldDisableCheckIn = lastAttendanceRecord?.type === 'check_in';
   const shouldDisableCheckOut = !lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out';
 
-  // Check network permission before attendance (memoized to prevent repeated calls)
+  // Check network permission before attendance (optimized to prevent repeated calls)
   const checkNetworkPermission = useCallback(async () => {
+    // Don't make API call if already checked
     if (isPermissionChecked) {
-      // console.log('[DEBUG] Permission already checked, skipping...');
       return networkPermission?.allowed || false;
     }
     
-    // console.log('[DEBUG] checkNetworkPermission called at:', new Date().toLocaleTimeString());
+    // Don't make API call if no institution ID
+    if (!user?.institutionId) {
+      return false;
+    }
+    
     try {
       const response = await apiRequest("POST", "/api/attendance/check-permission", {
-        institutionId: user?.institutionId
+        institutionId: user.institutionId
       });
       const result = await response.json() as { allowed: boolean; message: string };
       setNetworkPermission(result);
@@ -85,7 +89,7 @@ export default function Attendance() {
       setIsPermissionChecked(true);
       return false;
     }
-  }, [user?.institutionId, isPermissionChecked, networkPermission]);
+  }, [user?.institutionId, isPermissionChecked]); // Remove networkPermission from deps
 
   const attendanceMutation = useMutation({
     mutationFn: async (data: { type: "check_in" | "check_out"; timestamp: Date }) => {
@@ -122,13 +126,19 @@ export default function Attendance() {
     return () => clearInterval(timer);
   }, []);
 
-  // Check network permission on component mount (run only once)
+  // Check network permission on component mount (run only once when institutionId changes)
   useEffect(() => {
-    if (user?.institutionId && !isPermissionChecked) {
+    let mounted = true;
+    
+    if (user?.institutionId && !isPermissionChecked && mounted) {
       // console.log('[DEBUG] Checking network permission for institution:', user.institutionId);
       checkNetworkPermission();
     }
-  }, [user?.institutionId, checkNetworkPermission, isPermissionChecked]);
+    
+    return () => {
+      mounted = false;
+    };
+  }, [user?.institutionId]); // Remove checkNetworkPermission from deps to prevent loops
 
   const timeString = currentTime.toLocaleTimeString("ca-ES", {
     hour: "2-digit",

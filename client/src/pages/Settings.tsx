@@ -61,7 +61,7 @@ export default function Settings() {
     defaultLanguage: "ca",
   });
 
-  const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(false);
+  const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true); // Default enabled for regulatory compliance
   const [showAddAdminForm, setShowAddAdminForm] = useState(false);
   const [passwordChangeUser, setPasswordChangeUser] = useState<{ id: string; email: string } | null>(null);
   const [newAdminData, setNewAdminData] = useState({
@@ -99,7 +99,12 @@ export default function Settings() {
         defaultLanguage: settingsObj.defaultLanguage || "ca",
       });
       
-      setAutoDeleteEnabled(settingsObj.autoDeleteEnabled === "true" || false);
+      // Handle both string and boolean values, default to true for compliance
+      setAutoDeleteEnabled(
+        settingsObj.autoDeleteEnabled === true || 
+        settingsObj.autoDeleteEnabled === "true" || 
+        (settingsObj.autoDeleteEnabled === undefined || settingsObj.autoDeleteEnabled === null)
+      );
     }
   }, [settings]);
 

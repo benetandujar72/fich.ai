@@ -126,15 +126,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Attendance routes
-  app.get('/api/attendance/:employeeId', isAuthenticated, async (req, res) => {
+  app.get('/api/attendance/:userId', isAuthenticated, async (req, res) => {
     try {
-      const { employeeId } = req.params;
+      const { userId } = req.params;
       const { startDate, endDate } = req.query;
+      
+      // Get employee by user ID first
+      const employee = await storage.getEmployeeByUserId(userId);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found for user" });
+      }
+      
       const records = await storage.getAttendanceRecords(
-        employeeId, 
+        employee.id, 
         startDate ? new Date(startDate as string) : undefined,
         endDate ? new Date(endDate as string) : undefined
       );
+      console.log(`Fetched ${records.length} attendance records for user ${userId} (employee ${employee.id})`);
       res.json(records);
     } catch (error) {
       console.error("Error fetching attendance records:", error);
@@ -816,22 +824,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Attendance routes
-  app.get("/api/attendance/:employeeId", isAuthenticated, async (req, res) => {
-    try {
-      const { employeeId } = req.params;
-      const { startDate, endDate } = req.query;
-      
-      const start = startDate ? new Date(startDate as string) : undefined;
-      const end = endDate ? new Date(endDate as string) : undefined;
-      
-      const records = await storage.getAttendanceRecords(employeeId, start, end);
-      res.json(records);
-    } catch (error) {
-      console.error("Error fetching attendance:", error);
-      res.status(500).json({ message: "Failed to fetch attendance records" });
-    }
-  });
 
   app.post("/api/attendance", isAuthenticated, async (req, res) => {
     try {

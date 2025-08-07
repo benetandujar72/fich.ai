@@ -84,7 +84,9 @@ export default function Attendance() {
       });
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/attendance"] });
+      // Invalidate all attendance-related queries with correct user ID
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance/weekly"] });
       toast({
         title: t("success", language),
         description: variables.type === "check_in" 

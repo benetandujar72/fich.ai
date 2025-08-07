@@ -26,6 +26,7 @@ import {
   WifiOff,
   AlertTriangle
 } from "lucide-react";
+import { format } from "date-fns";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import QuickAttendanceModal from "@/components/modals/QuickAttendanceModal";
 import WeeklyCalendar from "@/components/WeeklyCalendar";

@@ -706,6 +706,12 @@ export class DatabaseStorage implements IStorage {
   // Weekly attendance operations
   async getWeeklyAttendance(employeeId: string, startDate: Date, endDate: Date): Promise<any[]> {
     try {
+      console.log(`[getWeeklyAttendance] Query parameters:`, {
+        employeeId,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      });
+
       // Get attendance records for the week
       const records = await db
         .select()
@@ -718,6 +724,8 @@ export class DatabaseStorage implements IStorage {
           )
         )
         .orderBy(attendanceRecords.timestamp);
+
+      console.log(`[getWeeklyAttendance] Found ${records.length} attendance records:`, records);
 
     // Get absence justifications for the week
     const justifications = await db
@@ -735,21 +743,37 @@ export class DatabaseStorage implements IStorage {
     const dailyAttendance = new Map();
     
     records.forEach((record: any) => {
-      const date = record.timestamp.toISOString().split('T')[0];
+      // Ensure we handle timestamp correctly whether it's Date object or string
+      const timestamp = record.timestamp instanceof Date ? record.timestamp : new Date(record.timestamp);
+      const date = timestamp.toISOString().split('T')[0];
+      console.log(`[getWeeklyAttendance] Processing record:`, {
+        id: record.id,
+        type: record.type,
+        timestamp: record.timestamp,
+        dateExtracted: date
+      });
       if (!dailyAttendance.has(date)) {
         dailyAttendance.set(date, { date, records: [] });
       }
       dailyAttendance.get(date).records.push(record);
     });
+    
+    console.log(`[getWeeklyAttendance] Daily attendance map:`, Object.fromEntries(dailyAttendance));
 
-    // Process each day's data
+    // Process each day's data - fix the date iteration bug
     const weeklyData = [];
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const dateStr = d.toISOString().split('T')[0];
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const dateStr = currentDate.toISOString().split('T')[0];
       const dayData = dailyAttendance.get(dateStr);
       const justification = justifications.find(j => 
         j.date === dateStr
       );
+      
+      console.log(`[getWeeklyAttendance] Processing day ${dateStr}:`, {
+        dayData: dayData ? `Found ${dayData.records.length} records` : 'No records',
+        justification: justification ? 'Found justification' : 'No justification'
+      });
 
       let checkInTime = null;
       let checkOutTime = null;
@@ -760,24 +784,33 @@ export class DatabaseStorage implements IStorage {
         const checkOutRecord = dayData.records.find((r: any) => r.type === 'check_out');
         
         if (checkInRecord) {
-          checkInTime = checkInRecord.timestamp.toLocaleTimeString('ca-ES', {
+          const timestamp = checkInRecord.timestamp instanceof Date ? checkInRecord.timestamp : new Date(checkInRecord.timestamp);
+          checkInTime = timestamp.toLocaleTimeString('ca-ES', {
             hour: '2-digit',
             minute: '2-digit'
           });
+          console.log(`[getWeeklyAttendance] Check-in found:`, { timestamp, checkInTime });
         }
         
         if (checkOutRecord) {
-          checkOutTime = checkOutRecord.timestamp.toLocaleTimeString('ca-ES', {
+          const timestamp = checkOutRecord.timestamp instanceof Date ? checkOutRecord.timestamp : new Date(checkOutRecord.timestamp);
+          checkOutTime = timestamp.toLocaleTimeString('ca-ES', {
             hour: '2-digit', 
             minute: '2-digit'
           });
+          console.log(`[getWeeklyAttendance] Check-out found:`, { timestamp, checkOutTime });
         }
 
         if (checkInRecord && checkOutRecord) {
-          const diff = checkOutRecord.timestamp.getTime() - checkInRecord.timestamp.getTime();
+          const checkInTimestamp = checkInRecord.timestamp instanceof Date ? checkInRecord.timestamp : new Date(checkInRecord.timestamp);
+          const checkOutTimestamp = checkOutRecord.timestamp instanceof Date ? checkOutRecord.timestamp : new Date(checkOutRecord.timestamp);
+          const diff = checkOutTimestamp.getTime() - checkInTimestamp.getTime();
           totalHours = Math.round((diff / (1000 * 60 * 60)) * 100) / 100;
         }
       }
+      
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
 
       weeklyData.push({
         date: dateStr,
@@ -793,6 +826,7 @@ export class DatabaseStorage implements IStorage {
       });
     }
 
+    console.log(`[getWeeklyAttendance] Returning weekly data:`, weeklyData);
     return weeklyData;
     } catch (error) {
       console.error("Error in getWeeklyAttendance:", error);

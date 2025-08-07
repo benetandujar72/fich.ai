@@ -60,7 +60,7 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showJustificationModal, setShowJustificationModal] = useState(false);
   const [justificationReason, setJustificationReason] = useState("");
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(new Date()); // Force refresh by changing this
 
   // Get current week's Monday at 00:00:00 to prevent constant re-renders
   const getWeekStart = (date: Date) => {
@@ -95,7 +95,7 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    staleTime: 30 * 1000, // 30 seconds - very short cache for immediate updates
+    staleTime: 0, // No cache - immediate updates for debugging
     gcTime: 5 * 60 * 1000, // 5 minutes garbage collection  
     retry: false, // Disable retries to prevent loops
   });
@@ -109,7 +109,12 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     staleTime: 30 * 60 * 1000, // 30 minutes for schedule data
   });
   
-  // console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());
+  console.log('[WeeklyCalendar] Rendered with:', { 
+    employeeId, 
+    weekStart: weekStart.toISOString(), 
+    weeklyAttendanceCount: weeklyAttendance?.length,
+    scheduleDataCount: scheduleData?.length
+  });
 
   // Submit absence justification
   const justificationMutation = useMutation({
@@ -150,6 +155,13 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     const attendance = (weeklyAttendance as any[]).find((att: any) => 
       att.date?.split('T')[0] === dateStr
     );
+
+    // Debug logging for attendance data
+    console.log(`[WeeklyCalendar] Getting attendance for ${dateStr}:`, {
+      weeklyAttendance,
+      foundAttendance: attendance,
+      employeeId
+    });
 
     if (!attendance) {
       return { date: dateStr, status: 'absent' };

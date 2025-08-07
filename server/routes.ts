@@ -142,47 +142,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create attendance record
-  app.post('/api/attendance', isAuthenticated, async (req, res) => {
-    try {
-      const { type, timestamp, method, location } = req.body;
-      const userId = (req.user as any)?.id;
-      
-      if (!type || !timestamp) {
-        return res.status(400).json({ message: "Missing required fields: type, timestamp" });
-      }
-
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      // Get employee associated with the current user
-      const employee = await storage.getEmployeeByUserId(userId);
-      if (!employee) {
-        return res.status(404).json({ 
-          message: "No employee record found for this user",
-          error: "Employee record required for attendance tracking" 
-        });
-      }
-
-      const attendanceRecord = await storage.createAttendanceRecord({
-        employeeId: employee.id,
-        type,
-        timestamp: new Date(timestamp),
-        method: method || "web",
-        location: location || "attendance_page"
-      });
-
-      res.json(attendanceRecord);
-    } catch (error) {
-      console.error("Error creating attendance record:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      res.status(500).json({ 
-        message: "Failed to create attendance record",
-        error: errorMessage 
-      });
-    }
-  });
 
   // Check network permission for attendance
   app.post('/api/attendance/check-permission', isAuthenticated, async (req, res) => {
@@ -876,16 +835,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/attendance", isAuthenticated, async (req, res) => {
     try {
-      const validatedData = insertAttendanceRecordSchema.parse(req.body);
+      const { type, timestamp, method, location } = req.body;
+      const userId = (req.user as any)?.id;
+      
+      if (!type || !timestamp) {
+        return res.status(400).json({ message: "Missing required fields: type, timestamp" });
+      }
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get employee associated with the current user
+      const employee = await storage.getEmployeeByUserId(userId);
+      if (!employee) {
+        return res.status(404).json({ 
+          message: "No employee record found for this user",
+          error: "Employee record required for attendance tracking" 
+        });
+      }
       
       // Check network permission before allowing attendance
       const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-      const employee = await storage.getEmployee(validatedData.employeeId);
-      
-      if (!employee) {
-        return res.status(404).json({ message: "Employee not found" });
-      }
-      
       const isAllowed = await storage.isIPAllowedForAttendance(employee.institutionId, clientIP);
       
       if (!isAllowed) {
@@ -896,7 +867,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const record = await storage.createAttendanceRecord(validatedData);
+      const record = await storage.createAttendanceRecord({
+        employeeId: employee.id,
+        type,
+        timestamp: new Date(timestamp),
+        method: method || "web",
+        location: location || "attendance_page"
+      });
       res.status(201).json(record);
     } catch (error) {
       if (error instanceof z.ZodError) {

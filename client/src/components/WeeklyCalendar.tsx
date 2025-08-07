@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,7 +60,8 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     return new Date(d.setDate(diff));
   };
 
-  const weekStart = getWeekStart(currentWeek);
+  // Memoize weekStart to prevent recalculation on every render
+  const weekStart = useMemo(() => getWeekStart(currentWeek), [currentWeek]);
   const weekDays = Array.from({ length: 5 }, (_, i) => {
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate() + i);
@@ -77,7 +78,7 @@ export default function WeeklyCalendar({ employeeId, language }: WeeklyCalendarP
     gcTime: 30 * 60 * 1000, // 30 minutes
   });
   
-  console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());
+  // console.log('[DEBUG] WeeklyCalendar rendered with employeeId:', employeeId, 'weekStart:', weekStart.toISOString());
 
   // Submit absence justification
   const justificationMutation = useMutation({

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
@@ -42,9 +42,10 @@ export default function Attendance() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
   const [networkPermission, setNetworkPermission] = useState<{ allowed: boolean; message: string } | null>(null);
+  const [isPermissionChecked, setIsPermissionChecked] = useState(false);
 
-  // Get employee ID from authenticated user
-  const employeeId = user?.id;
+  // Get employee ID from authenticated user (memoized to prevent re-renders)
+  const employeeId = useMemo(() => user?.id, [user?.id]);
 
   const { data: attendanceRecords = [], isLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ["/api/attendance", employeeId],
@@ -63,21 +64,28 @@ export default function Attendance() {
   const shouldDisableCheckOut = !lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out';
 
   // Check network permission before attendance (memoized to prevent repeated calls)
-  const checkNetworkPermission = async () => {
-    console.log('[DEBUG] checkNetworkPermission called at:', new Date().toLocaleTimeString());
+  const checkNetworkPermission = useCallback(async () => {
+    if (isPermissionChecked) {
+      // console.log('[DEBUG] Permission already checked, skipping...');
+      return networkPermission?.allowed || false;
+    }
+    
+    // console.log('[DEBUG] checkNetworkPermission called at:', new Date().toLocaleTimeString());
     try {
       const response = await apiRequest("POST", "/api/attendance/check-permission", {
         institutionId: user?.institutionId
       });
       const result = await response.json() as { allowed: boolean; message: string };
       setNetworkPermission(result);
+      setIsPermissionChecked(true);
       return result.allowed;
     } catch (error) {
       console.error("Error checking network permission:", error);
       setNetworkPermission({ allowed: false, message: "Error verificant permisos de xarxa" });
+      setIsPermissionChecked(true);
       return false;
     }
-  };
+  }, [user?.institutionId, isPermissionChecked, networkPermission]);
 
   const attendanceMutation = useMutation({
     mutationFn: async (data: { type: "check_in" | "check_out"; timestamp: Date }) => {
@@ -116,25 +124,11 @@ export default function Attendance() {
 
   // Check network permission on component mount (run only once)
   useEffect(() => {
-    let mounted = true;
-    console.log('[DEBUG] useEffect checkNetworkPermission triggered. institutionId:', user?.institutionId, 'networkPermission:', networkPermission);
-    
-    if (user?.institutionId && !networkPermission && mounted) {
-      checkNetworkPermission().then(result => {
-        if (mounted) {
-          console.log('[DEBUG] Network permission check completed:', result);
-        }
-      }).catch(error => {
-        if (mounted) {
-          console.error('Network permission check failed:', error);
-        }
-      });
+    if (user?.institutionId && !isPermissionChecked) {
+      // console.log('[DEBUG] Checking network permission for institution:', user.institutionId);
+      checkNetworkPermission();
     }
-    return () => { 
-      mounted = false; 
-      console.log('[DEBUG] useEffect cleanup - attendance component');
-    };
-  }, []); // Run only once on mount
+  }, [user?.institutionId, checkNetworkPermission, isPermissionChecked]);
 
   const timeString = currentTime.toLocaleTimeString("ca-ES", {
     hour: "2-digit",
@@ -168,12 +162,15 @@ export default function Attendance() {
     );
   };
 
+  // Get today's date once to prevent constant re-queries
+  const todayDate = useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
+  
   // Get today's schedule data
   const { data: todaySchedule } = useQuery({
-    queryKey: ['/api/schedule/weekly', user?.id, format(new Date(), 'yyyy-MM-dd')],
+    queryKey: ['/api/schedule/weekly', user?.id, todayDate],
     queryFn: async () => {
       if (!user?.id) return [];
-      const response = await fetch(`/api/schedule/weekly/${user.id}/${format(new Date(), 'yyyy-MM-dd')}`);
+      const response = await fetch(`/api/schedule/weekly/${user.id}/${todayDate}`);
       if (!response.ok) {
         return [];
       }

@@ -1,0 +1,321 @@
+ Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:09
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:10.418Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:10
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:10.418Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:10.789Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:10
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:10.789Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:10.789Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:11.779Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:11
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:11.779Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:11.779Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:12.785Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:12
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:12.785Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:12.785Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:13.783Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:13
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:13.783Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:13.783Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:14.777Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:14
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:14.777Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:14.777Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:15.781Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:15
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:15.781Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:15.781Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:16.786Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:16
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:16.786Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:16.786Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:17.776Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:17
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:17.776Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:17.776Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:18.780Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:18
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:18.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:18.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:19.782Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:19
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:19.782Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:19.782Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:20.783Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:20
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:20.783Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:20.783Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:21.791Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:21
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:21.791Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:21.791Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:22.780Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:22
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:22.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:22.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:23.780Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:23
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:23.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:23.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:24.785Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:24
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:24.785Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:24.785Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:25.786Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:25
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:25.786Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:25.786Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:26.792Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:26
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:26.792Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:26.792Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:27.790Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:27
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:27.790Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:28.781Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:28
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:28.781Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:28.781Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:29.778Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:29
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:29.778Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:29.778Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:30.789Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:30
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:30.789Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:30.789Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:31.790Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:31
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:31.790Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:31.790Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:32.780Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:32
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:32.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:32.780Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:33.784Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:33
+ [DEBUG] Network permission check completed: true
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:33.784Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:33.784Z
+ [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:34.780Z
+ [DEBUG] useEffect cleanup - attendance component
+ [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+ [DEBUG] checkNetworkPermission called at: 11:47:34
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:34.780Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:34.780Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:35.786Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:35
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:35.786Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:35.786Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:36.790Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:36
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:36.790Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:36.790Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:37.780Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:37
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:37.780Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:37.780Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:38.781Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:38
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:38.781Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:38.781Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:39.692Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:39
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:39.692Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:39.692Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:40.326Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:40
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:40.326Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:40.326Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:41.324Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:41
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:41.324Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:41.324Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:41.814Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:41
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:41.814Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:41.814Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:42.322Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:42
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:42.322Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:42.322Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:42.958Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:42
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:43.321Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:43
+api/attendance:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:43.410Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:43
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:43.410Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:43.410Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:44.326Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:44
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:44.326Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:44.326Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:45.335Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:45
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:45.335Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:45.335Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:46.319Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:46
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:46.319Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:47.335Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:47
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:47.335Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:47.335Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:48.328Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:48
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:48.328Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:48.328Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:49.343Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:49
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:49.343Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:49.343Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:50.333Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:50
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:50.333Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:50.333Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:51.328Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:51
+Attendance.tsx:125 [DEBUG] Network permission check completed: true
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:51.328Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:51.328Z
+WeeklyCalendar.tsx:80 [DEBUG] WeeklyCalendar rendered with employeeId: 34cc49c8-5828-450a-ab2e-0c3b6bcf8644 weekStart: 2025-08-04T09:47:52.333Z
+Attendance.tsx:135 [DEBUG] useEffect cleanup - attendance component
+Attendance.tsx:120 [DEBUG] useEffect checkNetworkPermission triggered. institutionId: 5262a4a1-44ec-48e5-b520-102b2dffea43 networkPermission: null
+Attendance.tsx:67 [DEBUG] checkNetworkPermission called at: 11:47:52

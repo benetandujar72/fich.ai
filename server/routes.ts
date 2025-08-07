@@ -1145,14 +1145,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Weekly attendance calendar route
-  app.get("/api/attendance/weekly/:employeeId/:weekStart", isAuthenticated, async (req, res) => {
+  app.get("/api/attendance/weekly/:userId/:weekStart", isAuthenticated, async (req, res) => {
     try {
-      const { employeeId, weekStart } = req.params;
+      const { userId, weekStart } = req.params;
+      console.log(`[WeeklyAttendance API] Getting attendance for user: ${userId}, week: ${weekStart}`);
+      
+      // First, find the employee record for this user
+      const employee = await storage.getEmployeeByUserId(userId);
+      if (!employee) {
+        console.log(`[WeeklyAttendance API] No employee found for user: ${userId}`);
+        return res.status(404).json({ message: "Employee not found for user" });
+      }
+      
+      console.log(`[WeeklyAttendance API] Found employee: ${employee.id} for user: ${userId}`);
+      
       const startDate = new Date(weekStart);
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + 6);
       
-      const weeklyData = await storage.getWeeklyAttendance(employeeId, startDate, endDate);
+      const weeklyData = await storage.getWeeklyAttendance(employee.id, startDate, endDate);
       res.json(weeklyData);
     } catch (error) {
       console.error("Error fetching weekly attendance:", error);

@@ -27,6 +27,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { format } from "date-fns";
+import { ca, es } from "date-fns/locale";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import QuickAttendanceModal from "@/components/modals/QuickAttendanceModal";
 import WeeklyCalendar from "@/components/WeeklyCalendar";

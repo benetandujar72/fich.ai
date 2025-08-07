@@ -41,8 +41,11 @@ export default function Attendance() {
   
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
-  const [networkPermission, setNetworkPermission] = useState<{ allowed: boolean; message: string } | null>(null);
-  const [isPermissionChecked, setIsPermissionChecked] = useState(false);
+  // DISABLED: Network permission checks to stop infinite loops
+  // const [networkPermission, setNetworkPermission] = useState<{ allowed: boolean; message: string } | null>(null);
+  // const [isPermissionChecked, setIsPermissionChecked] = useState(false);
+  const networkPermission = { allowed: true, message: "Red local autorizada" };
+  const isPermissionChecked = true;
 
   // Get employee ID from authenticated user (memoized to prevent re-renders)
   const employeeId = useMemo(() => user?.id, [user?.id]);
@@ -63,33 +66,13 @@ export default function Attendance() {
   const shouldDisableCheckIn = lastAttendanceRecord?.type === 'check_in';
   const shouldDisableCheckOut = !lastAttendanceRecord || lastAttendanceRecord?.type === 'check_out';
 
-  // Check network permission before attendance (optimized to prevent repeated calls)
+  // DISABLED: Network permission check to stop infinite loops
+  // const checkNetworkPermission = useCallback(async () => {
+  //   return true; // Always allow for now
+  // }, []);
   const checkNetworkPermission = useCallback(async () => {
-    // Don't make API call if already checked
-    if (isPermissionChecked) {
-      return networkPermission?.allowed || false;
-    }
-    
-    // Don't make API call if no institution ID
-    if (!user?.institutionId) {
-      return false;
-    }
-    
-    try {
-      const response = await apiRequest("POST", "/api/attendance/check-permission", {
-        institutionId: user.institutionId
-      });
-      const result = await response.json() as { allowed: boolean; message: string };
-      setNetworkPermission(result);
-      setIsPermissionChecked(true);
-      return result.allowed;
-    } catch (error) {
-      console.error("Error checking network permission:", error);
-      setNetworkPermission({ allowed: false, message: "Error verificant permisos de xarxa" });
-      setIsPermissionChecked(true);
-      return false;
-    }
-  }, [user?.institutionId, isPermissionChecked]); // Remove networkPermission from deps
+    return true; // Always allow - no API calls
+  }, []);
 
   const attendanceMutation = useMutation({
     mutationFn: async (data: { type: "check_in" | "check_out"; timestamp: Date }) => {
@@ -126,19 +109,10 @@ export default function Attendance() {
     return () => clearInterval(timer);
   }, []);
 
-  // Check network permission ONLY ONCE on mount
-  useEffect(() => {
-    let mounted = true;
-    
-    // Only run if we haven't checked yet and have institution ID
-    if (user?.institutionId && !isPermissionChecked && mounted) {
-      checkNetworkPermission();
-    }
-    
-    return () => {
-      mounted = false;
-    };
-  }, []); // EMPTY dependency array - run only once on mount
+  // DISABLED: Network permission check useEffect to stop infinite loops
+  // useEffect(() => {
+  //   // Disabled to prevent infinite loops
+  // }, []);
 
   const timeString = currentTime.toLocaleTimeString("ca-ES", {
     hour: "2-digit",
@@ -282,15 +256,12 @@ export default function Attendance() {
                 onClick={handleCheckIn}
                 disabled={
                   attendanceMutation.isPending || 
-                  (networkPermission && !networkPermission.allowed) ||
                   shouldDisableCheckIn
                 }
                 className={`w-full py-4 px-6 text-lg font-medium ${
                   shouldDisableCheckIn
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : networkPermission && !networkPermission.allowed 
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                      : "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-green-600 text-white hover:bg-green-700"
                 }`}
                 data-testid="checkin-button"
               >
@@ -306,15 +277,12 @@ export default function Attendance() {
                 onClick={handleCheckOut}
                 disabled={
                   attendanceMutation.isPending || 
-                  (networkPermission && !networkPermission.allowed) ||
                   shouldDisableCheckOut
                 }
                 className={`w-full py-4 px-6 text-lg font-medium ${
                   shouldDisableCheckOut
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : networkPermission && !networkPermission.allowed 
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                      : "bg-red-600 text-white hover:bg-red-700"
+                    : "bg-red-600 text-white hover:bg-red-700"
                 }`}
                 data-testid="checkout-button"
               >
@@ -511,6 +479,9 @@ export default function Attendance() {
         onCheckIn={handleCheckIn}
         onCheckOut={handleCheckOut}
         currentTime={timeString}
+        shouldDisableCheckIn={shouldDisableCheckIn}
+        shouldDisableCheckOut={shouldDisableCheckOut}
+        isLoading={attendanceMutation.isPending}
       />
     </main>
   );

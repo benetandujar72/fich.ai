@@ -53,25 +53,64 @@ export default function Reports() {
   const [detailedAttendance, setDetailedAttendance] = useState<any[]>([]);
   const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
 
-  // Set default dates on component mount (last month to today)
+  // Initialize dates and generate initial report (only once)
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
   useEffect(() => {
-    const now = new Date();
-    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    
-    const startDateStr = lastMonth.toISOString().split('T')[0];
-    const endDateStr = now.toISOString().split('T')[0];
-    
-    setStartDate(startDateStr);
-    setEndDate(endDateStr);
-  }, []);
-
-  // Auto-generate report when component mounts and user is available
-  useEffect(() => {
-    if (user?.institutionId && startDate && endDate) {
-      console.log("🚀 Auto-generating report for dates:", startDate, "to", endDate);
-      handleGenerateReport();
+    if (user?.institutionId && !hasInitialized) {
+      const now = new Date();
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      
+      const startDateStr = lastMonth.toISOString().split('T')[0];
+      const endDateStr = now.toISOString().split('T')[0];
+      
+      console.log("📅 Setting initial dates:", startDateStr, "to", endDateStr);
+      setStartDate(startDateStr);
+      setEndDate(endDateStr);
+      setHasInitialized(true);
+      
+      // Generate initial report
+      generateInitialReport(startDateStr, endDateStr);
     }
-  }, [user?.institutionId, startDate, endDate]); // Runs once when all dependencies are ready
+  }, [user?.institutionId, hasInitialized]);
+  
+  // Simple function to generate initial report without dependencies
+  const generateInitialReport = async (start: string, end: string) => {
+    if (!user?.institutionId) return;
+    
+    console.log("🚀 Generating initial report for:", start, "to", end);
+    setIsLoading(true);
+    
+    try {
+      const [overviewResponse, detailResponse, trendsResponse] = await Promise.all([
+        fetch(`/api/reports/overview/${user.institutionId}?startDate=${start}&endDate=${end}`, {
+          credentials: 'include'
+        }),
+        fetch(`/api/reports/detailed-attendance/${user.institutionId}?startDate=${start}&endDate=${end}`, {
+          credentials: 'include'
+        }),
+        fetch(`/api/reports/monthly-trends/${user.institutionId}`, {
+          credentials: 'include'
+        })
+      ]);
+      
+      if (overviewResponse.ok && detailResponse.ok && trendsResponse.ok) {
+        const overview = await overviewResponse.json();
+        const details = await detailResponse.json();
+        const trends = await trendsResponse.json();
+        
+        setReportData(overview);
+        setDetailedAttendance(details);
+        setMonthlyTrends(trends);
+        
+        console.log("✅ Initial report generated successfully");
+      }
+    } catch (error) {
+      console.error("❌ Error generating initial report:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const reportTypes = [
     { 

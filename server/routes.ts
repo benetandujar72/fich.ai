@@ -1388,17 +1388,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/reports/monthly-trends/:institutionId", isAuthenticated, async (req, res) => {
+  app.get("/api/reports/monthly-trends/:institutionId", isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
       const { months } = req.query;
+      const userId = req.user.id;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       
       const monthsToFetch = months ? parseInt(months as string) : 12;
-      const trends = await storage.getMonthlyTrends(institutionId, monthsToFetch);
+      let trends;
+      
+      if (user.role === 'employee') {
+        trends = await storage.getEmployeeMonthlyTrends(userId, monthsToFetch);
+      } else {
+        trends = await storage.getMonthlyTrends(institutionId, monthsToFetch);
+      }
+      
       res.json(trends);
     } catch (error) {
       console.error("Error fetching monthly trends:", error);
       res.status(500).json({ message: "Failed to fetch monthly trends" });
+    }
+  });
+
+  // Detailed attendance records for individual employee
+  app.get("/api/reports/detailed-attendance/:institutionId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { startDate, endDate } = req.query;
+      const userId = req.user.id;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      
+      let detailedData;
+      if (user.role === 'employee') {
+        detailedData = await storage.getEmployeeDetailedAttendance(userId, start, end);
+      } else {
+        detailedData = await storage.getInstitutionDetailedAttendance(institutionId, start, end);
+      }
+      
+      res.json(detailedData);
+    } catch (error) {
+      console.error("Error fetching detailed attendance:", error);
+      res.status(500).json({ message: "Failed to fetch detailed attendance" });
     }
   });
 

@@ -2277,6 +2277,242 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     }
   }
 
+  // Employee-specific monthly trends
+  async getEmployeeMonthlyTrends(userId: string, months: number = 12): Promise<Array<{
+    month: string;
+    attendanceRate: number;
+    totalHours: number;
+    lateCount: number;
+    absenceCount: number;
+  }>> {
+    try {
+      const results = [];
+      const now = new Date();
+      
+      for (let i = months - 1; i >= 0; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const startDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+        const endDate = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+        
+        const monthOverview = await this.getEmployeeAttendanceOverview(userId, startDate, endDate);
+        
+        results.push({
+          month: monthDate.toISOString().substring(0, 7),
+          attendanceRate: monthOverview.attendanceRate,
+          totalHours: monthOverview.averageHoursPerDay * 20, // Approximate working days
+          lateCount: monthOverview.totalLatesThisMonth,
+          absenceCount: monthOverview.totalAbsencesThisMonth,
+        });
+      }
+      
+      return results;
+    } catch (error) {
+      console.error("Error getting employee monthly trends:", error);
+      throw error;
+    }
+  }
+
+  // Employee detailed attendance records
+  async getEmployeeDetailedAttendance(userId: string, startDate?: Date, endDate?: Date): Promise<Array<{
+    date: string;
+    checkIn: string | null;
+    checkOut: string | null;
+    hoursWorked: number;
+    status: 'on_time' | 'late' | 'absent' | 'incomplete';
+    lateMinutes: number;
+  }>> {
+    try {
+      const now = new Date();
+      const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+      const defaultEndDate = endDate || now;
+
+      // Get employee record
+      const employee = await db
+        .select()
+        .from(employees)
+        .where(eq(employees.userId, userId))
+        .limit(1);
+
+      if (employee.length === 0) return [];
+
+      const employeeRecord = employee[0];
+
+      // Get all attendance records for the period
+      const attendanceData = await db
+        .select({
+          timestamp: attendanceRecords.timestamp,
+          type: attendanceRecords.type,
+        })
+        .from(attendanceRecords)
+        .where(
+          and(
+            eq(attendanceRecords.employeeId, employeeRecord.id),
+            gte(attendanceRecords.timestamp, defaultStartDate),
+            lte(attendanceRecords.timestamp, defaultEndDate)
+          )
+        )
+        .orderBy(attendanceRecords.timestamp);
+
+      // Process by date
+      const results = [];
+      const currentDate = new Date(defaultStartDate);
+      
+      while (currentDate <= defaultEndDate) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        // Get records for this date
+        const dayRecords = attendanceData.filter(record => 
+          record.timestamp.toISOString().split('T')[0] === dateStr
+        );
+        
+        const checkInRecord = dayRecords.find(r => r.type === 'check_in');
+        const checkOutRecord = dayRecords.find(r => r.type === 'check_out');
+        
+        let status: 'on_time' | 'late' | 'absent' | 'incomplete' = 'absent';
+        let lateMinutes = 0;
+        let hoursWorked = 0;
+        
+        if (checkInRecord) {
+          const checkInTime = checkInRecord.timestamp;
+          const hour = checkInTime.getHours();
+          const minute = checkInTime.getMinutes();
+          
+          // Check if late (after 8:30)
+          if (hour > 8 || (hour === 8 && minute > 30)) {
+            const expectedTime = new Date(checkInTime);
+            expectedTime.setHours(8, 30, 0, 0);
+            lateMinutes = Math.round((checkInTime.getTime() - expectedTime.getTime()) / (1000 * 60));
+            status = 'late';
+          } else {
+            status = 'on_time';
+          }
+          
+          // Calculate hours worked if both check-in and check-out exist
+          if (checkOutRecord) {
+            hoursWorked = (checkOutRecord.timestamp.getTime() - checkInRecord.timestamp.getTime()) / (1000 * 60 * 60);
+          } else {
+            status = 'incomplete';
+          }
+        }
+        
+        results.push({
+          date: dateStr,
+          checkIn: checkInRecord ? checkInRecord.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : null,
+          checkOut: checkOutRecord ? checkOutRecord.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : null,
+          hoursWorked: Math.round(hoursWorked * 100) / 100,
+          status,
+          lateMinutes,
+        });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      return results;
+    } catch (error) {
+      console.error("Error getting employee detailed attendance:", error);
+      throw error;
+    }
+  }
+
+  // Institution detailed attendance (for admins)
+  async getInstitutionDetailedAttendance(institutionId: string, startDate?: Date, endDate?: Date): Promise<Array<{
+    employeeName: string;
+    date: string;
+    checkIn: string | null;
+    checkOut: string | null;
+    hoursWorked: number;
+    status: 'on_time' | 'late' | 'absent' | 'incomplete';
+    lateMinutes: number;
+  }>> {
+    try {
+      const now = new Date();
+      const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+      const defaultEndDate = endDate || now;
+
+      // Get all employees in institution
+      const employeesList = await db
+        .select()
+        .from(employees)
+        .where(eq(employees.institutionId, institutionId));
+
+      const results = [];
+      
+      for (const employee of employeesList) {
+        // Get attendance records for this employee
+        const attendanceData = await db
+          .select({
+            timestamp: attendanceRecords.timestamp,
+            type: attendanceRecords.type,
+          })
+          .from(attendanceRecords)
+          .where(
+            and(
+              eq(attendanceRecords.employeeId, employee.id),
+              gte(attendanceRecords.timestamp, defaultStartDate),
+              lte(attendanceRecords.timestamp, defaultEndDate)
+            )
+          )
+          .orderBy(attendanceRecords.timestamp);
+
+        // Process by date for this employee
+        const currentDate = new Date(defaultStartDate);
+        
+        while (currentDate <= defaultEndDate) {
+          const dateStr = currentDate.toISOString().split('T')[0];
+          
+          const dayRecords = attendanceData.filter(record => 
+            record.timestamp.toISOString().split('T')[0] === dateStr
+          );
+          
+          const checkInRecord = dayRecords.find(r => r.type === 'check_in');
+          const checkOutRecord = dayRecords.find(r => r.type === 'check_out');
+          
+          let status: 'on_time' | 'late' | 'absent' | 'incomplete' = 'absent';
+          let lateMinutes = 0;
+          let hoursWorked = 0;
+          
+          if (checkInRecord) {
+            const checkInTime = checkInRecord.timestamp;
+            const hour = checkInTime.getHours();
+            const minute = checkInTime.getMinutes();
+            
+            if (hour > 8 || (hour === 8 && minute > 30)) {
+              const expectedTime = new Date(checkInTime);
+              expectedTime.setHours(8, 30, 0, 0);
+              lateMinutes = Math.round((checkInTime.getTime() - expectedTime.getTime()) / (1000 * 60));
+              status = 'late';
+            } else {
+              status = 'on_time';
+            }
+            
+            if (checkOutRecord) {
+              hoursWorked = (checkOutRecord.timestamp.getTime() - checkInRecord.timestamp.getTime()) / (1000 * 60 * 60);
+            } else {
+              status = 'incomplete';
+            }
+          }
+          
+          results.push({
+            employeeName: employee.fullName,
+            date: dateStr,
+            checkIn: checkInRecord ? checkInRecord.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : null,
+            checkOut: checkOutRecord ? checkOutRecord.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : null,
+            hoursWorked: Math.round(hoursWorked * 100) / 100,
+            status,
+            lateMinutes,
+          });
+          
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+      
+      return results.sort((a, b) => b.date.localeCompare(a.date)); // Most recent first
+    } catch (error) {
+      console.error("Error getting institution detailed attendance:", error);
+      throw error;
+    }
+  }
+
   async getDepartmentComparison(institutionId: string, startDate?: Date, endDate?: Date): Promise<Array<{
     departmentName: string;
     totalEmployees: number;

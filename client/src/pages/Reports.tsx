@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { 
   BarChart3, 
   FileText, 
@@ -15,9 +17,25 @@ import {
   Clock,
   AlertTriangle,
   LoaderIcon,
-  FileDown
+  FileDown,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  MinusCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar
+} from 'recharts';
 
 export default function Reports() {
   const { language } = useLanguage();
@@ -32,6 +50,8 @@ export default function Reports() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
+  const [detailedAttendance, setDetailedAttendance] = useState<any[]>([]);
+  const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
 
   const reportTypes = [
     { 
@@ -70,9 +90,9 @@ export default function Reports() {
     });
   };
 
-  // Generar informe simplificado
+  // Generar informe completo con datos detallados
   const handleGenerateReport = async () => {
-    console.log("🚀 Starting report generation");
+    console.log("🚀 Starting comprehensive report generation");
 
     if (!user?.institutionId || !startDate || !endDate || selectedReportTypes.length === 0) {
       console.error("❌ Missing required data");
@@ -92,20 +112,40 @@ export default function Reports() {
         endDate
       });
       
-      const url = `/api/reports/overview/${user.institutionId}?${params.toString()}`;
-      const response = await fetch(url, { credentials: 'include' });
+      // Fetch overview data
+      const overviewResponse = await fetch(`/api/reports/overview/${user.institutionId}?${params.toString()}`, { 
+        credentials: 'include' 
+      });
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log("✅ Report data received:", data);
-        setReportData(data);
+      // Fetch detailed attendance data
+      const detailedResponse = await fetch(`/api/reports/detailed-attendance/${user.institutionId}?${params.toString()}`, { 
+        credentials: 'include' 
+      });
+      
+      // Fetch monthly trends
+      const trendsResponse = await fetch(`/api/reports/monthly-trends/${user.institutionId}?months=6`, { 
+        credentials: 'include' 
+      });
+      
+      if (overviewResponse.ok && detailedResponse.ok && trendsResponse.ok) {
+        const overviewData = await overviewResponse.json();
+        const detailedData = await detailedResponse.json();
+        const trendsData = await trendsResponse.json();
+        
+        console.log("✅ Overview data received:", overviewData);
+        console.log("✅ Detailed attendance received:", detailedData.length, "records");
+        console.log("✅ Monthly trends received:", trendsData.length, "months");
+        
+        setReportData(overviewData);
+        setDetailedAttendance(detailedData);
+        setMonthlyTrends(trendsData);
         
         toast({
           title: language === "ca" ? "Informe generat" : "Informe generado",
-          description: language === "ca" ? "Les dades s'han carregat correctament" : "Los datos se han cargado correctamente",
+          description: language === "ca" ? "Dades completes carregades amb èxit" : "Datos completos cargados con éxito",
         });
       } else {
-        throw new Error(`HTTP ${response.status}`);
+        throw new Error("Failed to fetch some report data");
       }
 
     } catch (error) {
@@ -116,6 +156,8 @@ export default function Reports() {
         variant: "destructive",
       });
       setReportData(null);
+      setDetailedAttendance([]);
+      setMonthlyTrends([]);
     } finally {
       setIsLoading(false);
     }
@@ -447,6 +489,132 @@ export default function Reports() {
                   : "Informe generado con éxito. Puedes exportar los datos usando los botones de exportación de arriba."
                 }
               </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Detailed Attendance Table */}
+      {detailedAttendance.length > 0 && !isLoading && (
+        <Card data-testid="detailed-attendance-card" className="border-blue-200">
+          <CardHeader className="border-b border-blue-200 bg-blue-50/30">
+            <CardTitle className="flex items-center gap-2 text-blue-800">
+              <Calendar className="h-5 w-5" />
+              {language === "ca" ? "Registres detallats d'assistència" : "Registros detallados de asistencia"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{language === "ca" ? "Data" : "Fecha"}</TableHead>
+                    <TableHead>{language === "ca" ? "Entrada" : "Entrada"}</TableHead>
+                    <TableHead>{language === "ca" ? "Sortida" : "Salida"}</TableHead>
+                    <TableHead>{language === "ca" ? "Hores" : "Horas"}</TableHead>
+                    <TableHead>{language === "ca" ? "Estat" : "Estado"}</TableHead>
+                    <TableHead>{language === "ca" ? "Retard" : "Retraso"}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {detailedAttendance.map((record, index) => (
+                    <TableRow key={index} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">
+                        {new Date(record.date).toLocaleDateString('es-ES')}
+                      </TableCell>
+                      <TableCell>{record.checkIn || '-'}</TableCell>
+                      <TableCell>{record.checkOut || '-'}</TableCell>
+                      <TableCell>{record.hoursWorked ? `${record.hoursWorked}h` : '-'}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={
+                            record.status === 'on_time' ? 'default' :
+                            record.status === 'late' ? 'destructive' :
+                            record.status === 'incomplete' ? 'secondary' : 'outline'
+                          }
+                          className={
+                            record.status === 'on_time' ? 'bg-green-100 text-green-800 border-green-200' :
+                            record.status === 'late' ? 'bg-red-100 text-red-800 border-red-200' :
+                            record.status === 'incomplete' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                            'bg-gray-100 text-gray-800 border-gray-200'
+                          }
+                        >
+                          {record.status === 'on_time' && <CheckCircle className="w-3 h-3 mr-1" />}
+                          {record.status === 'late' && <XCircle className="w-3 h-3 mr-1" />}
+                          {record.status === 'incomplete' && <MinusCircle className="w-3 h-3 mr-1" />}
+                          {record.status === 'absent' && <XCircle className="w-3 h-3 mr-1" />}
+                          {
+                            record.status === 'on_time' ? (language === "ca" ? "A temps" : "A tiempo") :
+                            record.status === 'late' ? (language === "ca" ? "Tardança" : "Retraso") :
+                            record.status === 'incomplete' ? (language === "ca" ? "Incomplet" : "Incompleto") :
+                            (language === "ca" ? "Absent" : "Ausente")
+                          }
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {record.lateMinutes > 0 ? `${record.lateMinutes} min` : '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Monthly Trends Chart */}
+      {monthlyTrends.length > 0 && !isLoading && (
+        <Card data-testid="monthly-trends-card" className="border-purple-200">
+          <CardHeader className="border-b border-purple-200 bg-purple-50/30">
+            <CardTitle className="flex items-center gap-2 text-purple-800">
+              <TrendingUp className="h-5 w-5" />
+              {language === "ca" ? "Tendències mensuals" : "Tendencias mensuales"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Attendance Rate Trend */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  {language === "ca" ? "Taxa d'assistència" : "Tasa de asistencia"}
+                </h4>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={monthlyTrends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line 
+                      type="monotone" 
+                      dataKey="attendanceRate" 
+                      stroke="#3b82f6" 
+                      strokeWidth={2}
+                      name={language === "ca" ? "Taxa %" : "Tasa %"}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Late Count Trend */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  {language === "ca" ? "Retards mensuals" : "Retrasos mensuales"}
+                </h4>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={monthlyTrends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar 
+                      dataKey="lateCount" 
+                      fill="#f59e0b" 
+                      name={language === "ca" ? "Retards" : "Retrasos"}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </CardContent>
         </Card>

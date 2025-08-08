@@ -53,27 +53,25 @@ export default function Reports() {
   const [detailedAttendance, setDetailedAttendance] = useState<any[]>([]);
   const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
 
-  // Auto-generate report on component mount with last month to current date
+  // Set default dates on component mount (last month to today)
   useEffect(() => {
-    if (user?.institutionId) {
-      const now = new Date();
-      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const today = new Date();
-      
-      const startDateStr = lastMonth.toISOString().split('T')[0];
-      const endDateStr = today.toISOString().split('T')[0];
-      
-      console.log("📅 Auto-setting dates from", startDateStr, "to", endDateStr);
-      setStartDate(startDateStr);
-      setEndDate(endDateStr);
-      
-      // Generate report automatically with these dates
-      setTimeout(() => {
-        console.log("🚀 Auto-generating report for last month to current date");
-        handleGenerateReport();
-      }, 500);
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    
+    const startDateStr = lastMonth.toISOString().split('T')[0];
+    const endDateStr = now.toISOString().split('T')[0];
+    
+    setStartDate(startDateStr);
+    setEndDate(endDateStr);
+  }, []);
+
+  // Auto-generate report when component mounts and user is available
+  useEffect(() => {
+    if (user?.institutionId && startDate && endDate) {
+      console.log("🚀 Auto-generating report for dates:", startDate, "to", endDate);
+      handleGenerateReport();
     }
-  }, [user?.institutionId]); // Only run when user is available
+  }, [user?.institutionId, startDate, endDate]); // Runs once when all dependencies are ready
 
   const reportTypes = [
     { 

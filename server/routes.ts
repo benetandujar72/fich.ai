@@ -1339,15 +1339,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Reports API endpoints
-  app.get("/api/reports/overview/:institutionId", isAuthenticated, async (req, res) => {
+  app.get("/api/reports/overview/:institutionId", isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
       const { startDate, endDate } = req.query;
+      const userId = req.user.id;
       
       const start = startDate ? new Date(startDate as string) : undefined;
       const end = endDate ? new Date(endDate as string) : undefined;
       
-      const overview = await storage.getAttendanceOverview(institutionId, start, end);
+      // Get user details to check role
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      let overview;
+      if (user.role === 'employee') {
+        // For employees, only show their own data
+        overview = await storage.getEmployeeAttendanceOverview(userId, start, end);
+        console.log(`Employee report for user ${userId}:`, overview);
+      } else {
+        // For admins and superadmins, show institution data
+        overview = await storage.getAttendanceOverview(institutionId, start, end);
+        console.log(`Institution report for ${institutionId}:`, overview);
+      }
+      
       res.json(overview);
     } catch (error) {
       console.error("Error fetching attendance overview:", error);

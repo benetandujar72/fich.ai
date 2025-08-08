@@ -2191,6 +2191,92 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     }
   }
 
+  // Employee-specific attendance overview (for employee role)
+  async getEmployeeAttendanceOverview(userId: string, startDate?: Date, endDate?: Date): Promise<{
+    totalEmployees: number;
+    attendanceRate: number;
+    averageHoursPerDay: number;
+    totalLatesThisMonth: number;
+    totalAbsencesThisMonth: number;
+  }> {
+    try {
+      const now = new Date();
+      const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+      const defaultEndDate = endDate || now;
+
+      // Get employee record for this user
+      const employee = await db
+        .select()
+        .from(employees)
+        .where(eq(employees.userId, userId))
+        .limit(1);
+
+      if (employee.length === 0) {
+        return {
+          totalEmployees: 0,
+          attendanceRate: 0,
+          averageHoursPerDay: 0,
+          totalLatesThisMonth: 0,
+          totalAbsencesThisMonth: 0,
+        };
+      }
+
+      const employeeRecord = employee[0];
+      console.log(`DEBUG: Found employee ${employeeRecord.fullName} for user ${userId}`);
+
+      // Get attendance records for this specific employee
+      const attendanceData = await db
+        .select({
+          timestamp: attendanceRecords.timestamp,
+          type: attendanceRecords.type,
+        })
+        .from(attendanceRecords)
+        .where(eq(attendanceRecords.employeeId, employeeRecord.id));
+
+      console.log(`DEBUG: Found ${attendanceData.length} attendance records for employee ${employeeRecord.id}`);
+
+      // Calculate attendance for this employee only
+      const workingDays = Math.ceil((defaultEndDate.getTime() - defaultStartDate.getTime()) / (1000 * 60 * 60 * 24));
+      const attendanceDays = new Set<string>();
+      let lateCount = 0;
+
+      for (const record of attendanceData) {
+        const dateStr = record.timestamp.toISOString().split('T')[0];
+        attendanceDays.add(dateStr);
+        
+        // Check if late (after 8:30)
+        const hour = record.timestamp.getHours();
+        const minute = record.timestamp.getMinutes();
+        if (record.type === 'check_in' && (hour > 8 || (hour === 8 && minute > 30))) {
+          lateCount++;
+        }
+      }
+
+      // Get absences for this employee
+      const absenceData = await db
+        .select()
+        .from(absences)
+        .where(eq(absences.employeeId, employeeRecord.id));
+
+      console.log(`DEBUG: Found ${absenceData.length} absences for employee ${employeeRecord.id}`);
+
+      const attendanceRate = workingDays > 0 ? (attendanceDays.size / Math.max(workingDays, 1)) * 100 : 0;
+      const averageHoursPerDay = attendanceDays.size > 0 ? (attendanceDays.size * 8) / Math.max(attendanceDays.size, 1) : 0;
+
+      return {
+        totalEmployees: 1, // For employee view, always 1
+        attendanceRate: Math.round(attendanceRate * 10) / 10,
+        averageHoursPerDay: Math.round(averageHoursPerDay * 10) / 10,
+        totalLatesThisMonth: lateCount,
+        totalAbsencesThisMonth: absenceData.length,
+      };
+
+    } catch (error) {
+      console.error("Error getting employee attendance overview:", error);
+      throw error;
+    }
+  }
+
   async getDepartmentComparison(institutionId: string, startDate?: Date, endDate?: Date): Promise<Array<{
     departmentName: string;
     totalEmployees: number;

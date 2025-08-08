@@ -27,23 +27,22 @@ export default function Reports() {
   const permissions = usePermissions();
   const { toast } = useToast();
   
-  // Fechas por defecto calculadas una sola vez usando useMemo
-  const defaultStartDate = useMemo(() => {
+  // Estado del formulario con fechas por defecto simples
+  const [reportType, setReportType] = useState("general_attendance");
+  const [startDate, setStartDate] = useState(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    return firstDay.toISOString().split('T')[0];
-  }, []);
-  
-  const defaultEndDate = useMemo(() => {
+    const dateStr = firstDay.toISOString().split('T')[0];
+    console.log('Initial start date:', dateStr);
+    return dateStr;
+  });
+  const [endDate, setEndDate] = useState(() => {
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return lastDay.toISOString().split('T')[0];
-  }, []);
-
-  // Estado del formulario
-  const [reportType, setReportType] = useState("general_attendance");
-  const [startDate, setStartDate] = useState(defaultStartDate);
-  const [endDate, setEndDate] = useState(defaultEndDate);
+    const dateStr = lastDay.toISOString().split('T')[0];
+    console.log('Initial end date:', dateStr);
+    return dateStr;
+  });
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
 
   // Estado de datos
@@ -352,8 +351,12 @@ export default function Reports() {
                 id="start-date"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => {
+                  console.log('Start date changed:', e.target.value);
+                  setStartDate(e.target.value);
+                }}
                 data-testid="start-date-input"
+                style={{ pointerEvents: 'auto' }}
               />
             </div>
             
@@ -365,8 +368,12 @@ export default function Reports() {
                 id="end-date"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => {
+                  console.log('End date changed:', e.target.value);
+                  setEndDate(e.target.value);
+                }}
                 data-testid="end-date-input"
+                style={{ pointerEvents: 'auto' }}
               />
             </div>
           </div>

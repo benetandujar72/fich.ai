@@ -215,24 +215,36 @@ export default function Reports() {
             <Label className="text-base font-medium mb-3 block">
               {language === "ca" ? "Tipus d'informes" : "Tipos de informes"}
             </Label>
-            <div className="space-y-3">
+            <div className="space-y-3 p-4 bg-gray-50 rounded-lg border">
               {reportTypes.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
+                <div key={type.value} className="flex items-center space-x-3 p-2 hover:bg-white rounded border-l-4 border-transparent hover:border-blue-400 transition-all">
                   <Checkbox
                     id={type.value}
                     checked={selectedReportTypes.includes(type.value)}
                     onCheckedChange={() => handleReportTypeToggle(type.value)}
                     data-testid={`checkbox-${type.value}`}
+                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                   />
                   <Label 
                     htmlFor={type.value}
-                    className="text-sm font-normal cursor-pointer"
+                    className="text-sm font-medium cursor-pointer flex-1"
                   >
                     {type.label}
                   </Label>
+                  {selectedReportTypes.includes(type.value) && (
+                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                      {language === "ca" ? "Seleccionat" : "Seleccionado"}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {language === "ca" 
+                ? `${selectedReportTypes.length} tipus seleccionats` 
+                : `${selectedReportTypes.length} tipos seleccionados`
+              }
+            </p>
           </div>
 
           {/* Date Range */}
@@ -267,16 +279,27 @@ export default function Reports() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Button 
               onClick={handleGenerateReport}
-              className="bg-blue-600 text-white hover:bg-blue-700"
+              className="bg-blue-600 text-white hover:bg-blue-700 relative"
               data-testid="generate-report-button"
               disabled={isLoading || !user?.institutionId || !startDate || !endDate || selectedReportTypes.length === 0}
+              size="lg"
             >
               {isLoading ? (
-                <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+                <>
+                  <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+                  {language === "ca" ? "Generant..." : "Generando..."}
+                </>
               ) : (
-                <BarChart3 className="mr-2 h-4 w-4" />
+                <>
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  {language === "ca" ? "Generar informe" : "Generar informe"}
+                </>
               )}
-              {language === "ca" ? "Generar informe" : "Generar informe"}
+              {selectedReportTypes.length > 0 && !isLoading && (
+                <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {selectedReportTypes.length}
+                </span>
+              )}
             </Button>
             
             <Button 
@@ -307,45 +330,72 @@ export default function Reports() {
         </CardContent>
       </Card>
 
+      {/* Loading State */}
+      {isLoading && (
+        <Card data-testid="loading-state-card">
+          <CardContent className="p-12 text-center">
+            <LoaderIcon className="h-12 w-12 mx-auto mb-4 text-blue-600 animate-spin" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {language === "ca" ? "Generant informe..." : "Generando informe..."}
+            </h3>
+            <p className="text-gray-600">
+              {language === "ca" 
+                ? "Processant les dades d'assistència. Això pot trigar uns segons."
+                : "Procesando los datos de asistencia. Esto puede tardar unos segundos."
+              }
+            </p>
+            <div className="mt-4 space-y-2">
+              <div className="bg-gray-200 rounded-full h-2 w-full">
+                <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+              </div>
+              <p className="text-xs text-gray-500">
+                {language === "ca" ? "Analitzant dades..." : "Analizando datos..."}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Report Results */}
-      {reportData && (
-        <Card data-testid="report-results-card">
-          <CardHeader>
-            <CardTitle>
+      {reportData && !isLoading && (
+        <Card data-testid="report-results-card" className="border-green-200 bg-green-50/30">
+          <CardHeader className="border-b border-green-200">
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <TrendingUp className="h-5 w-5" />
               {language === "ca" ? "Resultats de l'informe" : "Resultados del informe"}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-green-50 rounded-lg">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200 hover:shadow-md transition-all">
                 <div className="bg-green-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <TrendingUp className="text-green-600 h-6 w-6" />
                 </div>
-                <p className="text-xl font-bold text-gray-900 mb-1">
-                  {reportData.attendanceRate ? `${reportData.attendanceRate.toFixed(1)}%` : "--"}
+                <p className="text-2xl font-bold text-gray-900 mb-1">
+                  {reportData.attendanceRate ? `${reportData.attendanceRate.toFixed(1)}%` : "0.0%"}
                 </p>
                 <p className="text-sm text-gray-600">
                   {language === "ca" ? "Taxa d'assistència" : "Tasa de asistencia"}
                 </p>
               </div>
 
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow-md transition-all">
                 <div className="bg-blue-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <Clock className="text-blue-600 h-6 w-6" />
                 </div>
-                <p className="text-xl font-bold text-gray-900 mb-1">
-                  {reportData.averageHoursPerDay ? `${reportData.averageHoursPerDay.toFixed(1)}` : "--"}
+                <p className="text-2xl font-bold text-gray-900 mb-1">
+                  {reportData.averageHoursPerDay ? `${reportData.averageHoursPerDay.toFixed(1)}h` : "0.0h"}
                 </p>
                 <p className="text-sm text-gray-600">
                   {language === "ca" ? "Mitjana hores/dia" : "Media horas/día"}
                 </p>
               </div>
 
-              <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200 hover:shadow-md transition-all">
                 <div className="bg-orange-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <AlertTriangle className="text-orange-600 h-6 w-6" />
                 </div>
-                <p className="text-xl font-bold text-gray-900 mb-1">
+                <p className="text-2xl font-bold text-gray-900 mb-1">
                   {reportData.totalLatesThisMonth || 0}
                 </p>
                 <p className="text-sm text-gray-600">
@@ -353,11 +403,11 @@ export default function Reports() {
                 </p>
               </div>
 
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200 hover:shadow-md transition-all">
                 <div className="bg-purple-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <Users className="text-purple-600 h-6 w-6" />
                 </div>
-                <p className="text-xl font-bold text-gray-900 mb-1">
+                <p className="text-2xl font-bold text-gray-900 mb-1">
                   {reportData.totalEmployees || 0}
                 </p>
                 <p className="text-sm text-gray-600">
@@ -366,17 +416,45 @@ export default function Reports() {
               </div>
             </div>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-medium text-gray-900 mb-2">
+            <div className="mt-6 p-4 bg-white rounded-lg border border-gray-200">
+              <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4" />
                 {language === "ca" ? "Informació del període" : "Información del período"}
               </h3>
-              <p className="text-sm text-gray-600">
-                {language === "ca" ? "Període:" : "Período:"} {startDate} - {endDate}
-              </p>
-              <p className="text-sm text-gray-600">
-                {language === "ca" ? "Tipus seleccionats:" : "Tipos seleccionados:"} {selectedReportTypes.map(type => 
-                  reportTypes.find(rt => rt.value === type)?.label || type
-                ).join(", ")}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700">
+                    {language === "ca" ? "Període:" : "Período:"}
+                  </span>
+                  <br />
+                  <span className="text-gray-600">{startDate} → {endDate}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">
+                    {language === "ca" ? "Tipus seleccionats:" : "Tipos seleccionados:"}
+                  </span>
+                  <br />
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {selectedReportTypes.map(type => {
+                      const typeLabel = reportTypes.find(rt => rt.value === type)?.label || type;
+                      return (
+                        <span key={type} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                          {typeLabel}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
+              <p className="text-sm text-green-800 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                {language === "ca" 
+                  ? "✓ Informe generat amb èxit. Pots exportar les dades utilitzant els botons d'exportació de dalt."
+                  : "✓ Informe generado con éxito. Puedes exportar los datos usando los botones de exportación de arriba."
+                }
               </p>
             </div>
           </CardContent>

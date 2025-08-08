@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,12 +19,18 @@ export default function WeeklySchedule() {
   
   const locale = language === "ca" ? ca : es;
 
+  // Memoize calculations to prevent re-renders
+  const weekStart = useMemo(() => startOfWeek(currentWeek, { weekStartsOn: 1 }), [currentWeek]);
+  const weekStartString = useMemo(() => format(weekStart, 'yyyy-MM-dd'), [weekStart]);
+  const weekDays = useMemo(() => Array.from({ length: 5 }, (_, i) => addDays(weekStart, i)), [weekStart]);
+  const hourPeriods = useMemo(() => Array.from({ length: 8 }, (_, i) => i + 1), []); // Hours 1-8
+
   // Get weekly schedule data
   const { data: scheduleData, isLoading, error } = useQuery({
-    queryKey: ['/api/schedule/weekly', user?.id, format(currentWeek, 'yyyy-MM-dd')],
+    queryKey: ['/api/schedule/weekly', user?.id, weekStartString],
     queryFn: async () => {
       if (!user?.id) return [];
-      const response = await fetch(`/api/schedule/weekly/${user.id}/${format(currentWeek, 'yyyy-MM-dd')}`);
+      const response = await fetch(`/api/schedule/weekly/${user.id}/${weekStartString}`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -35,12 +41,6 @@ export default function WeeklySchedule() {
     refetchOnWindowFocus: false,
     staleTime: 30 * 60 * 1000, // 30 minutes
   });
-
-
-  const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Start on Monday
-  const weekDays = Array.from({ length: 5 }, (_, i) => addDays(weekStart, i)); // Monday to Friday
-
-  const hourPeriods = Array.from({ length: 8 }, (_, i) => i + 1); // Hours 1-8
 
   const getSessionForSlot = (day: number, hour: number): ScheduleSession | null => {
     if (!scheduleData || !Array.isArray(scheduleData)) return null;
@@ -68,21 +68,25 @@ export default function WeeklySchedule() {
     return false; // No break time rows, just time gaps
   };
 
-  const getTotalHours = (): { lective: number; nonLective: number } => {
+  // Memoize calculations to prevent re-renders
+  const totalHours = useMemo(() => {
     if (!scheduleData || !Array.isArray(scheduleData)) return { lective: 0, nonLective: 0 };
     
     const lective = scheduleData.filter((s: ScheduleSession) => s.isLectiveHour).length;
     const nonLective = scheduleData.filter((s: ScheduleSession) => !s.isLectiveHour).length;
     
     return { lective, nonLective };
-  };
+  }, [scheduleData]);
 
-  const { lective, nonLective } = getTotalHours();
+  const { lective, nonLective } = totalHours;
 
-  // Calculate expected times for today
-  const todayDayOfWeek = getTodayDayOfWeek();
-  const todayExpectedTimes = calculateExpectedTimes(scheduleData || [], todayDayOfWeek);
-  const isToday = isSameDay(new Date(), new Date());
+  // Calculate expected times for today - memoized
+  const todayDayOfWeek = useMemo(() => getTodayDayOfWeek(), []);
+  const todayExpectedTimes = useMemo(() => 
+    calculateExpectedTimes(scheduleData || [], todayDayOfWeek), 
+    [scheduleData, todayDayOfWeek]
+  );
+  const isToday = useMemo(() => isSameDay(new Date(), new Date()), []);
 
   if (isLoading) {
     return (
@@ -242,7 +246,7 @@ export default function WeeklySchedule() {
                   const showSeparator = hour === 3 || hour === 6;
                   
                   return (
-                    <React.Fragment key={hour}>
+                    <React.Fragment key={`hour-${hour}`}>
                       <tr>
                         <td className="border p-2 text-sm font-medium">
                           <div>{hour}ª</div>

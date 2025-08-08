@@ -100,9 +100,22 @@ export default function Communications() {
   });
 
   // Get users for recipient selection
-  const { data: users } = useQuery({
+  const { data: users = [] } = useQuery({
     queryKey: ['/api/users', user?.institutionId],
+    queryFn: async () => {
+      if (!user?.institutionId) return [];
+      const response = await fetch(`/api/users/${user.institutionId}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: !!user?.institutionId,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Send message mutation

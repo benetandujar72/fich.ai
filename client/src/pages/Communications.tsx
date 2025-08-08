@@ -82,8 +82,21 @@ export default function Communications() {
 
   // Get communications
   const { data: communications, isLoading } = useQuery({
-    queryKey: ['/api/communications', user?.id, filter],
+    queryKey: ['/api/communications', user?.id, 'all'],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const response = await fetch(`/api/communications/${user.id}/all`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: !!user?.id,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Get users for recipient selection

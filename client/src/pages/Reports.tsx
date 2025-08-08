@@ -36,11 +36,11 @@ export default function Reports() {
   const [employeesLoaded, setEmployeesLoaded] = useState(false);
 
   // Estados de datos
-  const [overviewData, setOverviewData] = useState(null);
-  const [departmentData, setDepartmentData] = useState([]);
-  const [monthlyTrends, setMonthlyTrends] = useState([]);
-  const [attendanceRates, setAttendanceRates] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  const [overviewData, setOverviewData] = useState<any>(null);
+  const [departmentData, setDepartmentData] = useState<any[]>([]);
+  const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
+  const [attendanceRates, setAttendanceRates] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
 
   // Verificar si es admin
   const isAdmin = permissions.canViewEmployees || permissions.canGenerateInstitutionReports;
@@ -70,7 +70,7 @@ export default function Reports() {
       });
       if (response.ok) {
         const data = await response.json();
-        setEmployees(Array.isArray(data) ? data : []);
+        setEmployees(Array.isArray(data) ? data : [] as any[]);
         setEmployeesLoaded(true);
       }
     } catch (error) {
@@ -121,10 +121,10 @@ export default function Reports() {
           const deptUrl = `/api/reports/department-comparison/${user.institutionId}?${deptParams.toString()}`;
           const deptResponse = await fetch(deptUrl, { credentials: 'include' });
           const deptResult = deptResponse.ok ? await deptResponse.json() : [];
-          setDepartmentData(Array.isArray(deptResult) ? deptResult : []);
+          setDepartmentData(Array.isArray(deptResult) ? deptResult : [] as any[]);
         } catch (error) {
           console.error('Error loading departments:', error);
-          setDepartmentData([]);
+          setDepartmentData([] as any[]);
         }
       } else {
         setDepartmentData([]);
@@ -138,10 +138,10 @@ export default function Reports() {
         const trendsUrl = `/api/reports/monthly-trends/${user.institutionId}${trendsParams.toString() ? '?' + trendsParams.toString() : ''}`;
         const trendsResponse = await fetch(trendsUrl, { credentials: 'include' });
         const trendsResult = trendsResponse.ok ? await trendsResponse.json() : [];
-        setMonthlyTrends(Array.isArray(trendsResult) ? trendsResult : []);
+        setMonthlyTrends(Array.isArray(trendsResult) ? trendsResult : [] as any[]);
       } catch (error) {
         console.error('Error loading trends:', error);
-        setMonthlyTrends([]);
+        setMonthlyTrends([] as any[]);
       }
 
       // 4. Cargar tasas de asistencia
@@ -154,10 +154,10 @@ export default function Reports() {
         const ratesUrl = `/api/reports/attendance-rates/${user.institutionId}?${ratesParams.toString()}`;
         const ratesResponse = await fetch(ratesUrl, { credentials: 'include' });
         const ratesResult = ratesResponse.ok ? await ratesResponse.json() : [];
-        setAttendanceRates(Array.isArray(ratesResult) ? ratesResult : []);
+        setAttendanceRates(Array.isArray(ratesResult) ? ratesResult : [] as any[]);
       } catch (error) {
         console.error('Error loading attendance rates:', error);
-        setAttendanceRates([]);
+        setAttendanceRates([] as any[]);
       }
 
       toast({
@@ -174,9 +174,9 @@ export default function Reports() {
       });
       
       setOverviewData(null);
-      setDepartmentData([]);
-      setMonthlyTrends([]);
-      setAttendanceRates([]);
+      setDepartmentData([] as any[]);
+      setMonthlyTrends([] as any[]);
+      setAttendanceRates([] as any[]);
     } finally {
       setIsLoading(false);
     }

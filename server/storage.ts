@@ -2321,7 +2321,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         const monthOverview = await this.getAttendanceOverview(institutionId, startDate, endDate);
         
         results.push({
-          month: format(monthDate, 'yyyy-MM'),
+          month: monthDate.toISOString().substring(0, 7),
           attendanceRate: monthOverview.attendanceRate,
           totalHours: monthOverview.averageHoursPerDay * monthOverview.totalEmployees,
           lateCount: monthOverview.totalLatesThisMonth,
@@ -2392,15 +2392,15 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       const currentDate = new Date(startDate);
       
       while (currentDate <= endDate) {
-        const dateStr = format(currentDate, 'yyyy-MM-dd');
+        const dateStr = currentDate.toISOString().split('T')[0];
         
         // Get attendance for this date
         const dayAttendance = attendanceData.filter(record => 
-          format(record.timestamp, 'yyyy-MM-dd') === dateStr
+          record.timestamp.toISOString().split('T')[0] === dateStr
         );
         
         const dayAbsences = absenceData.filter(absence => 
-          format(absence.date, 'yyyy-MM-dd') === dateStr
+          absence.date.toISOString().split('T')[0] === dateStr
         );
         
         // Count unique employees who checked in

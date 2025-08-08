@@ -2119,7 +2119,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         };
       }
 
-      // Get attendance records for the period
+      // Get attendance records for the period - SIMPLIFIED VERSION
       const attendanceData = await db
         .select({
           employeeId: attendanceRecords.employeeId,
@@ -2128,19 +2128,16 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         })
         .from(attendanceRecords)
         .innerJoin(employees, eq(attendanceRecords.employeeId, employees.id))
-        .where(
-          and(
-            eq(employees.institutionId, institutionId),
-            gte(attendanceRecords.timestamp, defaultStartDate),
-            lte(attendanceRecords.timestamp, defaultEndDate)
-          )
-        );
+        .where(eq(employees.institutionId, institutionId));
+
+      console.log(`DEBUG: Found ${attendanceData.length} attendance records for institution ${institutionId}`);
 
       // Calculate attendance statistics
       const employeeAttendance = new Map<string, { dates: Set<string>; totalHours: number; lateCount: number }>();
       
       for (const record of attendanceData) {
-        const dateStr = format(record.timestamp, 'yyyy-MM-dd');
+        // Simple date formatting without date-fns
+        const dateStr = record.timestamp.toISOString().split('T')[0];
         const employeeId = record.employeeId;
         
         if (!employeeAttendance.has(employeeId)) {
@@ -2162,18 +2159,14 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         }
       }
 
-      // Get absences for the period
+      // Get absences for the period - SIMPLIFIED VERSION
       const absenceData = await db
         .select({ employeeId: absences.employeeId })
         .from(absences)
         .innerJoin(employees, eq(absences.employeeId, employees.id))
-        .where(
-          and(
-            eq(employees.institutionId, institutionId),
-            gte(absences.startDate, defaultStartDate),
-            lte(absences.startDate, defaultEndDate)
-          )
-        );
+        .where(eq(employees.institutionId, institutionId));
+
+      console.log(`DEBUG: Found ${absenceData.length} absences for institution ${institutionId}`);
 
       // Calculate metrics
       const workingDays = Math.ceil((defaultEndDate.getTime() - defaultStartDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -2269,7 +2262,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         // Process attendance records
         for (const record of attendanceData) {
           if (deptInfo.employeeIds.has(record.employeeId)) {
-            const dateStr = format(record.timestamp, 'yyyy-MM-dd');
+            const dateStr = record.timestamp.toISOString().split('T')[0];
             const empData = employeeAttendance.get(record.employeeId)!;
             empData.dates.add(dateStr);
             

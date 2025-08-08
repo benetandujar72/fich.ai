@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   BarChart3, 
-  PieChart, 
   FileText, 
   Download, 
   TrendingUp,
@@ -27,35 +26,21 @@ export default function Reports() {
   const permissions = usePermissions();
   const { toast } = useToast();
   
-  // Estado del formulario con fechas por defecto simples
+  // Estado simple sin cálculos complejos
   const [reportType, setReportType] = useState("general_attendance");
-  const [startDate, setStartDate] = useState(() => {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const dateStr = firstDay.toISOString().split('T')[0];
-    console.log('Initial start date:', dateStr);
-    return dateStr;
-  });
-  const [endDate, setEndDate] = useState(() => {
-    const now = new Date();
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const dateStr = lastDay.toISOString().split('T')[0];
-    console.log('Initial end date:', dateStr);
-    return dateStr;
-  });
+  const [startDate, setStartDate] = useState("2025-01-01");
+  const [endDate, setEndDate] = useState("2025-01-31");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [employeesLoaded, setEmployeesLoaded] = useState(false);
 
-  // Estado de datos
+  // Estados de datos
   const [overviewData, setOverviewData] = useState(null);
   const [departmentData, setDepartmentData] = useState([]);
   const [monthlyTrends, setMonthlyTrends] = useState([]);
   const [attendanceRates, setAttendanceRates] = useState([]);
   const [employees, setEmployees] = useState([]);
-
-  // Estado de carga
-  const [isLoading, setIsLoading] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [employeesLoaded, setEmployeesLoaded] = useState(false);
 
   // Verificar si es admin
   const isAdmin = permissions.canViewEmployees || permissions.canGenerateInstitutionReports;
@@ -75,7 +60,7 @@ export default function Reports() {
     },
   ];
 
-  // Cargar empleados - solo cuando se abra el dropdown
+  // Cargar empleados
   const handleLoadEmployees = async () => {
     if (!isAdmin || !user?.institutionId || employeesLoaded) return;
     
@@ -93,7 +78,7 @@ export default function Reports() {
     }
   };
 
-  // Generar informe - función completamente manual
+  // Generar informe
   const handleGenerateReport = async () => {
     if (!user?.institutionId || !startDate || !endDate) {
       toast({
@@ -107,12 +92,10 @@ export default function Reports() {
     setIsLoading(true);
     
     try {
-      // Cargar empleados si es necesario
       if (isAdmin && !employeesLoaded) {
         await handleLoadEmployees();
       }
 
-      // Determinar empleado objetivo
       const targetEmployeeId = isAdmin && selectedEmployeeId ? selectedEmployeeId : user.id;
 
       // 1. Cargar datos de resumen
@@ -190,7 +173,6 @@ export default function Reports() {
         variant: "destructive",
       });
       
-      // Reset data on error
       setOverviewData(null);
       setDepartmentData([]);
       setMonthlyTrends([]);
@@ -241,50 +223,6 @@ export default function Reports() {
       });
     } finally {
       setIsExporting(false);
-    }
-  };
-
-  // Exportar PDF
-  const handleExportPDF = async () => {
-    try {
-      const { default: html2canvas } = await import('html2canvas');
-      const { default: jsPDF } = await import('jspdf');
-      
-      const element = document.querySelector('[data-testid="reports-container"]');
-      if (!element) return;
-      
-      const canvas = await html2canvas(element as HTMLElement);
-      const imgData = canvas.toDataURL('image/png');
-      
-      const pdf = new jsPDF();
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-      
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-      
-      pdf.save(`report_${reportType}_${startDate}_${endDate}.pdf`);
-      
-      toast({
-        title: language === "ca" ? "PDF generat" : "PDF generado",
-        description: language === "ca" ? "L'informe PDF s'ha descarregat" : "El informe PDF se ha descargado",
-      });
-    } catch (error) {
-      toast({
-        title: language === "ca" ? "Error de PDF" : "Error de PDF",
-        description: language === "ca" ? "No s'ha pogut generar el PDF" : "No se pudo generar el PDF",
-        variant: "destructive",
-      });
     }
   };
 
@@ -351,12 +289,8 @@ export default function Reports() {
                 id="start-date"
                 type="date"
                 value={startDate}
-                onChange={(e) => {
-                  console.log('Start date changed:', e.target.value);
-                  setStartDate(e.target.value);
-                }}
+                onChange={(e) => setStartDate(e.target.value)}
                 data-testid="start-date-input"
-                style={{ pointerEvents: 'auto' }}
               />
             </div>
             
@@ -368,12 +302,8 @@ export default function Reports() {
                 id="end-date"
                 type="date"
                 value={endDate}
-                onChange={(e) => {
-                  console.log('End date changed:', e.target.value);
-                  setEndDate(e.target.value);
-                }}
+                onChange={(e) => setEndDate(e.target.value)}
                 data-testid="end-date-input"
-                style={{ pointerEvents: 'auto' }}
               />
             </div>
           </div>
@@ -405,16 +335,6 @@ export default function Reports() {
                 <FileText className="mr-2 h-4 w-4" />
               )}
               {language === "ca" ? "Exportar CSV" : "Exportar CSV"}
-            </Button>
-            
-            <Button 
-              onClick={handleExportPDF}
-              variant="outline"
-              data-testid="export-pdf-button"
-              disabled={!overviewData}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Exportar PDF" : "Exportar PDF"}
             </Button>
           </div>
         </CardContent>
@@ -509,7 +429,7 @@ export default function Reports() {
                 ) : (
                   <div className="h-full flex items-center justify-center text-gray-500">
                     <div className="text-center">
-                      <PieChart className="h-12 w-12 mx-auto mb-2" />
+                      <BarChart3 className="h-12 w-12 mx-auto mb-2" />
                       <p>{language === "ca" ? "No hi ha dades d'assistència" : "No hay datos de asistencia"}</p>
                     </div>
                   </div>
@@ -596,14 +516,8 @@ export default function Reports() {
               {language === "ca" ? "No s'han carregat informes" : "No se han cargado informes"}
             </h3>
             <p className="text-gray-600 mb-6">
-              {language === "ca" 
-                ? "Selecciona les dates i fes clic a 'Generar informe' per veure les dades"
-                : "Selecciona las fechas y haz clic en 'Generar informe' para ver los datos"}
+              {language === "ca" ? "Selecciona les dades i fes clic a 'Generar informe'" : "Selecciona los datos y haz clic en 'Generar informe'"}
             </p>
-            <Button onClick={handleGenerateReport} disabled={!user?.institutionId || !startDate || !endDate}>
-              <BarChart3 className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Generar primer informe" : "Generar primer informe"}
-            </Button>
           </CardContent>
         </Card>
       )}

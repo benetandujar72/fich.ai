@@ -135,6 +135,8 @@ export default function Reports() {
         console.log("✅ Overview data received:", overviewData);
         console.log("✅ Detailed attendance received:", detailedData.length, "records");
         console.log("✅ Monthly trends received:", trendsData.length, "months");
+        console.log("📊 Setting states - detailed:", detailedData);
+        console.log("📈 Setting states - trends:", trendsData);
         
         setReportData(overviewData);
         setDetailedAttendance(detailedData);
@@ -495,7 +497,14 @@ export default function Reports() {
       )}
 
       {/* Detailed Attendance Table */}
-      {detailedAttendance.length > 0 && !isLoading && (
+      {(() => {
+        console.log("🔍 Checking table render condition:", {
+          detailedLength: detailedAttendance.length,
+          isLoading,
+          shouldRender: detailedAttendance.length > 0 && !isLoading
+        });
+        return detailedAttendance.length > 0 && !isLoading;
+      })() && (
         <Card data-testid="detailed-attendance-card" className="border-blue-200">
           <CardHeader className="border-b border-blue-200 bg-blue-50/30">
             <CardTitle className="flex items-center gap-2 text-blue-800">

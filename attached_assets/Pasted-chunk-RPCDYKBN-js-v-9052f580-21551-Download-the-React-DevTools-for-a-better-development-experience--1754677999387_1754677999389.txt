@@ -1,0 +1,19 @@
+chunk-RPCDYKBN.js?v=9052f580:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}
+Reports.tsx:73 🔄 Toggling report type: late_absences
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}
+Reports.tsx:73 🔄 Toggling report type: worked_hours
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}
+Reports.tsx:298 📅 Start date changing to: 2025-07-01
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}
+Reports.tsx:314 📅 End date changing to: 2025-08-31
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}
+Reports.tsx:95 🚀 Starting comprehensive report generation
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: true, shouldRender: false}
+Reports.tsx:135 ✅ Overview data received: {totalEmployees: 1, attendanceRate: 3.3, averageHoursPerDay: 8, totalLatesThisMonth: 6, totalAbsencesThisMonth: 0}
+Reports.tsx:136 ✅ Detailed attendance received: 62 records
+Reports.tsx:137 ✅ Monthly trends received: 6 months
+Reports.tsx:138 📊 Setting states - detailed: (62) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Reports.tsx:139 📈 Setting states - trends: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+Reports.tsx:501 🔍 Checking table render condition: {detailedLength: 0, isLoading: false, shouldRender: false}

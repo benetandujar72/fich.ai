@@ -53,6 +53,12 @@ export default function Reports() {
   const [detailedAttendance, setDetailedAttendance] = useState<any[]>([]);
   const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
 
+  // Debug effect to track state changes
+  useEffect(() => {
+    console.log("🔄 State changed - detailedAttendance:", detailedAttendance.length, "items");
+    console.log("🔄 State changed - monthlyTrends:", monthlyTrends.length, "items");
+  }, [detailedAttendance, monthlyTrends]);
+
   const reportTypes = [
     { 
       value: "general_attendance", 
@@ -497,14 +503,7 @@ export default function Reports() {
       )}
 
       {/* Detailed Attendance Table */}
-      {(() => {
-        console.log("🔍 Checking table render condition:", {
-          detailedLength: detailedAttendance.length,
-          isLoading,
-          shouldRender: detailedAttendance.length > 0 && !isLoading
-        });
-        return detailedAttendance.length > 0 && !isLoading;
-      })() && (
+      {detailedAttendance.length > 0 && (
         <Card data-testid="detailed-attendance-card" className="border-blue-200">
           <CardHeader className="border-b border-blue-200 bg-blue-50/30">
             <CardTitle className="flex items-center gap-2 text-blue-800">
@@ -573,7 +572,7 @@ export default function Reports() {
       )}
 
       {/* Monthly Trends Chart */}
-      {monthlyTrends.length > 0 && !isLoading && (
+      {monthlyTrends.length > 0 && (
         <Card data-testid="monthly-trends-card" className="border-purple-200">
           <CardHeader className="border-b border-purple-200 bg-purple-50/30">
             <CardTitle className="flex items-center gap-2 text-purple-800">

@@ -53,6 +53,28 @@ export default function Reports() {
   const [detailedAttendance, setDetailedAttendance] = useState<any[]>([]);
   const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
 
+  // Auto-set dates to last month to current date and generate report
+  useEffect(() => {
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const today = new Date();
+    
+    const startDateStr = lastMonth.toISOString().split('T')[0];
+    const endDateStr = today.toISOString().split('T')[0];
+    
+    console.log("📅 Auto-setting dates:", { startDateStr, endDateStr });
+    setStartDate(startDateStr);
+    setEndDate(endDateStr);
+    
+    // Auto-generate report on page load after user is loaded
+    if (user?.institutionId) {
+      setTimeout(() => {
+        console.log("🚀 Auto-generating report on page load");
+        handleGenerateReport();
+      }, 1000);
+    }
+  }, [user?.institutionId]);
+
   // Debug effect to track state changes
   useEffect(() => {
     console.log("🔄 State changed - detailedAttendance:", detailedAttendance.length, "items");
@@ -144,9 +166,22 @@ export default function Reports() {
         console.log("📊 Setting states - detailed:", detailedData);
         console.log("📈 Setting states - trends:", trendsData);
         
+        // Set states with immediate logging
+        console.log("🔧 About to set report data...");
         setReportData(overviewData);
+        
+        console.log("🔧 About to set detailed attendance...", detailedData.length);
         setDetailedAttendance(detailedData);
+        
+        console.log("🔧 About to set monthly trends...", trendsData.length);
         setMonthlyTrends(trendsData);
+        
+        // Verify states are set
+        setTimeout(() => {
+          console.log("🔍 Verification after state update:");
+          console.log("- Detailed attendance length:", detailedData.length);
+          console.log("- Monthly trends length:", trendsData.length);
+        }, 100);
         
         toast({
           title: language === "ca" ? "Informe generat" : "Informe generado",

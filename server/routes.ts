@@ -1418,7 +1418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let filename = 'report.csv';
       
       switch (reportType) {
-        case 'overview':
+        case 'general_attendance':
           const overview = await storage.getAttendanceOverview(institutionId, start, end);
           csvData = `Metric,Value
 Total Employees,${overview.totalEmployees}
@@ -1426,7 +1426,27 @@ Attendance Rate,${overview.attendanceRate}%
 Average Hours Per Day,${overview.averageHoursPerDay}
 Total Lates This Month,${overview.totalLatesThisMonth}
 Total Absences This Month,${overview.totalAbsencesThisMonth}`;
-          filename = `attendance-overview-${new Date().toISOString().split('T')[0]}.csv`;
+          filename = `general-attendance-${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+
+        case 'late_absences':
+          // Get detailed late and absence data
+          const lateAbsenceData = await storage.getAttendanceRatesByPeriod(institutionId, start!, end!);
+          csvData = 'Date,Present,Late,Absent\n' +
+            lateAbsenceData.map(data => 
+              `${data.date},${data.present},${data.late},${data.absent}`
+            ).join('\n');
+          filename = `late-absences-${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+
+        case 'worked_hours':
+          // Get worked hours data
+          const trends = await storage.getMonthlyTrends(institutionId, 12);
+          csvData = 'Month,Total Hours,Average Hours,Working Days\n' +
+            trends.map(trend => 
+              `${trend.month},${trend.totalHours},${(trend.totalHours / 20).toFixed(2)},20`
+            ).join('\n');
+          filename = `worked-hours-${new Date().toISOString().split('T')[0]}.csv`;
           break;
           
         case 'department-comparison':
@@ -1439,9 +1459,9 @@ Total Absences This Month,${overview.totalAbsencesThisMonth}`;
           break;
           
         case 'monthly-trends':
-          const trends = await storage.getMonthlyTrends(institutionId, 12);
+          const monthlyTrends = await storage.getMonthlyTrends(institutionId, 12);
           csvData = 'Month,Attendance Rate,Total Hours,Late Count,Absence Count\n' +
-            trends.map(trend => 
+            monthlyTrends.map(trend => 
               `${trend.month},${trend.attendanceRate}%,${trend.totalHours},${trend.lateCount},${trend.absenceCount}`
             ).join('\n');
           filename = `monthly-trends-${new Date().toISOString().split('T')[0]}.csv`;

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   BarChart3, 
   FileText, 
@@ -15,7 +16,8 @@ import {
   Users,
   Clock,
   AlertTriangle,
-  LoaderIcon
+  LoaderIcon,
+  FileDown
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 import { useToast } from "@/hooks/use-toast";
@@ -26,13 +28,14 @@ export default function Reports() {
   const permissions = usePermissions();
   const { toast } = useToast();
   
-  // Estado simple sin cálculos complejos
-  const [reportType, setReportType] = useState("general_attendance");
+  // Estado para tipos de informe (checkboxes) y filtros
+  const [selectedReportTypes, setSelectedReportTypes] = useState<string[]>(["general_attendance"]);
   const [startDate, setStartDate] = useState("2025-01-01");
   const [endDate, setEndDate] = useState("2025-01-31");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [employeesLoaded, setEmployeesLoaded] = useState(false);
 
   // Estados de datos
@@ -59,6 +62,17 @@ export default function Reports() {
       label: language === "ca" ? "Hores treballades" : "Horas trabajadas" 
     },
   ];
+
+  // Manejar selección de tipos de informe (checkboxes)
+  const handleReportTypeToggle = (reportType: string) => {
+    setSelectedReportTypes(prev => {
+      if (prev.includes(reportType)) {
+        return prev.filter(type => type !== reportType);
+      } else {
+        return [...prev, reportType];
+      }
+    });
+  };
 
   // Cargar empleados
   const handleLoadEmployees = async () => {
@@ -182,47 +196,165 @@ export default function Reports() {
     }
   };
 
-  // Exportar CSV
+  // Exportar CSV para múltiples tipos de informe
   const handleExportCSV = async () => {
-    if (!user?.institutionId || !startDate || !endDate) return;
+    if (!user?.institutionId || !startDate || !endDate || selectedReportTypes.length === 0) return;
     
     setIsExporting(true);
     try {
       const targetEmployeeId = isAdmin && selectedEmployeeId ? selectedEmployeeId : user.id;
-      const params = new URLSearchParams({
-        reportType,
-        startDate,
-        endDate,
-        ...(targetEmployeeId && { employeeId: targetEmployeeId })
-      });
       
-      const url = `/api/reports/export/csv/${user.institutionId}?${params.toString()}`;
-      const response = await fetch(url, { credentials: 'include' });
-      
-      if (!response.ok) throw new Error('Export failed');
-      
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `report_${reportType}_${startDate}_${endDate}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
+      // Exportar cada tipo de informe seleccionado
+      for (const reportType of selectedReportTypes) {
+        const params = new URLSearchParams({
+          reportType,
+          startDate,
+          endDate,
+          ...(targetEmployeeId && { employeeId: targetEmployeeId })
+        });
+        
+        const url = `/api/reports/export/csv/${user.institutionId}?${params.toString()}`;
+        const response = await fetch(url, { credentials: 'include' });
+        
+        if (!response.ok) throw new Error(`Export failed for ${reportType}`);
+        
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `report_${reportType}_${startDate}_${endDate}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+      }
       
       toast({
-        title: language === "ca" ? "CSV exportat" : "CSV exportado",
-        description: language === "ca" ? "L'informe s'ha descarregat correctament" : "El informe se ha descargado correctamente",
+        title: language === "ca" ? "CSV exportats" : "CSV exportados",
+        description: language === "ca" ? "Els informes s'han descarregat correctament" : "Los informes se han descargado correctamente",
       });
     } catch (error) {
       toast({
         title: language === "ca" ? "Error d'exportació" : "Error de exportación",
-        description: language === "ca" ? "No s'ha pogut exportar l'informe" : "No se pudo exportar el informe",
+        description: language === "ca" ? "No s'ha pogut exportar algun informe" : "No se pudo exportar algún informe",
         variant: "destructive",
       });
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  // Exportar PDF con jsPDF
+  const handleExportPDF = async () => {
+    if (!user?.institutionId || !startDate || !endDate || !overviewData) return;
+    
+    setIsExportingPDF(true);
+    try {
+      // Importar jsPDF dinámicamente
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      
+      // Configuración del documento
+      const pageWidth = doc.internal.pageSize.width;
+      const margin = 20;
+      let yPosition = margin;
+      
+      // Título del informe
+      doc.setFontSize(20);
+      doc.text(language === "ca" ? "Informe d'Assistència" : "Informe de Asistencia", pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 20;
+      
+      // Información de período
+      doc.setFontSize(12);
+      doc.text(`${language === "ca" ? "Període:" : "Período:"} ${startDate} - ${endDate}`, margin, yPosition);
+      yPosition += 10;
+      
+      if (selectedEmployeeId && employees.length > 0) {
+        const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
+        if (selectedEmployee) {
+          doc.text(`${language === "ca" ? "Empleat:" : "Empleado:"} ${selectedEmployee.firstName} ${selectedEmployee.lastName}`, margin, yPosition);
+          yPosition += 10;
+        }
+      }
+      
+      yPosition += 10;
+      
+      // Métricas principales
+      doc.setFontSize(14);
+      doc.text(language === "ca" ? "Resum Executiu" : "Resumen Ejecutivo", margin, yPosition);
+      yPosition += 15;
+      
+      doc.setFontSize(11);
+      const metrics = [
+        `${language === "ca" ? "Taxa d'assistència:" : "Tasa de asistencia:"} ${overviewData.attendanceRate?.toFixed(1) || '--'}%`,
+        `${language === "ca" ? "Mitjana hores/dia:" : "Media horas/día:"} ${overviewData.averageHoursPerDay?.toFixed(1) || '--'}`,
+        `${language === "ca" ? "Retards aquest mes:" : "Retrasos este mes:"} ${overviewData.totalLatesThisMonth || 0}`,
+        `${language === "ca" ? "Total empleats:" : "Total empleados:"} ${overviewData.totalEmployees || 0}`,
+        `${language === "ca" ? "Absències aquest mes:" : "Ausencias este mes:"} ${overviewData.totalAbsencesThisMonth || 0}`
+      ];
+      
+      metrics.forEach(metric => {
+        doc.text(metric, margin, yPosition);
+        yPosition += 8;
+      });
+      
+      yPosition += 15;
+      
+      // Tipos de informe seleccionados
+      doc.setFontSize(14);
+      doc.text(language === "ca" ? "Tipus d'informes inclosos:" : "Tipos de informes incluidos:", margin, yPosition);
+      yPosition += 15;
+      
+      doc.setFontSize(11);
+      selectedReportTypes.forEach(type => {
+        const typeLabel = reportTypes.find(rt => rt.value === type)?.label || type;
+        doc.text(`• ${typeLabel}`, margin + 5, yPosition);
+        yPosition += 8;
+      });
+      
+      yPosition += 15;
+      
+      // Datos de departamentos (si es admin)
+      if (isAdmin && departmentData.length > 0) {
+        doc.setFontSize(14);
+        doc.text(language === "ca" ? "Comparativa per Departaments" : "Comparativa por Departamentos", margin, yPosition);
+        yPosition += 15;
+        
+        doc.setFontSize(11);
+        departmentData.forEach(dept => {
+          doc.text(`${dept.departmentName}: ${dept.attendanceRate?.toFixed(1) || '--'}% assistència`, margin, yPosition);
+          yPosition += 8;
+          
+          // Verificar si necesitamos nueva página
+          if (yPosition > doc.internal.pageSize.height - 30) {
+            doc.addPage();
+            yPosition = margin;
+          }
+        });
+      }
+      
+      // Footer
+      const today = new Date().toLocaleDateString(language === "ca" ? "ca-ES" : "es-ES");
+      doc.setFontSize(9);
+      doc.text(`${language === "ca" ? "Generat el:" : "Generado el:"} ${today}`, margin, doc.internal.pageSize.height - 10);
+      
+      // Descargar el PDF
+      const filename = `informe_assistencia_${startDate}_${endDate}.pdf`;
+      doc.save(filename);
+      
+      toast({
+        title: language === "ca" ? "PDF exportat" : "PDF exportado",
+        description: language === "ca" ? "L'informe PDF s'ha descarregat correctament" : "El informe PDF se ha descargado correctamente",
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: language === "ca" ? "Error d'exportació PDF" : "Error de exportación PDF",
+        description: language === "ca" ? "No s'ha pogut exportar l'informe PDF" : "No se pudo exportar el informe PDF",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExportingPDF(false);
     }
   };
 
@@ -236,24 +368,32 @@ export default function Reports() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div>
-              <Label htmlFor="report-type">
-                {language === "ca" ? "Tipus d'informe" : "Tipo de informe"}
-              </Label>
-              <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger id="report-type" data-testid="report-type-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {reportTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Report types selection with checkboxes */}
+          <div className="mb-6">
+            <Label className="text-base font-medium">
+              {language === "ca" ? "Tipus d'informes" : "Tipos de informes"}
+            </Label>
+            <div className="mt-3 space-y-3" data-testid="report-types-checkboxes">
+              {reportTypes.map((type) => (
+                <div key={type.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`report-type-${type.value}`}
+                    checked={selectedReportTypes.includes(type.value)}
+                    onCheckedChange={() => handleReportTypeToggle(type.value)}
+                    data-testid={`checkbox-${type.value}`}
+                  />
+                  <Label 
+                    htmlFor={`report-type-${type.value}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {type.label}
+                  </Label>
+                </div>
+              ))}
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             {/* Employee selector - only for admins */}
             {isAdmin && (
@@ -313,7 +453,7 @@ export default function Reports() {
               onClick={handleGenerateReport}
               className="bg-blue-600 text-white hover:bg-blue-700"
               data-testid="generate-report-button"
-              disabled={isLoading || !user?.institutionId || !startDate || !endDate}
+              disabled={isLoading || !user?.institutionId || !startDate || !endDate || selectedReportTypes.length === 0}
             >
               {isLoading ? (
                 <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -327,7 +467,7 @@ export default function Reports() {
               onClick={handleExportCSV}
               variant="outline"
               data-testid="export-csv-button"
-              disabled={isExporting || !overviewData}
+              disabled={isExporting || !overviewData || selectedReportTypes.length === 0}
             >
               {isExporting ? (
                 <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -335,6 +475,21 @@ export default function Reports() {
                 <FileText className="mr-2 h-4 w-4" />
               )}
               {language === "ca" ? "Exportar CSV" : "Exportar CSV"}
+            </Button>
+
+            <Button 
+              onClick={handleExportPDF}
+              variant="outline"
+              className="border-red-200 text-red-600 hover:bg-red-50"
+              data-testid="export-pdf-button"
+              disabled={isExportingPDF || !overviewData}
+            >
+              {isExportingPDF ? (
+                <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileDown className="mr-2 h-4 w-4" />
+              )}
+              {language === "ca" ? "Exportar PDF" : "Exportar PDF"}
             </Button>
           </div>
         </CardContent>

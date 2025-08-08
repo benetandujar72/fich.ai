@@ -1,9 +1,7 @@
-import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
-import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,42 +12,71 @@ import {
   PieChart, 
   FileText, 
   Download, 
-  Calendar,
   TrendingUp,
   Users,
   Clock,
   AlertTriangle,
-  Shield,
   LoaderIcon
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 
+interface ReportData {
+  overview: {
+    totalEmployees: number;
+    attendanceRate: number;
+    averageHoursPerDay: number;
+    totalLatesThisMonth: number;
+    totalAbsencesThisMonth: number;
+  } | null;
+  departmentData: Array<{
+    departmentName: string;
+    attendanceRate: number;
+    employeeCount: number;
+  }>;
+  monthlyTrends: Array<{
+    month: string;
+    attendanceRate: number;
+    lateCount: number;
+  }>;
+  attendanceRates: Array<{
+    date: string;
+    present: number;
+    late: number;
+    absent: number;
+  }>;
+}
+
 export default function Reports() {
   const { language } = useLanguage();
   const { user } = useAuth();
-  const permissions = usePermissions();
+  const { canManageEmployees } = usePermissions();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
-  // Stable date calculations - only calculated once
-  const defaultDates = useMemo(() => {
+  // State for form controls
+  const [reportType, setReportType] = useState("general_attendance");
+  const [startDate, setStartDate] = useState(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    return firstDay.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    return {
-      startDate: firstDay.toISOString().split('T')[0],
-      endDate: lastDay.toISOString().split('T')[0]
-    };
-  }, []); // Empty dependency array means this only runs once
+    return lastDay.toISOString().split('T')[0];
+  });
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
 
-  const [reportType, setReportType] = useState("general_attendance");
-  const [startDate, setStartDate] = useState(defaultDates.startDate);
-  const [endDate, setEndDate] = useState(defaultDates.endDate);
-
-  // Get institution ID from authenticated user
-  const institutionId = user?.institutionId;
+  // State for report data and loading
+  const [reportData, setReportData] = useState<ReportData>({
+    overview: null,
+    departmentData: [],
+    monthlyTrends: [],
+    attendanceRates: []
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [employees, setEmployees] = useState<Array<{ id: string; firstName: string; lastName: string }>>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   const reportTypes = [
     { 
@@ -64,101 +91,107 @@ export default function Reports() {
       value: "worked_hours", 
       label: language === "ca" ? "Hores treballades" : "Horas trabajadas" 
     },
-    { 
-      value: "substitute_duties", 
-      label: language === "ca" ? "Guàrdies realitzades" : "Guardias realizadas" 
-    },
   ];
 
-  // Create stable query keys to prevent infinite loops
-  const queryEnabled = !!(institutionId && startDate && endDate);
-  
-  // Fetch reports data with proper caching and stable keys
-  const { data: overviewData, isLoading: overviewLoading } = useQuery({
-    queryKey: ['reports', 'overview', institutionId, startDate, endDate],
-    queryFn: async () => {
-      const response = await fetch(`/api/reports/overview/${institutionId}/${startDate}/${endDate}`, {
+  // Load employees list for admin users
+  const loadEmployees = useCallback(async () => {
+    if (!canManageEmployees || !user?.institutionId) return;
+    
+    try {
+      const response = await fetch(`/api/employees?institutionId=${user.institutionId}`, {
         credentials: 'include',
       });
-      if (!response.ok) {
-        throw new Error('Failed to fetch overview data');
+      if (response.ok) {
+        const data = await response.json();
+        setEmployees(data || []);
       }
-      return response.json();
-    },
-    enabled: queryEnabled,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-    retry: 1,
-  });
+    } catch (error) {
+      console.error('Error loading employees:', error);
+    }
+  }, [canManageEmployees, user?.institutionId]);
 
-  const { data: departmentData, isLoading: departmentLoading } = useQuery({
-    queryKey: ['reports', 'department-comparison', institutionId, startDate, endDate],
-    queryFn: async () => {
-      const response = await fetch(`/api/reports/department-comparison/${institutionId}/${startDate}/${endDate}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch department data');
-      }
-      return response.json();
-    },
-    enabled: queryEnabled,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-    retry: 1,
-  });
+  // Load employees on component mount
+  useEffect(() => {
+    loadEmployees();
+  }, [loadEmployees]);
 
-  const { data: monthlyTrends, isLoading: trendsLoading } = useQuery({
-    queryKey: ['reports', 'monthly-trends', institutionId],
-    queryFn: async () => {
-      const response = await fetch(`/api/reports/monthly-trends/${institutionId}`, {
-        credentials: 'include',
+  // Generate report data
+  const generateReport = useCallback(async () => {
+    if (!user?.institutionId || !startDate || !endDate) {
+      toast({
+        title: language === "ca" ? "Error" : "Error",
+        description: language === "ca" ? "Falten dades necessàries" : "Faltan datos necesarios",
+        variant: "destructive",
       });
-      if (!response.ok) {
-        throw new Error('Failed to fetch trends data');
-      }
-      return response.json();
-    },
-    enabled: !!institutionId,
-    staleTime: 15 * 60 * 1000, // 15 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-    retry: 1,
-  });
+      return;
+    }
 
-  const { data: attendanceRates, isLoading: ratesLoading } = useQuery({
-    queryKey: ['reports', 'attendance-rates', institutionId, startDate, endDate],
-    queryFn: async () => {
-      const response = await fetch(`/api/reports/attendance-rates/${institutionId}/${startDate}/${endDate}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch attendance rates');
-      }
-      return response.json();
-    },
-    enabled: queryEnabled,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-    retry: 1,
-  });
+    setIsLoading(true);
+    
+    try {
+      // Determine which employee to get data for
+      const targetEmployeeId = canManageEmployees && selectedEmployeeId 
+        ? selectedEmployeeId 
+        : user.id; // Non-admin users only see their own data
 
-  // CSV Export mutation
-  const csvExportMutation = useMutation({
-    mutationFn: async () => {
-      if (!institutionId || !startDate || !endDate) {
-        throw new Error('Missing required parameters');
-      }
-      const url = `/api/reports/export/csv/${institutionId}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
-      const response = await fetch(url, {
-        credentials: 'include',
+      // Fetch all report data in parallel
+      const [overviewRes, departmentRes, trendsRes, ratesRes] = await Promise.all([
+        fetch(`/api/reports/overview/${user.institutionId}/${startDate}/${endDate}${targetEmployeeId ? `?employeeId=${targetEmployeeId}` : ''}`, {
+          credentials: 'include',
+        }),
+        canManageEmployees ? fetch(`/api/reports/department-comparison/${user.institutionId}/${startDate}/${endDate}`, {
+          credentials: 'include',
+        }) : Promise.resolve({ ok: true, json: () => [] }),
+        fetch(`/api/reports/monthly-trends/${user.institutionId}${targetEmployeeId ? `?employeeId=${targetEmployeeId}` : ''}`, {
+          credentials: 'include',
+        }),
+        fetch(`/api/reports/attendance-rates/${user.institutionId}/${startDate}/${endDate}${targetEmployeeId ? `?employeeId=${targetEmployeeId}` : ''}`, {
+          credentials: 'include',
+        }),
+      ]);
+
+      // Process responses
+      const overview = overviewRes.ok ? await overviewRes.json() : null;
+      const departmentData = departmentRes.ok ? await departmentRes.json() : [];
+      const monthlyTrends = trendsRes.ok ? await trendsRes.json() : [];
+      const attendanceRates = ratesRes.ok ? await ratesRes.json() : [];
+
+      setReportData({
+        overview,
+        departmentData: Array.isArray(departmentData) ? departmentData : [],
+        monthlyTrends: Array.isArray(monthlyTrends) ? monthlyTrends : [],
+        attendanceRates: Array.isArray(attendanceRates) ? attendanceRates : []
       });
-      if (!response.ok) {
-        throw new Error('Failed to export CSV');
-      }
+
+      toast({
+        title: language === "ca" ? "Informe generat" : "Informe generado",
+        description: language === "ca" ? "Les dades s'han carregat correctament" : "Los datos se han cargado correctamente",
+      });
+
+    } catch (error) {
+      console.error('Error generating report:', error);
+      toast({
+        title: language === "ca" ? "Error" : "Error",
+        description: language === "ca" ? "No s'ha pogut generar l'informe" : "No se pudo generar el informe",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, startDate, endDate, selectedEmployeeId, canManageEmployees, language, toast]);
+
+  // Export CSV
+  const handleExportCSV = async () => {
+    if (!user?.institutionId || !startDate || !endDate) return;
+    
+    setIsExporting(true);
+    try {
+      const targetEmployeeId = canManageEmployees && selectedEmployeeId ? selectedEmployeeId : user.id;
+      const url = `/api/reports/export/csv/${user.institutionId}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}${targetEmployeeId ? `&employeeId=${targetEmployeeId}` : ''}`;
+      
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) throw new Error('Export failed');
+      
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -168,35 +201,23 @@ export default function Reports() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
-    },
-    onSuccess: () => {
+      
       toast({
-        title: language === "ca" ? "Exportació completada" : "Exportación completada",
-        description: language === "ca" ? "L'informe CSV s'ha descarregat correctament" : "El informe CSV se ha descargado correctamente",
+        title: language === "ca" ? "CSV exportat" : "CSV exportado",
+        description: language === "ca" ? "L'informe s'ha descarregat correctament" : "El informe se ha descargado correctamente",
       });
-    },
-    onError: (error) => {
+    } catch (error) {
       toast({
         title: language === "ca" ? "Error d'exportació" : "Error de exportación",
-        description: language === "ca" ? "No s'ha pogut descarregar l'informe" : "No se pudo descargar el informe",
+        description: language === "ca" ? "No s'ha pogut exportar l'informe" : "No se pudo exportar el informe",
         variant: "destructive",
       });
-    },
-  });
-
-  const handleGenerateReport = () => {
-    // Properly invalidate queries instead of page reload
-    queryClient.invalidateQueries({ queryKey: ['reports'] });
-    toast({
-      title: language === "ca" ? "Actualitzant dades" : "Actualizando datos",
-      description: language === "ca" ? "S'estan actualitzant les dades dels informes" : "Se están actualizando los datos de los informes",
-    });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
-  const handleExportCSV = () => {
-    csvExportMutation.mutate();
-  };
-
+  // Export PDF
   const handleExportPDF = async () => {
     try {
       const { default: html2canvas } = await import('html2canvas');
@@ -213,7 +234,6 @@ export default function Reports() {
       const pageHeight = 295;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
-      
       let position = 0;
       
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
@@ -230,7 +250,7 @@ export default function Reports() {
       
       toast({
         title: language === "ca" ? "PDF generat" : "PDF generado",
-        description: language === "ca" ? "L'informe PDF s'ha descarregat correctament" : "El informe PDF se ha descargado correctamente",
+        description: language === "ca" ? "L'informe PDF s'ha descarregat" : "El informe PDF se ha descargado",
       });
     } catch (error) {
       toast({
@@ -241,57 +261,41 @@ export default function Reports() {
     }
   };
 
-  // Calculate key metrics from real data
+  // Calculate key metrics
   const keyMetrics = [
     {
       title: language === "ca" ? "Taxa d'assistència" : "Tasa de asistencia",
-      value: overviewLoading ? "--" : `${overviewData?.attendanceRate?.toFixed(1) || 0}%`,
+      value: reportData.overview ? `${reportData.overview.attendanceRate.toFixed(1)}%` : "--",
       icon: TrendingUp,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
+      color: "text-green-600",
+      bgColor: "bg-green-100",
       testId: "metric-attendance-rate"
     },
     {
       title: language === "ca" ? "Mitjana hores/dia" : "Media horas/día",
-      value: overviewLoading ? "--" : `${overviewData?.averageHoursPerDay?.toFixed(1) || 0}`,
+      value: reportData.overview ? `${reportData.overview.averageHoursPerDay.toFixed(1)}` : "--",
       icon: Clock,
-      color: "text-accent",
-      bgColor: "bg-accent/10",
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
       testId: "metric-average-hours"
     },
     {
       title: language === "ca" ? "Retards aquest mes" : "Retrasos este mes",
-      value: overviewLoading ? "--" : `${overviewData?.totalLatesThisMonth || 0}`,
+      value: reportData.overview ? `${reportData.overview.totalLatesThisMonth}` : "--",
       icon: AlertTriangle,
-      color: "text-error",
-      bgColor: "bg-error/10",
+      color: "text-orange-600",
+      bgColor: "bg-orange-100",
       testId: "metric-monthly-lates"
     },
     {
       title: language === "ca" ? "Total empleats" : "Total empleados",
-      value: overviewLoading ? "--" : `${overviewData?.totalEmployees || 0}`,
+      value: reportData.overview ? `${reportData.overview.totalEmployees}` : "--",
       icon: Users,
-      color: "text-secondary",
-      bgColor: "bg-secondary/10",
+      color: "text-purple-600",
+      bgColor: "bg-purple-100",
       testId: "metric-total-employees"
     },
   ];
-
-  // Show loading state
-  if (overviewLoading && departmentLoading && trendsLoading) {
-    return (
-      <main className="p-6 space-y-6">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <LoaderIcon className="h-8 w-8 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">
-              {language === "ca" ? "Carregant informes..." : "Cargando informes..."}
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-    );
-  }
 
   return (
     <main className="p-6 space-y-6" data-testid="reports-container">
@@ -303,7 +307,7 @@ export default function Reports() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <Label htmlFor="report-type">
                 {language === "ca" ? "Tipus d'informe" : "Tipo de informe"}
@@ -321,6 +325,28 @@ export default function Reports() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Employee selector - only for admin users */}
+            {canManageEmployees && (
+              <div>
+                <Label htmlFor="employee-select">
+                  {language === "ca" ? "Empleat (opcional)" : "Empleado (opcional)"}
+                </Label>
+                <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
+                  <SelectTrigger id="employee-select" data-testid="employee-select">
+                    <SelectValue placeholder={language === "ca" ? "Tots els empleats" : "Todos los empleados"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">{language === "ca" ? "Tots els empleats" : "Todos los empleados"}</SelectItem>
+                    {employees.map((employee) => (
+                      <SelectItem key={employee.id} value={employee.id}>
+                        {employee.firstName} {employee.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             <div>
               <Label htmlFor="start-date">
@@ -351,22 +377,26 @@ export default function Reports() {
           
           <div className="mt-6 flex flex-wrap gap-3">
             <Button 
-              onClick={handleGenerateReport}
-              className="bg-primary text-white hover:bg-blue-700"
+              onClick={generateReport}
+              className="bg-blue-600 text-white hover:bg-blue-700"
               data-testid="generate-report-button"
-              disabled={!institutionId || !startDate || !endDate}
+              disabled={isLoading || !user?.institutionId || !startDate || !endDate}
             >
-              <BarChart3 className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Actualitzar dades" : "Actualizar datos"}
+              {isLoading ? (
+                <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <BarChart3 className="mr-2 h-4 w-4" />
+              )}
+              {language === "ca" ? "Generar informe" : "Generar informe"}
             </Button>
             
             <Button 
               onClick={handleExportCSV}
-              className="bg-secondary text-white hover:bg-green-700"
+              variant="outline"
               data-testid="export-csv-button"
-              disabled={csvExportMutation.isPending || !institutionId || !startDate || !endDate}
+              disabled={isExporting || !reportData.overview}
             >
-              {csvExportMutation.isPending ? (
+              {isExporting ? (
                 <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <FileText className="mr-2 h-4 w-4" />
@@ -376,9 +406,9 @@ export default function Reports() {
             
             <Button 
               onClick={handleExportPDF}
-              className="bg-error text-white hover:bg-red-700"
+              variant="outline"
               data-testid="export-pdf-button"
-              disabled={!institutionId || !startDate || !endDate}
+              disabled={!reportData.overview}
             >
               <Download className="mr-2 h-4 w-4" />
               {language === "ca" ? "Exportar PDF" : "Exportar PDF"}
@@ -387,159 +417,149 @@ export default function Reports() {
         </CardContent>
       </Card>
 
-      {/* Statistics Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Attendance Overview */}
-        <Card data-testid="attendance-overview-card">
-          <CardHeader>
-            <CardTitle>
-              {language === "ca" ? "Resum d'assistència" : "Resumen de asistencia"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              {ratesLoading ? (
-                <div className="h-full flex items-center justify-center">
-                  <LoaderIcon className="h-8 w-8 animate-spin" />
-                </div>
-              ) : attendanceRates && attendanceRates.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={attendanceRates}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="present" fill="#22c55e" name={language === "ca" ? "Presents" : "Presentes"} />
-                    <Bar dataKey="late" fill="#f59e0b" name={language === "ca" ? "Retards" : "Retrasos"} />
-                    <Bar dataKey="absent" fill="#ef4444" name={language === "ca" ? "Absents" : "Ausentes"} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-gray-500">
-                  <div className="text-center">
-                    <PieChart className="h-12 w-12 mx-auto mb-2" />
-                    <p>{language === "ca" ? "No hi ha dades disponibles" : "No hay datos disponibles"}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Department Comparison */}
-        <Card data-testid="department-comparison-card">
-          <CardHeader>
-            <CardTitle>
-              {language === "ca" ? "Comparativa per departaments" : "Comparativa por departamentos"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              {departmentLoading ? (
-                <div className="h-full flex items-center justify-center">
-                  <LoaderIcon className="h-8 w-8 animate-spin" />
-                </div>
-              ) : departmentData && departmentData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={departmentData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="departmentName" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="attendanceRate" fill="#3b82f6" name={language === "ca" ? "Taxa assistència (%)" : "Tasa asistencia (%)"} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-gray-500">
-                  <div className="text-center">
-                    <BarChart3 className="h-12 w-12 mx-auto mb-2" />
-                    <p>{language === "ca" ? "No hi ha dades de departaments" : "No hay datos de departamentos"}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {keyMetrics.map((metric) => (
-          <Card key={metric.title} className="text-center" data-testid={metric.testId}>
-            <CardContent className="p-6">
-              <div className={`${metric.bgColor} p-3 rounded-full w-fit mx-auto mb-3`}>
-                <metric.icon className={`${metric.color} h-8 w-8`} />
+      {reportData.overview && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {keyMetrics.map((metric) => (
+            <Card key={metric.title} className="text-center" data-testid={metric.testId}>
+              <CardContent className="p-6">
+                <div className={`${metric.bgColor} p-3 rounded-full w-fit mx-auto mb-3`}>
+                  <metric.icon className={`${metric.color} h-8 w-8`} />
+                </div>
+                <p className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</p>
+                <p className="text-sm text-gray-600">{metric.title}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Charts */}
+      {reportData.overview && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Attendance Overview */}
+          <Card data-testid="attendance-overview-card">
+            <CardHeader>
+              <CardTitle>
+                {language === "ca" ? "Resum d'assistència" : "Resumen de asistencia"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                {reportData.attendanceRates.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={reportData.attendanceRates}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="present" fill="#22c55e" name={language === "ca" ? "Presents" : "Presentes"} />
+                      <Bar dataKey="late" fill="#f59e0b" name={language === "ca" ? "Retards" : "Retrasos"} />
+                      <Bar dataKey="absent" fill="#ef4444" name={language === "ca" ? "Absents" : "Ausentes"} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-gray-500">
+                    <div className="text-center">
+                      <PieChart className="h-12 w-12 mx-auto mb-2" />
+                      <p>{language === "ca" ? "No hi ha dades d'assistència" : "No hay datos de asistencia"}</p>
+                    </div>
+                  </div>
+                )}
               </div>
-              <p className="text-2xl font-bold text-text mb-1">{metric.value}</p>
-              <p className="text-sm text-gray-600">{metric.title}</p>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Report History */}
-      <Card data-testid="report-history-card">
-        <CardHeader>
-          <CardTitle>
-            {language === "ca" ? "Historial d'informes" : "Historial de informes"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Empty state */}
-            <div className="text-center py-8">
-              <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-gray-600 mb-2">
-                {language === "ca" ? "No s'han generat informes encara" : "No se han generado informes aún"}
-              </p>
-              <p className="text-sm text-gray-500">
-                {language === "ca" 
-                  ? "Els informes generats apareixeran aquí per a la seva descàrrega"
-                  : "Los informes generados aparecerán aquí para su descarga"}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Monthly Trends */}
-      <Card data-testid="monthly-trends-card">
-        <CardHeader>
-          <CardTitle>
-            {language === "ca" ? "Tendències mensuals" : "Tendencias mensuales"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            {trendsLoading ? (
-              <div className="h-full flex items-center justify-center">
-                <LoaderIcon className="h-8 w-8 animate-spin" />
-              </div>
-            ) : monthlyTrends && monthlyTrends.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="attendanceRate" stroke="#3b82f6" name={language === "ca" ? "Taxa assistència (%)" : "Tasa asistencia (%)"} />
-                  <Line type="monotone" dataKey="lateCount" stroke="#f59e0b" name={language === "ca" ? "Retards" : "Retrasos"} />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-500">
-                <div className="text-center">
-                  <TrendingUp className="h-12 w-12 mx-auto mb-2" />
-                  <p>{language === "ca" ? "No hi ha dades de tendències" : "No hay datos de tendencias"}</p>
+          {/* Department Comparison - only for admin */}
+          {canManageEmployees && (
+            <Card data-testid="department-comparison-card">
+              <CardHeader>
+                <CardTitle>
+                  {language === "ca" ? "Comparativa per departaments" : "Comparativa por departamentos"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  {reportData.departmentData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={reportData.departmentData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="departmentName" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="attendanceRate" fill="#3b82f6" name={language === "ca" ? "Taxa assistència (%)" : "Tasa asistencia (%)"} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-gray-500">
+                      <div className="text-center">
+                        <BarChart3 className="h-12 w-12 mx-auto mb-2" />
+                        <p>{language === "ca" ? "No hi ha dades de departaments" : "No hay datos de departamentos"}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Monthly Trends */}
+          <Card data-testid="monthly-trends-card" className={canManageEmployees ? "" : "lg:col-span-2"}>
+            <CardHeader>
+              <CardTitle>
+                {language === "ca" ? "Tendències mensuals" : "Tendencias mensuales"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                {reportData.monthlyTrends.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={reportData.monthlyTrends}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="attendanceRate" stroke="#3b82f6" name={language === "ca" ? "Taxa assistència (%)" : "Tasa asistencia (%)"} />
+                      <Line type="monotone" dataKey="lateCount" stroke="#f59e0b" name={language === "ca" ? "Retards" : "Retrasos"} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-gray-500">
+                    <div className="text-center">
+                      <TrendingUp className="h-12 w-12 mx-auto mb-2" />
+                      <p>{language === "ca" ? "No hi ha dades de tendències" : "No hay datos de tendencias"}</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Empty state when no data loaded */}
+      {!reportData.overview && !isLoading && (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
+              {language === "ca" ? "No s'han carregat informes" : "No se han cargado informes"}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {language === "ca" 
+                ? "Selecciona les dates i fes clic a 'Generar informe' per veure les dades"
+                : "Selecciona las fechas y haz clic en 'Generar informe' para ver los datos"}
+            </p>
+            <Button onClick={generateReport} disabled={!user?.institutionId || !startDate || !endDate}>
+              <BarChart3 className="mr-2 h-4 w-4" />
+              {language === "ca" ? "Generar primer informe" : "Generar primer informe"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }

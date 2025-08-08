@@ -21,66 +21,45 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 
-interface ReportData {
-  overview: {
-    totalEmployees: number;
-    attendanceRate: number;
-    averageHoursPerDay: number;
-    totalLatesThisMonth: number;
-    totalAbsencesThisMonth: number;
-  } | null;
-  departmentData: Array<{
-    departmentName: string;
-    attendanceRate: number;
-    employeeCount: number;
-  }>;
-  monthlyTrends: Array<{
-    month: string;
-    attendanceRate: number;
-    lateCount: number;
-  }>;
-  attendanceRates: Array<{
-    date: string;
-    present: number;
-    late: number;
-    absent: number;
-  }>;
-}
-
 export default function Reports() {
   const { language } = useLanguage();
   const { user } = useAuth();
   const permissions = usePermissions();
   const { toast } = useToast();
   
-  // Form state
-  const [reportType, setReportType] = useState("general_attendance");
-  const [startDate, setStartDate] = useState(() => {
+  // Fechas por defecto calculadas una sola vez
+  const defaultStartDate = (() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     return firstDay.toISOString().split('T')[0];
-  });
-  const [endDate, setEndDate] = useState(() => {
+  })();
+  
+  const defaultEndDate = (() => {
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return lastDay.toISOString().split('T')[0];
-  });
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
+  })();
 
-  // Data state
-  const [reportData, setReportData] = useState<ReportData>({
-    overview: null,
-    departmentData: [],
-    monthlyTrends: [],
-    attendanceRates: []
-  });
-  const [employees, setEmployees] = useState<Array<{ id: string; firstName: string; lastName: string }>>([]);
+  // Estado del formulario
+  const [reportType, setReportType] = useState("general_attendance");
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+
+  // Estado de datos
+  const [overviewData, setOverviewData] = useState(null);
+  const [departmentData, setDepartmentData] = useState([]);
+  const [monthlyTrends, setMonthlyTrends] = useState([]);
+  const [attendanceRates, setAttendanceRates] = useState([]);
+  const [employees, setEmployees] = useState([]);
+
+  // Estado de carga
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [employeesLoaded, setEmployeesLoaded] = useState(false);
 
-  // Determine if user can see all employees (admin/superadmin)
-  const canViewAllEmployees = permissions.canViewEmployees || permissions.canGenerateInstitutionReports;
+  // Verificar si es admin
+  const isAdmin = permissions.canViewEmployees || permissions.canGenerateInstitutionReports;
 
   const reportTypes = [
     { 
@@ -97,9 +76,9 @@ export default function Reports() {
     },
   ];
 
-  // Load employees list for admin users (only when needed)
-  const loadEmployees = async () => {
-    if (!canViewAllEmployees || !user?.institutionId || employeesLoaded) return;
+  // Cargar empleados - solo cuando se abra el dropdown
+  const handleLoadEmployees = async () => {
+    if (!isAdmin || !user?.institutionId || employeesLoaded) return;
     
     try {
       const response = await fetch(`/api/employees?institutionId=${user.institutionId}`, {
@@ -108,15 +87,15 @@ export default function Reports() {
       if (response.ok) {
         const data = await response.json();
         setEmployees(Array.isArray(data) ? data : []);
+        setEmployeesLoaded(true);
       }
-      setEmployeesLoaded(true);
     } catch (error) {
       console.error('Error loading employees:', error);
     }
   };
 
-  // Generate report - ONLY MANUAL TRIGGER
-  const generateReport = async () => {
+  // Generar informe - función completamente manual
+  const handleGenerateReport = async () => {
     if (!user?.institutionId || !startDate || !endDate) {
       toast({
         title: language === "ca" ? "Error" : "Error",
@@ -129,45 +108,62 @@ export default function Reports() {
     setIsLoading(true);
     
     try {
-      // Load employees if needed and not loaded
-      if (canViewAllEmployees && !employeesLoaded) {
-        await loadEmployees();
+      // Cargar empleados si es necesario
+      if (isAdmin && !employeesLoaded) {
+        await handleLoadEmployees();
       }
 
-      // Determine target employee
-      const targetEmployeeId = canViewAllEmployees && selectedEmployeeId ? selectedEmployeeId : user.id;
+      // Determinar empleado objetivo
+      const targetEmployeeId = isAdmin && selectedEmployeeId ? selectedEmployeeId : user.id;
       const employeeParam = targetEmployeeId ? `?employeeId=${targetEmployeeId}` : '';
 
-      // Fetch overview data
-      const overviewUrl = `/api/reports/overview/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
-      const overviewResponse = await fetch(overviewUrl, { credentials: 'include' });
-      const overview = overviewResponse.ok ? await overviewResponse.json() : null;
-
-      // Fetch department data (only for admins)
-      let departmentData = [];
-      if (canViewAllEmployees) {
-        const deptUrl = `/api/reports/department-comparison/${user.institutionId}/${startDate}/${endDate}`;
-        const deptResponse = await fetch(deptUrl, { credentials: 'include' });
-        departmentData = deptResponse.ok ? await deptResponse.json() : [];
+      // 1. Cargar datos de resumen
+      try {
+        const overviewUrl = `/api/reports/overview/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
+        const overviewResponse = await fetch(overviewUrl, { credentials: 'include' });
+        const overviewResult = overviewResponse.ok ? await overviewResponse.json() : null;
+        setOverviewData(overviewResult);
+      } catch (error) {
+        console.error('Error loading overview:', error);
+        setOverviewData(null);
       }
 
-      // Fetch monthly trends
-      const trendsUrl = `/api/reports/monthly-trends/${user.institutionId}${employeeParam}`;
-      const trendsResponse = await fetch(trendsUrl, { credentials: 'include' });
-      const monthlyTrends = trendsResponse.ok ? await trendsResponse.json() : [];
+      // 2. Cargar datos de departamentos (solo para admins)
+      if (isAdmin) {
+        try {
+          const deptUrl = `/api/reports/department-comparison/${user.institutionId}/${startDate}/${endDate}`;
+          const deptResponse = await fetch(deptUrl, { credentials: 'include' });
+          const deptResult = deptResponse.ok ? await deptResponse.json() : [];
+          setDepartmentData(Array.isArray(deptResult) ? deptResult : []);
+        } catch (error) {
+          console.error('Error loading departments:', error);
+          setDepartmentData([]);
+        }
+      } else {
+        setDepartmentData([]);
+      }
 
-      // Fetch attendance rates
-      const ratesUrl = `/api/reports/attendance-rates/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
-      const ratesResponse = await fetch(ratesUrl, { credentials: 'include' });
-      const attendanceRates = ratesResponse.ok ? await ratesResponse.json() : [];
+      // 3. Cargar tendencias mensuales
+      try {
+        const trendsUrl = `/api/reports/monthly-trends/${user.institutionId}${employeeParam}`;
+        const trendsResponse = await fetch(trendsUrl, { credentials: 'include' });
+        const trendsResult = trendsResponse.ok ? await trendsResponse.json() : [];
+        setMonthlyTrends(Array.isArray(trendsResult) ? trendsResult : []);
+      } catch (error) {
+        console.error('Error loading trends:', error);
+        setMonthlyTrends([]);
+      }
 
-      // Update state with fetched data
-      setReportData({
-        overview,
-        departmentData: Array.isArray(departmentData) ? departmentData : [],
-        monthlyTrends: Array.isArray(monthlyTrends) ? monthlyTrends : [],
-        attendanceRates: Array.isArray(attendanceRates) ? attendanceRates : []
-      });
+      // 4. Cargar tasas de asistencia
+      try {
+        const ratesUrl = `/api/reports/attendance-rates/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
+        const ratesResponse = await fetch(ratesUrl, { credentials: 'include' });
+        const ratesResult = ratesResponse.ok ? await ratesResponse.json() : [];
+        setAttendanceRates(Array.isArray(ratesResult) ? ratesResult : []);
+      } catch (error) {
+        console.error('Error loading attendance rates:', error);
+        setAttendanceRates([]);
+      }
 
       toast({
         title: language === "ca" ? "Informe generat" : "Informe generado",
@@ -181,25 +177,24 @@ export default function Reports() {
         description: language === "ca" ? "No s'ha pogut generar l'informe" : "No se pudo generar el informe",
         variant: "destructive",
       });
+      
       // Reset data on error
-      setReportData({
-        overview: null,
-        departmentData: [],
-        monthlyTrends: [],
-        attendanceRates: []
-      });
+      setOverviewData(null);
+      setDepartmentData([]);
+      setMonthlyTrends([]);
+      setAttendanceRates([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Export CSV
+  // Exportar CSV
   const handleExportCSV = async () => {
     if (!user?.institutionId || !startDate || !endDate) return;
     
     setIsExporting(true);
     try {
-      const targetEmployeeId = canViewAllEmployees && selectedEmployeeId ? selectedEmployeeId : user.id;
+      const targetEmployeeId = isAdmin && selectedEmployeeId ? selectedEmployeeId : user.id;
       const params = new URLSearchParams({
         reportType,
         startDate,
@@ -237,7 +232,7 @@ export default function Reports() {
     }
   };
 
-  // Export PDF
+  // Exportar PDF
   const handleExportPDF = async () => {
     try {
       const { default: html2canvas } = await import('html2canvas');
@@ -281,42 +276,6 @@ export default function Reports() {
     }
   };
 
-  // Key metrics
-  const keyMetrics = [
-    {
-      title: language === "ca" ? "Taxa d'assistència" : "Tasa de asistencia",
-      value: reportData.overview ? `${reportData.overview.attendanceRate.toFixed(1)}%` : "--",
-      icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
-      testId: "metric-attendance-rate"
-    },
-    {
-      title: language === "ca" ? "Mitjana hores/dia" : "Media horas/día",
-      value: reportData.overview ? `${reportData.overview.averageHoursPerDay.toFixed(1)}` : "--",
-      icon: Clock,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
-      testId: "metric-average-hours"
-    },
-    {
-      title: language === "ca" ? "Retards aquest mes" : "Retrasos este mes",
-      value: reportData.overview ? `${reportData.overview.totalLatesThisMonth}` : "--",
-      icon: AlertTriangle,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
-      testId: "metric-monthly-lates"
-    },
-    {
-      title: language === "ca" ? "Total empleats" : "Total empleados",
-      value: reportData.overview ? `${reportData.overview.totalEmployees}` : "--",
-      icon: Users,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
-      testId: "metric-total-employees"
-    },
-  ];
-
   return (
     <main className="p-6 space-y-6" data-testid="reports-container">
       {/* Report Generator */}
@@ -346,14 +305,18 @@ export default function Reports() {
               </Select>
             </div>
 
-            {/* Employee selector - only for users who can view all employees */}
-            {canViewAllEmployees && (
+            {/* Employee selector - only for admins */}
+            {isAdmin && (
               <div>
                 <Label htmlFor="employee-select">
                   {language === "ca" ? "Empleat (opcional)" : "Empleado (opcional)"}
                 </Label>
                 <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
-                  <SelectTrigger id="employee-select" data-testid="employee-select" onClick={loadEmployees}>
+                  <SelectTrigger 
+                    id="employee-select" 
+                    data-testid="employee-select"
+                    onClick={handleLoadEmployees}
+                  >
                     <SelectValue placeholder={language === "ca" ? "Tots els empleats" : "Todos los empleados"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -397,7 +360,7 @@ export default function Reports() {
           
           <div className="mt-6 flex flex-wrap gap-3">
             <Button 
-              onClick={generateReport}
+              onClick={handleGenerateReport}
               className="bg-blue-600 text-white hover:bg-blue-700"
               data-testid="generate-report-button"
               disabled={isLoading || !user?.institutionId || !startDate || !endDate}
@@ -414,7 +377,7 @@ export default function Reports() {
               onClick={handleExportCSV}
               variant="outline"
               data-testid="export-csv-button"
-              disabled={isExporting || !reportData.overview}
+              disabled={isExporting || !overviewData}
             >
               {isExporting ? (
                 <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -428,7 +391,7 @@ export default function Reports() {
               onClick={handleExportPDF}
               variant="outline"
               data-testid="export-pdf-button"
-              disabled={!reportData.overview}
+              disabled={!overviewData}
             >
               <Download className="mr-2 h-4 w-4" />
               {language === "ca" ? "Exportar PDF" : "Exportar PDF"}
@@ -438,24 +401,68 @@ export default function Reports() {
       </Card>
 
       {/* Key Metrics - only show when data is loaded */}
-      {reportData.overview && (
+      {overviewData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {keyMetrics.map((metric) => (
-            <Card key={metric.title} className="text-center" data-testid={metric.testId}>
-              <CardContent className="p-6">
-                <div className={`${metric.bgColor} p-3 rounded-full w-fit mx-auto mb-3`}>
-                  <metric.icon className={`${metric.color} h-8 w-8`} />
-                </div>
-                <p className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</p>
-                <p className="text-sm text-gray-600">{metric.title}</p>
-              </CardContent>
-            </Card>
-          ))}
+          <Card className="text-center" data-testid="metric-attendance-rate">
+            <CardContent className="p-6">
+              <div className="bg-green-100 p-3 rounded-full w-fit mx-auto mb-3">
+                <TrendingUp className="text-green-600 h-8 w-8" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 mb-1">
+                {overviewData.attendanceRate ? `${overviewData.attendanceRate.toFixed(1)}%` : "--"}
+              </p>
+              <p className="text-sm text-gray-600">
+                {language === "ca" ? "Taxa d'assistència" : "Tasa de asistencia"}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center" data-testid="metric-average-hours">
+            <CardContent className="p-6">
+              <div className="bg-blue-100 p-3 rounded-full w-fit mx-auto mb-3">
+                <Clock className="text-blue-600 h-8 w-8" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 mb-1">
+                {overviewData.averageHoursPerDay ? `${overviewData.averageHoursPerDay.toFixed(1)}` : "--"}
+              </p>
+              <p className="text-sm text-gray-600">
+                {language === "ca" ? "Mitjana hores/dia" : "Media horas/día"}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center" data-testid="metric-monthly-lates">
+            <CardContent className="p-6">
+              <div className="bg-orange-100 p-3 rounded-full w-fit mx-auto mb-3">
+                <AlertTriangle className="text-orange-600 h-8 w-8" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 mb-1">
+                {overviewData.totalLatesThisMonth || 0}
+              </p>
+              <p className="text-sm text-gray-600">
+                {language === "ca" ? "Retards aquest mes" : "Retrasos este mes"}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center" data-testid="metric-total-employees">
+            <CardContent className="p-6">
+              <div className="bg-purple-100 p-3 rounded-full w-fit mx-auto mb-3">
+                <Users className="text-purple-600 h-8 w-8" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 mb-1">
+                {overviewData.totalEmployees || 0}
+              </p>
+              <p className="text-sm text-gray-600">
+                {language === "ca" ? "Total empleats" : "Total empleados"}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       )}
 
       {/* Charts - only show when data is loaded */}
-      {reportData.overview && (
+      {overviewData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Attendance Overview */}
           <Card data-testid="attendance-overview-card">
@@ -466,9 +473,9 @@ export default function Reports() {
             </CardHeader>
             <CardContent>
               <div className="h-64">
-                {reportData.attendanceRates.length > 0 ? (
+                {attendanceRates.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={reportData.attendanceRates}>
+                    <BarChart data={attendanceRates}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis />
@@ -491,8 +498,8 @@ export default function Reports() {
             </CardContent>
           </Card>
 
-          {/* Department Comparison - only for users who can view all employees */}
-          {canViewAllEmployees && (
+          {/* Department Comparison - only for admins */}
+          {isAdmin && (
             <Card data-testid="department-comparison-card">
               <CardHeader>
                 <CardTitle>
@@ -501,9 +508,9 @@ export default function Reports() {
               </CardHeader>
               <CardContent>
                 <div className="h-64">
-                  {reportData.departmentData.length > 0 ? (
+                  {departmentData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={reportData.departmentData}>
+                      <BarChart data={departmentData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="departmentName" />
                         <YAxis />
@@ -526,7 +533,7 @@ export default function Reports() {
           )}
 
           {/* Monthly Trends */}
-          <Card data-testid="monthly-trends-card" className={canViewAllEmployees ? "" : "lg:col-span-2"}>
+          <Card data-testid="monthly-trends-card" className={isAdmin ? "" : "lg:col-span-2"}>
             <CardHeader>
               <CardTitle>
                 {language === "ca" ? "Tendències mensuals" : "Tendencias mensuales"}
@@ -534,9 +541,9 @@ export default function Reports() {
             </CardHeader>
             <CardContent>
               <div className="h-64">
-                {reportData.monthlyTrends.length > 0 ? (
+                {monthlyTrends.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={reportData.monthlyTrends}>
+                    <LineChart data={monthlyTrends}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
@@ -561,7 +568,7 @@ export default function Reports() {
       )}
 
       {/* Empty state when no data loaded */}
-      {!reportData.overview && !isLoading && (
+      {!overviewData && !isLoading && (
         <Card>
           <CardContent className="p-12 text-center">
             <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
@@ -573,7 +580,7 @@ export default function Reports() {
                 ? "Selecciona les dates i fes clic a 'Generar informe' per veure les dades"
                 : "Selecciona las fechas y haz clic en 'Generar informe' para ver los datos"}
             </p>
-            <Button onClick={generateReport} disabled={!user?.institutionId || !startDate || !endDate}>
+            <Button onClick={handleGenerateReport} disabled={!user?.institutionId || !startDate || !endDate}>
               <BarChart3 className="mr-2 h-4 w-4" />
               {language === "ca" ? "Generar primer informe" : "Generar primer informe"}
             </Button>

@@ -115,11 +115,15 @@ export default function Reports() {
 
       // Determinar empleado objetivo
       const targetEmployeeId = isAdmin && selectedEmployeeId ? selectedEmployeeId : user.id;
-      const employeeParam = targetEmployeeId ? `?employeeId=${targetEmployeeId}` : '';
 
       // 1. Cargar datos de resumen
       try {
-        const overviewUrl = `/api/reports/overview/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
+        const overviewParams = new URLSearchParams({
+          startDate,
+          endDate,
+          ...(targetEmployeeId && { employeeId: targetEmployeeId })
+        });
+        const overviewUrl = `/api/reports/overview/${user.institutionId}?${overviewParams.toString()}`;
         const overviewResponse = await fetch(overviewUrl, { credentials: 'include' });
         const overviewResult = overviewResponse.ok ? await overviewResponse.json() : null;
         setOverviewData(overviewResult);
@@ -131,7 +135,8 @@ export default function Reports() {
       // 2. Cargar datos de departamentos (solo para admins)
       if (isAdmin) {
         try {
-          const deptUrl = `/api/reports/department-comparison/${user.institutionId}/${startDate}/${endDate}`;
+          const deptParams = new URLSearchParams({ startDate, endDate });
+          const deptUrl = `/api/reports/department-comparison/${user.institutionId}?${deptParams.toString()}`;
           const deptResponse = await fetch(deptUrl, { credentials: 'include' });
           const deptResult = deptResponse.ok ? await deptResponse.json() : [];
           setDepartmentData(Array.isArray(deptResult) ? deptResult : []);
@@ -145,7 +150,10 @@ export default function Reports() {
 
       // 3. Cargar tendencias mensuales
       try {
-        const trendsUrl = `/api/reports/monthly-trends/${user.institutionId}${employeeParam}`;
+        const trendsParams = new URLSearchParams({
+          ...(targetEmployeeId && { employeeId: targetEmployeeId })
+        });
+        const trendsUrl = `/api/reports/monthly-trends/${user.institutionId}${trendsParams.toString() ? '?' + trendsParams.toString() : ''}`;
         const trendsResponse = await fetch(trendsUrl, { credentials: 'include' });
         const trendsResult = trendsResponse.ok ? await trendsResponse.json() : [];
         setMonthlyTrends(Array.isArray(trendsResult) ? trendsResult : []);
@@ -156,7 +164,12 @@ export default function Reports() {
 
       // 4. Cargar tasas de asistencia
       try {
-        const ratesUrl = `/api/reports/attendance-rates/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
+        const ratesParams = new URLSearchParams({
+          startDate,
+          endDate,
+          ...(targetEmployeeId && { employeeId: targetEmployeeId })
+        });
+        const ratesUrl = `/api/reports/attendance-rates/${user.institutionId}?${ratesParams.toString()}`;
         const ratesResponse = await fetch(ratesUrl, { credentials: 'include' });
         const ratesResult = ratesResponse.ok ? await ratesResponse.json() : [];
         setAttendanceRates(Array.isArray(ratesResult) ? ratesResult : []);

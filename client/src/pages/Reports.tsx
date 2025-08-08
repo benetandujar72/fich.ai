@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -27,18 +27,18 @@ export default function Reports() {
   const permissions = usePermissions();
   const { toast } = useToast();
   
-  // Fechas por defecto calculadas una sola vez
-  const defaultStartDate = (() => {
+  // Fechas por defecto calculadas una sola vez usando useMemo
+  const defaultStartDate = useMemo(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     return firstDay.toISOString().split('T')[0];
-  })();
+  }, []);
   
-  const defaultEndDate = (() => {
+  const defaultEndDate = useMemo(() => {
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return lastDay.toISOString().split('T')[0];
-  })();
+  }, []);
 
   // Estado del formulario
   const [reportType, setReportType] = useState("general_attendance");

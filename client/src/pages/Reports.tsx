@@ -10,7 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { 
   BarChart3, 
   FileText, 
-  Download, 
   TrendingUp,
   Users,
   Clock,
@@ -34,9 +33,6 @@ export default function Reports() {
   const [isExporting, setIsExporting] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
 
-  // Verificar si es admin
-  const isAdmin = permissions.canViewEmployees || permissions.canGenerateInstitutionReports;
-
   const reportTypes = [
     { 
       value: "general_attendance", 
@@ -55,21 +51,28 @@ export default function Reports() {
   // Manejar selección de tipos de informe (checkboxes)
   const handleReportTypeToggle = (reportType: string) => {
     console.log("🔄 Toggling report type:", reportType);
-    setSelectedReportTypes(prev => {
-      const newTypes = prev.includes(reportType) 
-        ? prev.filter(type => type !== reportType)
-        : [...prev, reportType];
-      console.log("📊 Selected report types:", newTypes);
-      return newTypes;
+    
+    setSelectedReportTypes(prevTypes => {
+      const isCurrentlySelected = prevTypes.includes(reportType);
+      
+      if (isCurrentlySelected) {
+        // Solo permitir deseleccionar si hay más de un tipo seleccionado
+        if (prevTypes.length > 1) {
+          return prevTypes.filter(type => type !== reportType);
+        } else {
+          // Mantener al menos un tipo seleccionado
+          console.log("⚠️ Keeping at least one type selected");
+          return prevTypes;
+        }
+      } else {
+        return [...prevTypes, reportType];
+      }
     });
   };
 
   // Generar informe simplificado
   const handleGenerateReport = async () => {
     console.log("🚀 Starting report generation");
-    console.log("📋 User:", user?.id, "Institution:", user?.institutionId);
-    console.log("📅 Date range:", startDate, "to", endDate);
-    console.log("📊 Selected types:", selectedReportTypes);
 
     if (!user?.institutionId || !startDate || !endDate || selectedReportTypes.length === 0) {
       console.error("❌ Missing required data");
@@ -84,17 +87,13 @@ export default function Reports() {
     setIsLoading(true);
     
     try {
-      console.log("🔄 Fetching overview data...");
       const params = new URLSearchParams({
         startDate,
         endDate
       });
       
       const url = `/api/reports/overview/${user.institutionId}?${params.toString()}`;
-      console.log("🌐 Request URL:", url);
-      
       const response = await fetch(url, { credentials: 'include' });
-      console.log("📡 Response status:", response.status);
       
       if (response.ok) {
         const data = await response.json();
@@ -133,10 +132,7 @@ export default function Reports() {
     
     setIsExporting(true);
     try {
-      // Exportar solo el primer tipo seleccionado por simplicidad
       const reportType = selectedReportTypes[0];
-      console.log("📊 Exporting type:", reportType);
-      
       const params = new URLSearchParams({
         reportType,
         startDate,
@@ -144,10 +140,7 @@ export default function Reports() {
       });
       
       const url = `/api/reports/export/csv/${user.institutionId}?${params.toString()}`;
-      console.log("🌐 CSV URL:", url);
-      
       const response = await fetch(url, { credentials: 'include' });
-      console.log("📡 CSV Response:", response.status);
       
       if (!response.ok) throw new Error(`Export failed: ${response.status}`);
       
@@ -257,7 +250,10 @@ export default function Reports() {
                 id="start-date"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => {
+                  console.log("📅 Start date changing to:", e.target.value);
+                  setStartDate(e.target.value);
+                }}
                 data-testid="start-date-input"
               />
             </div>
@@ -270,7 +266,10 @@ export default function Reports() {
                 id="end-date"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => {
+                  console.log("📅 End date changing to:", e.target.value);
+                  setEndDate(e.target.value);
+                }}
                 data-testid="end-date-input"
               />
             </div>
@@ -344,14 +343,6 @@ export default function Reports() {
                 : "Procesando los datos de asistencia. Esto puede tardar unos segundos."
               }
             </p>
-            <div className="mt-4 space-y-2">
-              <div className="bg-gray-200 rounded-full h-2 w-full">
-                <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-              </div>
-              <p className="text-xs text-gray-500">
-                {language === "ca" ? "Analitzant dades..." : "Analizando datos..."}
-              </p>
-            </div>
           </CardContent>
         </Card>
       )}
@@ -367,7 +358,7 @@ export default function Reports() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200 hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="bg-green-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <TrendingUp className="text-green-600 h-6 w-6" />
                 </div>
@@ -379,7 +370,7 @@ export default function Reports() {
                 </p>
               </div>
 
-              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="bg-blue-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <Clock className="text-blue-600 h-6 w-6" />
                 </div>
@@ -391,7 +382,7 @@ export default function Reports() {
                 </p>
               </div>
 
-              <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200 hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <div className="bg-orange-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <AlertTriangle className="text-orange-600 h-6 w-6" />
                 </div>
@@ -403,7 +394,7 @@ export default function Reports() {
                 </p>
               </div>
 
-              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200 hover:shadow-md transition-all">
+              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
                 <div className="bg-purple-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <Users className="text-purple-600 h-6 w-6" />
                 </div>
@@ -452,8 +443,8 @@ export default function Reports() {
               <p className="text-sm text-green-800 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 {language === "ca" 
-                  ? "✓ Informe generat amb èxit. Pots exportar les dades utilitzant els botons d'exportació de dalt."
-                  : "✓ Informe generado con éxito. Puedes exportar los datos usando los botones de exportación de arriba."
+                  ? "Informe generat amb èxit. Pots exportar les dades utilitzant els botons d'exportació de dalt."
+                  : "Informe generado con éxito. Puedes exportar los datos usando los botones de exportación de arriba."
                 }
               </p>
             </div>

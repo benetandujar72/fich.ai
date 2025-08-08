@@ -40,13 +40,13 @@ function Router() {
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Update time every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // Update time every second - TEMPORALMENTE DESACTIVADO PARA EVITAR RE-RENDERS
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date());
+  //   }, 1000);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   // Get last attendance record to determine button states (memoized to prevent re-renders)
   const { data: attendanceRecords } = useQuery({

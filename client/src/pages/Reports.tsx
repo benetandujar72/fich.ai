@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -30,23 +30,23 @@ export default function Reports() {
   const { user } = useAuth();
   const permissions = usePermissions();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
-  // Get default date range for current month
-  const getDefaultStartDate = () => {
+  // Stable date calculations - only calculated once
+  const defaultDates = useMemo(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    return firstDay.toISOString().split('T')[0];
-  };
-  
-  const getDefaultEndDate = () => {
-    const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return lastDay.toISOString().split('T')[0];
-  };
+    
+    return {
+      startDate: firstDay.toISOString().split('T')[0],
+      endDate: lastDay.toISOString().split('T')[0]
+    };
+  }, []); // Empty dependency array means this only runs once
 
   const [reportType, setReportType] = useState("general_attendance");
-  const [startDate, setStartDate] = useState(getDefaultStartDate());
-  const [endDate, setEndDate] = useState(getDefaultEndDate());
+  const [startDate, setStartDate] = useState(defaultDates.startDate);
+  const [endDate, setEndDate] = useState(defaultDates.endDate);
 
   // Get institution ID from authenticated user
   const institutionId = user?.institutionId;
@@ -70,37 +70,80 @@ export default function Reports() {
     },
   ];
 
-  // Fetch reports data with proper caching to prevent infinite loops
+  // Create stable query keys to prevent infinite loops
+  const queryEnabled = !!(institutionId && startDate && endDate);
+  
+  // Fetch reports data with proper caching and stable keys
   const { data: overviewData, isLoading: overviewLoading } = useQuery({
-    queryKey: ['/api/reports/overview', institutionId, startDate, endDate],
-    enabled: !!institutionId && !!startDate && !!endDate,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-  });
-
-  const { data: departmentData, isLoading: departmentLoading } = useQuery({
-    queryKey: ['/api/reports/department-comparison', institutionId, startDate, endDate],
-    enabled: !!institutionId && !!startDate && !!endDate,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-  });
-
-  const { data: monthlyTrends, isLoading: trendsLoading } = useQuery({
-    queryKey: ['/api/reports/monthly-trends', institutionId],
-    enabled: !!institutionId,
+    queryKey: ['reports', 'overview', institutionId, startDate, endDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/reports/overview/${institutionId}/${startDate}/${endDate}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch overview data');
+      }
+      return response.json();
+    },
+    enabled: queryEnabled,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
     refetchInterval: false,
+    retry: 1,
+  });
+
+  const { data: departmentData, isLoading: departmentLoading } = useQuery({
+    queryKey: ['reports', 'department-comparison', institutionId, startDate, endDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/reports/department-comparison/${institutionId}/${startDate}/${endDate}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch department data');
+      }
+      return response.json();
+    },
+    enabled: queryEnabled,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    retry: 1,
+  });
+
+  const { data: monthlyTrends, isLoading: trendsLoading } = useQuery({
+    queryKey: ['reports', 'monthly-trends', institutionId],
+    queryFn: async () => {
+      const response = await fetch(`/api/reports/monthly-trends/${institutionId}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch trends data');
+      }
+      return response.json();
+    },
+    enabled: !!institutionId,
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    retry: 1,
   });
 
   const { data: attendanceRates, isLoading: ratesLoading } = useQuery({
-    queryKey: ['/api/reports/attendance-rates', institutionId, startDate, endDate],
-    enabled: !!institutionId && !!startDate && !!endDate,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryKey: ['reports', 'attendance-rates', institutionId, startDate, endDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/reports/attendance-rates/${institutionId}/${startDate}/${endDate}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch attendance rates');
+      }
+      return response.json();
+    },
+    enabled: queryEnabled,
+    staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
     refetchInterval: false,
+    retry: 1,
   });
 
   // CSV Export mutation
@@ -142,10 +185,12 @@ export default function Reports() {
   });
 
   const handleGenerateReport = () => {
-    // Force refresh by invalidating query cache
-    if (typeof window !== 'undefined') {
-      window.location.reload();
-    }
+    // Properly invalidate queries instead of page reload
+    queryClient.invalidateQueries({ queryKey: ['reports'] });
+    toast({
+      title: language === "ca" ? "Actualitzant dades" : "Actualizando datos",
+      description: language === "ca" ? "S'estan actualitzant les dades dels informes" : "Se están actualizando los datos de los informes",
+    });
   };
 
   const handleExportCSV = () => {

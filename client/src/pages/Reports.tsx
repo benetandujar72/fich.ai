@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -50,10 +50,10 @@ interface ReportData {
 export default function Reports() {
   const { language } = useLanguage();
   const { user } = useAuth();
-  const { canManageEmployees } = usePermissions();
+  const permissions = usePermissions();
   const { toast } = useToast();
   
-  // State for form controls
+  // Form state
   const [reportType, setReportType] = useState("general_attendance");
   const [startDate, setStartDate] = useState(() => {
     const now = new Date();
@@ -67,16 +67,20 @@ export default function Reports() {
   });
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
 
-  // State for report data and loading
+  // Data state
   const [reportData, setReportData] = useState<ReportData>({
     overview: null,
     departmentData: [],
     monthlyTrends: [],
     attendanceRates: []
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState<Array<{ id: string; firstName: string; lastName: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [employeesLoaded, setEmployeesLoaded] = useState(false);
+
+  // Determine if user can see all employees (admin/superadmin)
+  const canViewAllEmployees = permissions.canViewEmployees || permissions.canGenerateInstitutionReports;
 
   const reportTypes = [
     { 
@@ -93,9 +97,9 @@ export default function Reports() {
     },
   ];
 
-  // Load employees list for admin users
-  const loadEmployees = useCallback(async () => {
-    if (!canManageEmployees || !user?.institutionId) return;
+  // Load employees list for admin users (only when needed)
+  const loadEmployees = async () => {
+    if (!canViewAllEmployees || !user?.institutionId || employeesLoaded) return;
     
     try {
       const response = await fetch(`/api/employees?institutionId=${user.institutionId}`, {
@@ -103,20 +107,16 @@ export default function Reports() {
       });
       if (response.ok) {
         const data = await response.json();
-        setEmployees(data || []);
+        setEmployees(Array.isArray(data) ? data : []);
       }
+      setEmployeesLoaded(true);
     } catch (error) {
       console.error('Error loading employees:', error);
     }
-  }, [canManageEmployees, user?.institutionId]);
+  };
 
-  // Load employees on component mount
-  useEffect(() => {
-    loadEmployees();
-  }, [loadEmployees]);
-
-  // Generate report data
-  const generateReport = useCallback(async () => {
+  // Generate report - ONLY MANUAL TRIGGER
+  const generateReport = async () => {
     if (!user?.institutionId || !startDate || !endDate) {
       toast({
         title: language === "ca" ? "Error" : "Error",
@@ -129,33 +129,39 @@ export default function Reports() {
     setIsLoading(true);
     
     try {
-      // Determine which employee to get data for
-      const targetEmployeeId = canManageEmployees && selectedEmployeeId 
-        ? selectedEmployeeId 
-        : user.id; // Non-admin users only see their own data
+      // Load employees if needed and not loaded
+      if (canViewAllEmployees && !employeesLoaded) {
+        await loadEmployees();
+      }
 
-      // Fetch all report data in parallel
-      const [overviewRes, departmentRes, trendsRes, ratesRes] = await Promise.all([
-        fetch(`/api/reports/overview/${user.institutionId}/${startDate}/${endDate}${targetEmployeeId ? `?employeeId=${targetEmployeeId}` : ''}`, {
-          credentials: 'include',
-        }),
-        canManageEmployees ? fetch(`/api/reports/department-comparison/${user.institutionId}/${startDate}/${endDate}`, {
-          credentials: 'include',
-        }) : Promise.resolve({ ok: true, json: () => [] }),
-        fetch(`/api/reports/monthly-trends/${user.institutionId}${targetEmployeeId ? `?employeeId=${targetEmployeeId}` : ''}`, {
-          credentials: 'include',
-        }),
-        fetch(`/api/reports/attendance-rates/${user.institutionId}/${startDate}/${endDate}${targetEmployeeId ? `?employeeId=${targetEmployeeId}` : ''}`, {
-          credentials: 'include',
-        }),
-      ]);
+      // Determine target employee
+      const targetEmployeeId = canViewAllEmployees && selectedEmployeeId ? selectedEmployeeId : user.id;
+      const employeeParam = targetEmployeeId ? `?employeeId=${targetEmployeeId}` : '';
 
-      // Process responses
-      const overview = overviewRes.ok ? await overviewRes.json() : null;
-      const departmentData = departmentRes.ok ? await departmentRes.json() : [];
-      const monthlyTrends = trendsRes.ok ? await trendsRes.json() : [];
-      const attendanceRates = ratesRes.ok ? await ratesRes.json() : [];
+      // Fetch overview data
+      const overviewUrl = `/api/reports/overview/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
+      const overviewResponse = await fetch(overviewUrl, { credentials: 'include' });
+      const overview = overviewResponse.ok ? await overviewResponse.json() : null;
 
+      // Fetch department data (only for admins)
+      let departmentData = [];
+      if (canViewAllEmployees) {
+        const deptUrl = `/api/reports/department-comparison/${user.institutionId}/${startDate}/${endDate}`;
+        const deptResponse = await fetch(deptUrl, { credentials: 'include' });
+        departmentData = deptResponse.ok ? await deptResponse.json() : [];
+      }
+
+      // Fetch monthly trends
+      const trendsUrl = `/api/reports/monthly-trends/${user.institutionId}${employeeParam}`;
+      const trendsResponse = await fetch(trendsUrl, { credentials: 'include' });
+      const monthlyTrends = trendsResponse.ok ? await trendsResponse.json() : [];
+
+      // Fetch attendance rates
+      const ratesUrl = `/api/reports/attendance-rates/${user.institutionId}/${startDate}/${endDate}${employeeParam}`;
+      const ratesResponse = await fetch(ratesUrl, { credentials: 'include' });
+      const attendanceRates = ratesResponse.ok ? await ratesResponse.json() : [];
+
+      // Update state with fetched data
       setReportData({
         overview,
         departmentData: Array.isArray(departmentData) ? departmentData : [],
@@ -175,10 +181,17 @@ export default function Reports() {
         description: language === "ca" ? "No s'ha pogut generar l'informe" : "No se pudo generar el informe",
         variant: "destructive",
       });
+      // Reset data on error
+      setReportData({
+        overview: null,
+        departmentData: [],
+        monthlyTrends: [],
+        attendanceRates: []
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [user, startDate, endDate, selectedEmployeeId, canManageEmployees, language, toast]);
+  };
 
   // Export CSV
   const handleExportCSV = async () => {
@@ -186,10 +199,17 @@ export default function Reports() {
     
     setIsExporting(true);
     try {
-      const targetEmployeeId = canManageEmployees && selectedEmployeeId ? selectedEmployeeId : user.id;
-      const url = `/api/reports/export/csv/${user.institutionId}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}${targetEmployeeId ? `&employeeId=${targetEmployeeId}` : ''}`;
+      const targetEmployeeId = canViewAllEmployees && selectedEmployeeId ? selectedEmployeeId : user.id;
+      const params = new URLSearchParams({
+        reportType,
+        startDate,
+        endDate,
+        ...(targetEmployeeId && { employeeId: targetEmployeeId })
+      });
       
+      const url = `/api/reports/export/csv/${user.institutionId}?${params.toString()}`;
       const response = await fetch(url, { credentials: 'include' });
+      
       if (!response.ok) throw new Error('Export failed');
       
       const blob = await response.blob();
@@ -261,7 +281,7 @@ export default function Reports() {
     }
   };
 
-  // Calculate key metrics
+  // Key metrics
   const keyMetrics = [
     {
       title: language === "ca" ? "Taxa d'assistència" : "Tasa de asistencia",
@@ -326,14 +346,14 @@ export default function Reports() {
               </Select>
             </div>
 
-            {/* Employee selector - only for admin users */}
-            {canManageEmployees && (
+            {/* Employee selector - only for users who can view all employees */}
+            {canViewAllEmployees && (
               <div>
                 <Label htmlFor="employee-select">
                   {language === "ca" ? "Empleat (opcional)" : "Empleado (opcional)"}
                 </Label>
                 <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
-                  <SelectTrigger id="employee-select" data-testid="employee-select">
+                  <SelectTrigger id="employee-select" data-testid="employee-select" onClick={loadEmployees}>
                     <SelectValue placeholder={language === "ca" ? "Tots els empleats" : "Todos los empleados"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -417,7 +437,7 @@ export default function Reports() {
         </CardContent>
       </Card>
 
-      {/* Key Metrics */}
+      {/* Key Metrics - only show when data is loaded */}
       {reportData.overview && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {keyMetrics.map((metric) => (
@@ -434,7 +454,7 @@ export default function Reports() {
         </div>
       )}
 
-      {/* Charts */}
+      {/* Charts - only show when data is loaded */}
       {reportData.overview && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Attendance Overview */}
@@ -471,8 +491,8 @@ export default function Reports() {
             </CardContent>
           </Card>
 
-          {/* Department Comparison - only for admin */}
-          {canManageEmployees && (
+          {/* Department Comparison - only for users who can view all employees */}
+          {canViewAllEmployees && (
             <Card data-testid="department-comparison-card">
               <CardHeader>
                 <CardTitle>
@@ -506,7 +526,7 @@ export default function Reports() {
           )}
 
           {/* Monthly Trends */}
-          <Card data-testid="monthly-trends-card" className={canManageEmployees ? "" : "lg:col-span-2"}>
+          <Card data-testid="monthly-trends-card" className={canViewAllEmployees ? "" : "lg:col-span-2"}>
             <CardHeader>
               <CardTitle>
                 {language === "ca" ? "Tendències mensuals" : "Tendencias mensuales"}

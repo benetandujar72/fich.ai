@@ -1,0 +1,134 @@
+verageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:53 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 307ms :: …
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+Employee report for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855: {
+  totalEmployees: 1,
+  attendanceRate: 6.7,
+  averageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+6:42:54 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 303ms :: …
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+6:42:54 PM [express] GET /api/reports/monthly-trends/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 935…
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+6:42:54 PM [express] GET /api/reports/detailed-attendance/5262a4a1-44ec-48e5-b520-102b2dffea43 304 i…
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:54 PM [express] GET /api/reports/detailed-attendance/5262a4a1-44ec-48e5-b520-102b2dffea43 304 i…
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:54 PM [express] GET /api/reports/monthly-trends/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 986…
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+Employee report for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855: {
+  totalEmployees: 1,
+  attendanceRate: 6.7,
+  averageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:54 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 305ms :: …
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:54 PM [express] GET /api/reports/detailed-attendance/5262a4a1-44ec-48e5-b520-102b2dffea43 304 i…
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+Employee report for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855: {
+  totalEmployees: 1,
+  attendanceRate: 6.7,
+  averageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+6:42:54 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 303ms :: …
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+Employee report for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855: {
+  totalEmployees: 1,
+  attendanceRate: 6.7,
+  averageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+Employee report for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855: {
+  totalEmployees: 1,
+  attendanceRate: 6.7,
+  averageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+6:42:54 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 313ms :: …
+6:42:54 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 304ms :: …
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+6:42:54 PM [express] GET /api/reports/monthly-trends/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 955…
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+Employee report for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855: {
+  totalEmployees: 1,
+  attendanceRate: 6.7,
+  averageHoursPerDay: 8,
+  totalLatesThisMonth: 6,
+  totalAbsencesThisMonth: 0
+}
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:54 PM [express] GET /api/reports/overview/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 304ms :: …
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+6:42:55 PM [express] GET /api/reports/detailed-attendance/5262a4a1-44ec-48e5-b520-102b2dffea43 304 i…
+DEBUG: Found 0 absences for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07
+DEBUG: Found employee A.APARICIO for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855
+DEBUG: Found 14 attendance records for employee 27c082f9-fdb8-48b4-88de-c49d9c604c07

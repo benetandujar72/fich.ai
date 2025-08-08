@@ -64,6 +64,7 @@ import {
 import { logger } from './logger';
 import { db } from "./db";
 import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull } from "drizzle-orm";
+import { format } from "date-fns";
 
 export interface IStorage {
   // User operations
@@ -2083,6 +2084,365 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       return insertedCount;
     } catch (error) {
       console.error('GENERATE_WEEKLY_SCHEDULE_ERROR', error);
+      throw error;
+    }
+  }
+
+  // Reports functionality
+  async getAttendanceOverview(institutionId: string, startDate?: Date, endDate?: Date): Promise<{
+    totalEmployees: number;
+    attendanceRate: number;
+    averageHoursPerDay: number;
+    totalLatesThisMonth: number;
+    totalAbsencesThisMonth: number;
+  }> {
+    try {
+      const now = new Date();
+      const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+      const defaultEndDate = endDate || now;
+
+      // Get total employees in institution
+      const allEmployees = await db
+        .select({ count: count() })
+        .from(employees)
+        .where(eq(employees.institutionId, institutionId));
+      
+      const totalEmployees = allEmployees[0]?.count || 0;
+
+      if (totalEmployees === 0) {
+        return {
+          totalEmployees: 0,
+          attendanceRate: 0,
+          averageHoursPerDay: 0,
+          totalLatesThisMonth: 0,
+          totalAbsencesThisMonth: 0,
+        };
+      }
+
+      // Get attendance records for the period
+      const attendanceData = await db
+        .select({
+          employeeId: attendanceRecords.employeeId,
+          timestamp: attendanceRecords.timestamp,
+          type: attendanceRecords.type,
+        })
+        .from(attendanceRecords)
+        .innerJoin(employees, eq(attendanceRecords.employeeId, employees.id))
+        .where(
+          and(
+            eq(employees.institutionId, institutionId),
+            gte(attendanceRecords.timestamp, defaultStartDate),
+            lte(attendanceRecords.timestamp, defaultEndDate)
+          )
+        );
+
+      // Calculate attendance statistics
+      const employeeAttendance = new Map<string, { dates: Set<string>; totalHours: number; lateCount: number }>();
+      
+      for (const record of attendanceData) {
+        const dateStr = format(record.timestamp, 'yyyy-MM-dd');
+        const employeeId = record.employeeId;
+        
+        if (!employeeAttendance.has(employeeId)) {
+          employeeAttendance.set(employeeId, { 
+            dates: new Set(), 
+            totalHours: 0, 
+            lateCount: 0 
+          });
+        }
+        
+        const empData = employeeAttendance.get(employeeId)!;
+        empData.dates.add(dateStr);
+        
+        // Check if late (after 8:30)
+        const hour = record.timestamp.getHours();
+        const minute = record.timestamp.getMinutes();
+        if (record.type === 'check_in' && (hour > 8 || (hour === 8 && minute > 30))) {
+          empData.lateCount++;
+        }
+      }
+
+      // Get absences for the period
+      const absenceData = await db
+        .select({ employeeId: absences.employeeId })
+        .from(absences)
+        .innerJoin(employees, eq(absences.employeeId, employees.id))
+        .where(
+          and(
+            eq(employees.institutionId, institutionId),
+            gte(absences.startDate, defaultStartDate),
+            lte(absences.startDate, defaultEndDate)
+          )
+        );
+
+      // Calculate metrics
+      const workingDays = Math.ceil((defaultEndDate.getTime() - defaultStartDate.getTime()) / (1000 * 60 * 60 * 24));
+      const expectedAttendanceDays = totalEmployees * Math.max(1, workingDays);
+      const actualAttendanceDays = Array.from(employeeAttendance.values()).reduce((sum, emp) => sum + emp.dates.size, 0);
+      
+      const attendanceRate = expectedAttendanceDays > 0 ? (actualAttendanceDays / expectedAttendanceDays) * 100 : 0;
+      const totalLatesThisMonth = Array.from(employeeAttendance.values()).reduce((sum, emp) => sum + emp.lateCount, 0);
+      const averageHoursPerDay = totalEmployees > 0 ? (actualAttendanceDays * 8) / Math.max(totalEmployees, 1) : 0;
+
+      return {
+        totalEmployees,
+        attendanceRate: Math.round(attendanceRate * 10) / 10,
+        averageHoursPerDay: Math.round(averageHoursPerDay * 10) / 10,
+        totalLatesThisMonth,
+        totalAbsencesThisMonth: absenceData.length,
+      };
+
+    } catch (error) {
+      console.error("Error getting attendance overview:", error);
+      throw error;
+    }
+  }
+
+  async getDepartmentComparison(institutionId: string, startDate?: Date, endDate?: Date): Promise<Array<{
+    departmentName: string;
+    totalEmployees: number;
+    attendanceRate: number;
+    averageHours: number;
+    lateCount: number;
+  }>> {
+    try {
+      const now = new Date();
+      const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+      const defaultEndDate = endDate || now;
+
+      // Get departments with employee counts
+      const departmentData = await db
+        .select({
+          departmentId: employees.departmentId,
+          departmentName: departments.name,
+          employeeId: employees.id,
+        })
+        .from(employees)
+        .leftJoin(departments, eq(employees.departmentId, departments.id))
+        .where(eq(employees.institutionId, institutionId));
+
+      if (departmentData.length === 0) {
+        return [];
+      }
+
+      // Group by department
+      const deptMap = new Map<string, { name: string; employeeIds: Set<string> }>();
+      
+      for (const emp of departmentData) {
+        const deptId = emp.departmentId || 'sin-departamento';
+        const deptName = emp.departmentName || 'Sin departamento';
+        
+        if (!deptMap.has(deptId)) {
+          deptMap.set(deptId, { name: deptName, employeeIds: new Set() });
+        }
+        deptMap.get(deptId)!.employeeIds.add(emp.employeeId);
+      }
+
+      // Get attendance data for all employees
+      const attendanceData = await db
+        .select({
+          employeeId: attendanceRecords.employeeId,
+          timestamp: attendanceRecords.timestamp,
+          type: attendanceRecords.type,
+        })
+        .from(attendanceRecords)
+        .innerJoin(employees, eq(attendanceRecords.employeeId, employees.id))
+        .where(
+          and(
+            eq(employees.institutionId, institutionId),
+            gte(attendanceRecords.timestamp, defaultStartDate),
+            lte(attendanceRecords.timestamp, defaultEndDate)
+          )
+        );
+
+      // Calculate department statistics
+      const results = [];
+      
+      for (const [deptId, deptInfo] of Array.from(deptMap.entries())) {
+        const employeeAttendance = new Map<string, { dates: Set<string>; lateCount: number }>();
+        
+        // Initialize for all employees in department
+        for (const empId of deptInfo.employeeIds) {
+          employeeAttendance.set(empId, { dates: new Set(), lateCount: 0 });
+        }
+        
+        // Process attendance records
+        for (const record of attendanceData) {
+          if (deptInfo.employeeIds.has(record.employeeId)) {
+            const dateStr = format(record.timestamp, 'yyyy-MM-dd');
+            const empData = employeeAttendance.get(record.employeeId)!;
+            empData.dates.add(dateStr);
+            
+            // Check if late
+            const hour = record.timestamp.getHours();
+            const minute = record.timestamp.getMinutes();
+            if (record.type === 'check_in' && (hour > 8 || (hour === 8 && minute > 30))) {
+              empData.lateCount++;
+            }
+          }
+        }
+
+        // Calculate metrics
+        const totalEmployees = deptInfo.employeeIds.size;
+        const workingDays = Math.ceil((defaultEndDate.getTime() - defaultStartDate.getTime()) / (1000 * 60 * 60 * 24));
+        const expectedAttendanceDays = totalEmployees * Math.max(1, workingDays);
+        const actualAttendanceDays = Array.from(employeeAttendance.values()).reduce((sum, emp) => sum + emp.dates.size, 0);
+        const totalLates = Array.from(employeeAttendance.values()).reduce((sum, emp) => sum + emp.lateCount, 0);
+        
+        const attendanceRate = expectedAttendanceDays > 0 ? (actualAttendanceDays / expectedAttendanceDays) * 100 : 0;
+        const averageHours = totalEmployees > 0 ? (actualAttendanceDays * 8) / Math.max(totalEmployees, 1) : 0;
+
+        results.push({
+          departmentName: deptInfo.name,
+          totalEmployees,
+          attendanceRate: Math.round(attendanceRate * 10) / 10,
+          averageHours: Math.round(averageHours * 10) / 10,
+          lateCount: totalLates,
+        });
+      }
+
+      return results.sort((a, b) => b.attendanceRate - a.attendanceRate);
+
+    } catch (error) {
+      console.error("Error getting department comparison:", error);
+      throw error;
+    }
+  }
+
+  async getMonthlyTrends(institutionId: string, months: number = 12): Promise<Array<{
+    month: string;
+    attendanceRate: number;
+    totalHours: number;
+    lateCount: number;
+    absenceCount: number;
+  }>> {
+    try {
+      const results = [];
+      const now = new Date();
+      
+      for (let i = months - 1; i >= 0; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const startDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+        const endDate = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+        
+        const monthOverview = await this.getAttendanceOverview(institutionId, startDate, endDate);
+        
+        results.push({
+          month: format(monthDate, 'yyyy-MM'),
+          attendanceRate: monthOverview.attendanceRate,
+          totalHours: monthOverview.averageHoursPerDay * monthOverview.totalEmployees,
+          lateCount: monthOverview.totalLatesThisMonth,
+          absenceCount: monthOverview.totalAbsencesThisMonth,
+        });
+      }
+      
+      return results;
+
+    } catch (error) {
+      console.error("Error getting monthly trends:", error);
+      throw error;
+    }
+  }
+
+  async getAttendanceRatesByPeriod(institutionId: string, startDate: Date, endDate: Date): Promise<Array<{
+    date: string;
+    present: number;
+    absent: number;
+    late: number;
+    attendanceRate: number;
+  }>> {
+    try {
+      // Get all employees in institution
+      const allEmployees = await db
+        .select({ id: employees.id })
+        .from(employees)
+        .where(eq(employees.institutionId, institutionId));
+      
+      const totalEmployees = allEmployees.length;
+      if (totalEmployees === 0) return [];
+
+      // Get attendance records for the period
+      const attendanceData = await db
+        .select({
+          employeeId: attendanceRecords.employeeId,
+          timestamp: attendanceRecords.timestamp,
+          type: attendanceRecords.type,
+        })
+        .from(attendanceRecords)
+        .innerJoin(employees, eq(attendanceRecords.employeeId, employees.id))
+        .where(
+          and(
+            eq(employees.institutionId, institutionId),
+            gte(attendanceRecords.timestamp, startDate),
+            lte(attendanceRecords.timestamp, endDate)
+          )
+        );
+
+      // Get absences for the period
+      const absenceData = await db
+        .select({
+          employeeId: absences.employeeId,
+          date: absences.startDate,
+        })
+        .from(absences)
+        .innerJoin(employees, eq(absences.employeeId, employees.id))
+        .where(
+          and(
+            eq(employees.institutionId, institutionId),
+            gte(absences.startDate, startDate),
+            lte(absences.startDate, endDate)
+          )
+        );
+
+      // Process by date
+      const results = [];
+      const currentDate = new Date(startDate);
+      
+      while (currentDate <= endDate) {
+        const dateStr = format(currentDate, 'yyyy-MM-dd');
+        
+        // Get attendance for this date
+        const dayAttendance = attendanceData.filter(record => 
+          format(record.timestamp, 'yyyy-MM-dd') === dateStr
+        );
+        
+        const dayAbsences = absenceData.filter(absence => 
+          format(absence.date, 'yyyy-MM-dd') === dateStr
+        );
+        
+        // Count unique employees who checked in
+        const presentEmployees = new Set(
+          dayAttendance
+            .filter(record => record.type === 'check_in')
+            .map(record => record.employeeId)
+        );
+        
+        // Count late arrivals (after 8:30)
+        const lateEmployees = dayAttendance.filter(record => 
+          record.type === 'check_in' && 
+          (record.timestamp.getHours() > 8 || 
+           (record.timestamp.getHours() === 8 && record.timestamp.getMinutes() > 30))
+        ).length;
+        
+        const present = presentEmployees.size;
+        const absent = totalEmployees - present;
+        const attendanceRate = totalEmployees > 0 ? (present / totalEmployees) * 100 : 0;
+        
+        results.push({
+          date: dateStr,
+          present,
+          absent,
+          late: lateEmployees,
+          attendanceRate: Math.round(attendanceRate * 10) / 10,
+        });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      return results;
+
+    } catch (error) {
+      console.error("Error getting attendance rates by period:", error);
       throw error;
     }
   }

@@ -1338,6 +1338,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reports API endpoints
+  app.get("/api/reports/overview/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      
+      const overview = await storage.getAttendanceOverview(institutionId, start, end);
+      res.json(overview);
+    } catch (error) {
+      console.error("Error fetching attendance overview:", error);
+      res.status(500).json({ message: "Failed to fetch attendance overview" });
+    }
+  });
+
+  app.get("/api/reports/department-comparison/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      
+      const comparison = await storage.getDepartmentComparison(institutionId, start, end);
+      res.json(comparison);
+    } catch (error) {
+      console.error("Error fetching department comparison:", error);
+      res.status(500).json({ message: "Failed to fetch department comparison" });
+    }
+  });
+
+  app.get("/api/reports/monthly-trends/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { months } = req.query;
+      
+      const monthsToFetch = months ? parseInt(months as string) : 12;
+      const trends = await storage.getMonthlyTrends(institutionId, monthsToFetch);
+      res.json(trends);
+    } catch (error) {
+      console.error("Error fetching monthly trends:", error);
+      res.status(500).json({ message: "Failed to fetch monthly trends" });
+    }
+  });
+
+  app.get("/api/reports/attendance-rates/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      const rates = await storage.getAttendanceRatesByPeriod(institutionId, start, end);
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching attendance rates:", error);
+      res.status(500).json({ message: "Failed to fetch attendance rates" });
+    }
+  });
+
+  // Export reports as CSV
+  app.get("/api/reports/export/csv/:institutionId", isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { reportType, startDate, endDate } = req.query;
+      
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      
+      let csvData = '';
+      let filename = 'report.csv';
+      
+      switch (reportType) {
+        case 'overview':
+          const overview = await storage.getAttendanceOverview(institutionId, start, end);
+          csvData = `Metric,Value
+Total Employees,${overview.totalEmployees}
+Attendance Rate,${overview.attendanceRate}%
+Average Hours Per Day,${overview.averageHoursPerDay}
+Total Lates This Month,${overview.totalLatesThisMonth}
+Total Absences This Month,${overview.totalAbsencesThisMonth}`;
+          filename = `attendance-overview-${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+          
+        case 'department-comparison':
+          const departments = await storage.getDepartmentComparison(institutionId, start, end);
+          csvData = 'Department,Total Employees,Attendance Rate,Average Hours,Late Count\n' +
+            departments.map(dept => 
+              `"${dept.departmentName}",${dept.totalEmployees},${dept.attendanceRate}%,${dept.averageHours},${dept.lateCount}`
+            ).join('\n');
+          filename = `department-comparison-${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+          
+        case 'monthly-trends':
+          const trends = await storage.getMonthlyTrends(institutionId, 12);
+          csvData = 'Month,Attendance Rate,Total Hours,Late Count,Absence Count\n' +
+            trends.map(trend => 
+              `${trend.month},${trend.attendanceRate}%,${trend.totalHours},${trend.lateCount},${trend.absenceCount}`
+            ).join('\n');
+          filename = `monthly-trends-${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+          
+        default:
+          return res.status(400).json({ message: "Invalid report type" });
+      }
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(csvData);
+      
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      res.status(500).json({ message: "Failed to export CSV" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

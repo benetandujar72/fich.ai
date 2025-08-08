@@ -31,17 +31,22 @@ export default function Reports() {
   const permissions = usePermissions();
   const { toast } = useToast();
   
-  const [reportType, setReportType] = useState("general_attendance");
-  const [startDate, setStartDate] = useState(() => {
+  // Get default date range for current month
+  const getDefaultStartDate = () => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     return firstDay.toISOString().split('T')[0];
-  });
-  const [endDate, setEndDate] = useState(() => {
+  };
+  
+  const getDefaultEndDate = () => {
     const now = new Date();
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return lastDay.toISOString().split('T')[0];
-  });
+  };
+
+  const [reportType, setReportType] = useState("general_attendance");
+  const [startDate, setStartDate] = useState(getDefaultStartDate());
+  const [endDate, setEndDate] = useState(getDefaultEndDate());
 
   // Get institution ID from authenticated user
   const institutionId = user?.institutionId;
@@ -65,25 +70,37 @@ export default function Reports() {
     },
   ];
 
-  // Fetch reports data
+  // Fetch reports data with proper caching to prevent infinite loops
   const { data: overviewData, isLoading: overviewLoading } = useQuery({
     queryKey: ['/api/reports/overview', institutionId, startDate, endDate],
     enabled: !!institutionId && !!startDate && !!endDate,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   const { data: departmentData, isLoading: departmentLoading } = useQuery({
     queryKey: ['/api/reports/department-comparison', institutionId, startDate, endDate],
     enabled: !!institutionId && !!startDate && !!endDate,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   const { data: monthlyTrends, isLoading: trendsLoading } = useQuery({
     queryKey: ['/api/reports/monthly-trends', institutionId],
     enabled: !!institutionId,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   const { data: attendanceRates, isLoading: ratesLoading } = useQuery({
     queryKey: ['/api/reports/attendance-rates', institutionId, startDate, endDate],
     enabled: !!institutionId && !!startDate && !!endDate,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // CSV Export mutation
@@ -125,8 +142,10 @@ export default function Reports() {
   });
 
   const handleGenerateReport = () => {
-    // Refresh all data by refetching
-    window.location.reload();
+    // Force refresh by invalidating query cache
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   };
 
   const handleExportCSV = () => {

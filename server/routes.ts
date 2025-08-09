@@ -64,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ELSE 'received'
             END as action,
             c.subject as title,
-            SUBSTRING(c.content, 1, 100) as description,
+            SUBSTRING(c.message, 1, 100) as description,
             c.created_at as "timestamp",
             COALESCE(u1.first_name, 'Sistema') as "relatedUserName",
             COALESCE(u1.email, 'sistema@centre.edu') as "relatedUserEmail",
@@ -86,7 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ELSE 'received'  
             END as action,
             c.subject as title,
-            SUBSTRING(c.content, 1, 100) as description,
+            SUBSTRING(c.message, 1, 100) as description,
             c.created_at as "timestamp",
             COALESCE(u1.first_name, 'Sistema') || ' ' || COALESCE(u1.last_name, '') as "relatedUserName",
             COALESCE(u1.email, 'sistema@centre.edu') as "relatedUserEmail",
@@ -246,23 +246,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const summaryResult = await db.execute(sql`
           SELECT 
             COUNT(DISTINCT u.id) as total_employees,
-            COUNT(DISTINCT CASE WHEN a.user_id IS NOT NULL THEN u.id END) as employees_with_records,
+            COUNT(DISTINCT CASE WHEN a.employee_id IS NOT NULL THEN u.id END) as employees_with_records,
             AVG(CASE WHEN day_stats.hours_worked > 0 THEN day_stats.hours_worked END) as avg_daily_hours,
             SUM(day_stats.hours_worked) as total_hours_all_employees
           FROM users u
           LEFT JOIN (
             SELECT 
-              a.user_id,
+              a.employee_id,
               DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
               EXTRACT(EPOCH FROM (
-                MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) - 
-                MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END)
+                MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
+                MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
               ))/3600 as hours_worked
             FROM attendance_records a
             WHERE a.timestamp >= ${monday.toISOString()}
               AND a.timestamp <= ${friday.toISOString()}
-            GROUP BY a.user_id, DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
-          ) day_stats ON u.id = day_stats.user_id
+            GROUP BY a.employee_id, DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
+          ) day_stats ON u.id = day_stats.employee_id
           WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
         `);
 

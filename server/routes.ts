@@ -225,14 +225,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             u.id as user_id,
             u.first_name || ' ' || COALESCE(u.last_name, '') as name,
             u.email,
-            DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
-            COUNT(CASE WHEN a.type = 'check_in' THEN 1 END) as check_ins,
-            COUNT(CASE WHEN a.type = 'check_out' THEN 1 END) as check_outs,
-            MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END) as first_check_in,
-            MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) as last_check_out,
+            DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') as day,
+            COUNT(CASE WHEN ar.type = 'check_in' THEN 1 END) as check_ins,
+            COUNT(CASE WHEN ar.type = 'check_out' THEN 1 END) as check_outs,
+            MIN(CASE WHEN ar.type = 'check_in' THEN ar.timestamp END) as first_check_in,
+            MAX(CASE WHEN ar.type = 'check_out' THEN ar.timestamp END) as last_check_out,
             EXTRACT(EPOCH FROM (
-              MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
-              MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
+              MAX(CASE WHEN ar.type = 'check_out' THEN ar.timestamp END) - 
+              MIN(CASE WHEN ar.type = 'check_in' THEN ar.timestamp END)
             ))/3600 as hours_worked
           FROM users u
           LEFT JOIN attendance_records ar ON u.id = ar.employee_id 

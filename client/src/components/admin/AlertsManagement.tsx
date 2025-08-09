@@ -61,6 +61,23 @@ interface AlertConfig {
   alertType: string;
   recipients: string[];
   subject: string;
+  isActive: boolean;
+}
+
+interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface AlertConfig {
+  id: string;
+  name: string;
+  description: string;
+  alertType: string;
+  recipients: string[];
+  subject: string;
   messageTemplate: string;
   isActive: boolean;
 }
@@ -97,7 +114,7 @@ export function AlertsManagement() {
   });
 
   // Enhanced filtered alerts with multiple filters
-  const filteredAlerts = alerts.filter((alert: Alert) => {
+  const filteredAlerts = (alerts as Alert[]).filter((alert: Alert) => {
     const matchesSearch = 
       alert.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       alert.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -141,13 +158,16 @@ export function AlertsManagement() {
       message: string;
       type: string;
     }) => {
-      return apiRequest('/api/admin/alerts/send', {
+      return fetch('/api/admin/alerts/send-custom', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           ...data,
           institutionId: user?.institutionId,
         }),
-      });
+      }).then(res => res.json());
     },
     onSuccess: () => {
       toast({
@@ -214,7 +234,7 @@ export function AlertsManagement() {
               </DialogHeader>
               {/* Alert configs content */}
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {alertConfigs.map((config: AlertConfig) => (
+                {(alertConfigs as AlertConfig[]).map((config: AlertConfig) => (
                   <Card key={config.id}>
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
@@ -270,7 +290,7 @@ export function AlertsManagement() {
                         <SelectValue placeholder="Selecciona un empleat" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees.map((employee: any) => (
+                        {(employees as Employee[]).map((employee: Employee) => (
                           <SelectItem key={employee.id} value={employee.id}>
                             {employee.firstName} {employee.lastName} - {employee.email}
                           </SelectItem>

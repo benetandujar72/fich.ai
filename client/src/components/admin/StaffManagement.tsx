@@ -71,7 +71,7 @@ export function StaffManagement() {
   });
 
   // Filtered employees based on search and role filter
-  const filteredEmployees = employees.filter((employee: Employee) => {
+  const filteredEmployees = (employees as Employee[]).filter((employee: Employee) => {
     const matchesSearch = 
       employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||

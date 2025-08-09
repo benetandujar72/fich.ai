@@ -206,7 +206,7 @@ export default function Communications() {
     const matchesSearch = searchTerm === '' || 
       comm.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comm.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${comm.sender.firstName} ${comm.sender.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+      `${comm.senderFirstName} ${comm.senderLastName}`.toLowerCase().includes(searchTerm.toLowerCase());
 
     switch (selectedFilter) {
       case 'inbox':
@@ -446,8 +446,8 @@ export default function Communications() {
                               <div className="flex items-center space-x-2 mb-1">
                                 <p className="text-sm font-medium truncate">
                                   {communication.senderId === user?.id 
-                                    ? `Para: ${communication.recipient.firstName} ${communication.recipient.lastName}`
-                                    : `De: ${communication.sender.firstName} ${communication.sender.lastName}`
+                                    ? `Para: ${communication.recipientFirstName} ${communication.recipientLastName}`
+                                    : `De: ${communication.senderFirstName} ${communication.senderLastName}`
                                   }
                                 </p>
                                 <Badge variant={getPriorityColor(communication.priority)} className="text-xs">
@@ -498,7 +498,7 @@ export default function Communications() {
                       <div className="flex items-center space-x-2">
                         <Users className="h-4 w-4" />
                         <span>
-                          De: {selectedCommunication.sender.firstName} {selectedCommunication.sender.lastName}
+                          De: {selectedCommunication.senderFirstName} {selectedCommunication.senderLastName}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">

@@ -1,0 +1,43 @@
+
+> rest-express@1.0.0 dev
+7:13:51 AM [express] serving on port 5000s
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+7:14:00 AM [express] GET /api/auth/user 304 in 181ms :: {"id":"1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855"…
+7:14:00 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+7:14:00 AM [express] GET /api/users/all 200 in 55ms :: [{"id":"0e21b9bb-42d9-4f40-98d9-7a11cc5241c6"…
+7:14:05 AM [express] GET /api/auth/user 200 in 178ms :: {"id":"1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855"…
+GET_COMMUNICATIONS_ERROR TypeError: Cannot convert undefined or null to object
+    at Function.entries (<anonymous>)
+    at orderSelectedFields (/home/runner/workspace/node_modules/src/utils.ts:77:16)
+    at <anonymous> (/home/runner/workspace/node_modules/src/utils.ts:88:19)
+    at Array.reduce (<anonymous>)
+    at orderSelectedFields (/home/runner/workspace/node_modules/src/utils.ts:77:32)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:979:23)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at PgSelectBase._prepare (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:978:17)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:1009:16)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at PgSelectBase.execute (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:1008:17)
+    at PgSelectBase.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Error fetching communications: TypeError: Cannot convert undefined or null to object
+    at Function.entries (<anonymous>)
+    at orderSelectedFields (/home/runner/workspace/node_modules/src/utils.ts:77:16)
+    at <anonymous> (/home/runner/workspace/node_modules/src/utils.ts:88:19)
+    at Array.reduce (<anonymous>)
+    at orderSelectedFields (/home/runner/workspace/node_modules/src/utils.ts:77:32)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:979:23)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at PgSelectBase._prepare (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:978:17)
+    at <anonymous> (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:1009:16)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at PgSelectBase.execute (/home/runner/workspace/node_modules/src/pg-core/query-builders/select.ts:1008:17)
+    at PgSelectBase.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+7:14:05 AM [express] GET /api/communications/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/all 500 in 138ms :…
+7:14:06 AM [express] GET /api/users/institution/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 178ms ::…
+Fetched 16 attendance records for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855 (employee 27c082f9-fdb8-48b4-88de-c49d9c604c07)
+7:14:06 AM [express] GET /api/attendance/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855 304 in 241ms :: [{"id"…
+^A

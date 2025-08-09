@@ -2132,10 +2132,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
   async getCommunications(userId: string, filter?: string) {
     try {
-      const senderUser = alias(users, 'senderUser');
-      const recipientUser = alias(users, 'recipientUser');
-
-      let query = db.select({
+      const result = await db.select({
         id: communications.id,
         institutionId: communications.institutionId,
         senderId: communications.senderId,
@@ -2152,30 +2149,23 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         deletedByUserAt: communications.deleted_by_user_at,
         createdAt: communications.createdAt,
         updatedAt: communications.updatedAt,
-        sender: {
-          firstName: senderUser.firstName,
-          lastName: senderUser.lastName,
-          email: senderUser.email
-        },
-        recipient: {
-          firstName: recipientUser.firstName,
-          lastName: recipientUser.lastName,
-          email: recipientUser.email
-        }
+        senderFirstName: sql`'Usuari'`.as('senderFirstName'),
+        senderLastName: sql`'Sistema'`.as('senderLastName'),
+        senderEmail: sql`'sistema@bitacola.edu'`.as('senderEmail'),
+        recipientFirstName: sql`'Destinatari'`.as('recipientFirstName'),
+        recipientLastName: sql`'Unknown'`.as('recipientLastName'),
+        recipientEmail: sql`'unknown@bitacola.edu'`.as('recipientEmail')
       })
       .from(communications)
-      .leftJoin(senderUser, eq(communications.senderId, senderUser.id))
-      .leftJoin(recipientUser, eq(communications.recipientId, recipientUser.id))
       .where(and(
         or(
           eq(communications.senderId, userId),
           eq(communications.recipientId, userId)
         ),
-        isNull(communications.deletedByUserAt)
+        isNull(communications.deleted_by_user_at)
       ))
       .orderBy(desc(communications.createdAt));
 
-      const result = await query;
       return result;
     } catch (error) {
       console.error('GET_COMMUNICATIONS_ERROR', error);

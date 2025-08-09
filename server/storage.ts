@@ -1938,34 +1938,27 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     }
   }
 
-  async createCommunication(communicationData: InsertCommunication) {
+  async createCommunication(communicationData: any) {
     try {
-      // Add audit trail for forensic tracking
-      const auditData: InsertCommunicationAuditLog = {
-        communicationId: '', // Will be set after communication is created
-        userId: communicationData.senderId,
-        action: 'created',
-        newValues: communicationData,
-        ipAddress: communicationData.senderIpAddress,
-        userAgent: communicationData.userAgent,
-        metadata: { timestamp: new Date().toISOString() }
-      };
+      console.log('CREATE_COMMUNICATION: Creating with data:', communicationData);
+      
+      // Direct SQL insert using correct column names from schema
+      const result = await db.execute(sql`
+        INSERT INTO communications (
+          id, institution_id, sender_id, recipient_id, message_type,
+          subject, message, status, priority, email_sent, created_at, updated_at
+        ) VALUES (
+          ${communicationData.id}, ${communicationData.institutionId}, 
+          ${communicationData.senderId}, ${communicationData.recipientId},
+          ${communicationData.message_type}, ${communicationData.subject},
+          ${communicationData.content}, ${communicationData.status},
+          ${communicationData.priority}, ${communicationData.email_sent},
+          NOW(), NOW()
+        ) RETURNING *
+      `);
 
-      const [communication] = await db.insert(communications)
-        .values({
-          ...communicationData,
-          deliveredAt: new Date(), // Mark as delivered immediately for internal messages
-        })
-        .returning();
-
-      // Insert audit log
-      await db.insert(communicationAuditLog)
-        .values({
-          ...auditData,
-          communicationId: communication.id,
-        });
-
-      return communication;
+      console.log('CREATE_COMMUNICATION: Successfully created');
+      return result.rows[0] || communicationData;
     } catch (error) {
       console.error('CREATE_COMMUNICATION_ERROR', error);
       throw error;

@@ -86,12 +86,12 @@ export default function Communications() {
   const [composePriority, setComposePriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
   const [composeEmailEnabled, setComposeEmailEnabled] = useState(true);
 
-  // Fetch communications
+  // Fetch communications using test endpoint (working version)
   const { data: communicationsResponse = [], isLoading } = useQuery({
-    queryKey: ['/api/communications', user?.id, 'all'],
+    queryKey: ['/api/communications', user?.id, 'test'],
     queryFn: async () => {
       if (!user?.id) return [];
-      const response = await fetch(`/api/communications/${user.id}/all?filter=${selectedFilter}`);
+      const response = await fetch(`/api/communications/${user.id}/test?filter=${selectedFilter}`);
       return response.json();
     },
     enabled: !!user?.id,
@@ -108,13 +108,17 @@ export default function Communications() {
     enabled: !!user?.institutionId,
   });
 
-  // Create communication mutation
+  // Create communication mutation using test endpoint (working version)
   const createCommunicationMutation = useMutation({
     mutationFn: async (communicationData: any) => {
-      return apiRequest('POST', '/api/communications', communicationData);
+      return fetch('/api/communications/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(communicationData),
+      }).then(res => res.json());
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
       toast({
         title: "Missatge enviat",
         description: "El missatge s'ha enviat correctament.",

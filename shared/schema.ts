@@ -791,6 +791,16 @@ export type InsertAlertNotification = z.infer<typeof insertAlertNotificationSche
 
 export type Communication = typeof communications.$inferSelect;
 export type InsertCommunication = z.infer<typeof insertCommunicationSchema>;
+
+// Extended communication type with user information
+export type CommunicationWithUsers = Communication & {
+  senderFirstName?: string;
+  senderLastName?: string;
+  senderEmail?: string;
+  recipientFirstName?: string; 
+  recipientLastName?: string;
+  recipientEmail?: string;
+};
 export type CommunicationAttachment = typeof communicationAttachments.$inferSelect;
 export type InsertCommunicationAttachment = z.infer<typeof insertCommunicationAttachmentSchema>;
 export type CommunicationAuditLog = typeof communicationAuditLog.$inferSelect;

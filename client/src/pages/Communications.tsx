@@ -141,7 +141,7 @@ export default function Communications() {
       return apiRequest('PATCH', `/api/communications/${communicationId}/read`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
     },
   });
 
@@ -151,7 +151,7 @@ export default function Communications() {
       return apiRequest('DELETE', `/api/communications/${communicationId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
       toast({
         title: "Missatge eliminat",
         description: "El missatge s'ha eliminat correctament.",

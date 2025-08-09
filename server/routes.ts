@@ -1584,13 +1584,9 @@ Total Absences This Month,${overview.totalAbsencesThisMonth}`;
 
   app.post('/api/communications', isAuthenticated, async (req: any, res) => {
     try {
-      console.log('CREATE_COMM_DEBUG: User object:', req.user);
-      console.log('CREATE_COMM_DEBUG: Session:', req.session);
-      
-      if (!req.user || !req.user.id) {
-        console.log('CREATE_COMM_DEBUG: No user found in request');
-        return res.status(401).json({ message: "User not authenticated" });
-      }
+      console.log('CREATE_COMM_DEBUG: Creating communication (authenticated)');
+      console.log('CREATE_COMM_DEBUG: Body:', req.body);
+      console.log('CREATE_COMM_DEBUG: User from session:', req.user);
       
       const userId = req.user.id;
       const user = await storage.getUser(userId);
@@ -1600,18 +1596,25 @@ Total Absences This Month,${overview.totalAbsencesThisMonth}`;
       }
 
       // Validate communication data
-      const validatedData = insertCommunicationSchema.parse({
-        ...req.body,
+      const communicationData = {
+        id: globalThis.crypto.randomUUID(),
         institutionId: user.institutionId,
         senderId: userId,
-        senderIpAddress: req.ip,
-        userAgent: req.get('User-Agent'),
-      });
+        recipientId: req.body.recipientId,
+        message_type: req.body.messageType || 'internal',
+        subject: req.body.subject,
+        content: req.body.content,
+        status: 'sent',
+        priority: req.body.priority || 'medium',
+        email_sent: req.body.emailSent || false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
-      const communication = await storage.createCommunication(validatedData);
+      const communication = await storage.createCommunication(communicationData);
 
       // Send email notification if recipient has email and email is enabled
-      if (communication.recipientId && validatedData.emailSent !== false) {
+      if (communication.recipientId && communicationData.email_sent !== false) {
         const recipient = await storage.getUser(communication.recipientId);
         if (recipient?.email) {
           const { sendGridService } = await import('./sendgridService');

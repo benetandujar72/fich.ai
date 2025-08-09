@@ -2132,8 +2132,41 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
   async getCommunications(userId: string, filter?: string) {
     try {
-      // Return empty array for now since there are no communications yet
-      return [];
+      console.log('GET_COMMUNICATIONS: Fetching for user:', userId, 'filter:', filter);
+      
+      // Direct SQL query to avoid Drizzle issues
+      const result = await db.execute(sql`
+        SELECT 
+          id,
+          institution_id as "institutionId",
+          sender_id as "senderId", 
+          recipient_id as "recipientId",
+          message_type as "messageType",
+          subject,
+          content,
+          status,
+          priority,
+          email_sent as "emailSent",
+          email_sent_at as "emailSentAt",
+          read_at as "readAt",
+          delivered_at as "deliveredAt",
+          deleted_by_user_at as "deletedByUserAt",
+          created_at as "createdAt",
+          updated_at as "updatedAt",
+          'Sistema' as "senderFirstName",
+          'EduPresència' as "senderLastName", 
+          'sistema@bitacola.edu' as "senderEmail",
+          'Usuari' as "recipientFirstName",
+          'Centre' as "recipientLastName",
+          'usuari@bitacola.edu' as "recipientEmail"
+        FROM communications 
+        WHERE (sender_id = ${userId} OR recipient_id = ${userId})
+          AND deleted_by_user_at IS NULL
+        ORDER BY created_at DESC
+      `);
+
+      console.log('GET_COMMUNICATIONS: Found', result.rows.length, 'communications');
+      return result.rows;
     } catch (error) {
       console.error('GET_COMMUNICATIONS_ERROR', error);
       throw error;

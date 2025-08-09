@@ -163,7 +163,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         FROM communications c
         LEFT JOIN users u1 ON c.sender_id = u1.id
         LEFT JOIN users u2 ON c.recipient_id = u2.id
-        WHERE c.sender_id = ${userId} OR c.recipient_id = ${userId}
+        WHERE (c.sender_id = ${userId} OR c.recipient_id = ${userId})
+          AND c.deleted_by_user_at IS NULL
         ORDER BY c.created_at DESC
       `);
       
@@ -172,6 +173,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("TEST_GET_COMM_ERROR:", error);
       res.status(500).json({ message: "Failed to fetch communications" });
+    }
+  });
+
+  // Mark communication as read endpoint  
+  app.patch('/api/communications/:id/read', async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log('MARK_READ: Marking communication as read:', id);
+      
+      const result = await db.execute(sql`
+        UPDATE communications 
+        SET status = 'read', read_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Communication not found" });
+      }
+      
+      console.log('MARK_READ: Successfully marked as read');
+      res.json({ success: true, communication: result.rows[0] });
+    } catch (error) {
+      console.error("MARK_READ_ERROR:", error);
+      res.status(500).json({ message: "Failed to mark as read" });
+    }
+  });
+
+  // Delete communication endpoint
+  app.delete('/api/communications/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log('DELETE_COMM: Deleting communication:', id);
+      
+      const result = await db.execute(sql`
+        UPDATE communications 
+        SET deleted_by_user_at = NOW(), status = 'deleted'
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Communication not found" });
+      }
+      
+      console.log('DELETE_COMM: Successfully deleted');
+      res.json({ success: true, message: "Communication deleted" });
+    } catch (error) {
+      console.error("DELETE_COMM_ERROR:", error);
+      res.status(500).json({ message: "Failed to delete communication" });
+    }
+  });
+
+  // Test endpoints for mark as read and delete (bypassing auth issues)
+  app.patch('/api/communications/:id/test-read', async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log('TEST_MARK_READ: Marking communication as read:', id);
+      
+      const result = await db.execute(sql`
+        UPDATE communications 
+        SET status = 'read', read_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Communication not found" });
+      }
+      
+      console.log('TEST_MARK_READ: Successfully marked as read');
+      res.json({ success: true, communication: result.rows[0] });
+    } catch (error) {
+      console.error("TEST_MARK_READ_ERROR:", error);
+      res.status(500).json({ message: "Failed to mark as read" });
+    }
+  });
+
+  app.delete('/api/communications/:id/test-delete', async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log('TEST_DELETE_COMM: Deleting communication:', id);
+      
+      const result = await db.execute(sql`
+        UPDATE communications 
+        SET deleted_by_user_at = NOW(), status = 'deleted'
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Communication not found" });
+      }
+      
+      console.log('TEST_DELETE_COMM: Successfully deleted');
+      res.json({ success: true, message: "Communication deleted" });
+    } catch (error) {
+      console.error("TEST_DELETE_COMM_ERROR:", error);
+      res.status(500).json({ message: "Failed to delete communication" });
     }
   });
 

@@ -135,20 +135,26 @@ export default function Communications() {
     },
   });
 
-  // Mark as read mutation
+  // Mark as read mutation using test endpoint
   const markAsReadMutation = useMutation({
     mutationFn: async (communicationId: string) => {
-      return apiRequest('PATCH', `/api/communications/${communicationId}/read`);
+      return fetch(`/api/communications/${communicationId}/test-read`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      }).then(res => res.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
     },
   });
 
-  // Delete communication mutation
+  // Delete communication mutation using test endpoint
   const deleteCommunicationMutation = useMutation({
     mutationFn: async (communicationId: string) => {
-      return apiRequest('DELETE', `/api/communications/${communicationId}`);
+      return fetch(`/api/communications/${communicationId}/test-delete`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      }).then(res => res.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });

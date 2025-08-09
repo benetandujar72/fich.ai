@@ -1584,6 +1584,14 @@ Total Absences This Month,${overview.totalAbsencesThisMonth}`;
 
   app.post('/api/communications', isAuthenticated, async (req: any, res) => {
     try {
+      console.log('CREATE_COMM_DEBUG: User object:', req.user);
+      console.log('CREATE_COMM_DEBUG: Session:', req.session);
+      
+      if (!req.user || !req.user.id) {
+        console.log('CREATE_COMM_DEBUG: No user found in request');
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const userId = req.user.id;
       const user = await storage.getUser(userId);
       

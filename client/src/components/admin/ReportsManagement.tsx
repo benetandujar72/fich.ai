@@ -46,9 +46,11 @@ export function ReportsManagement() {
   const [selectedUserForDetail, setSelectedUserForDetail] = useState<string | null>(null);
 
   // Fetch weekly attendance data for all employees
-  const { data: weeklyData = [] } = useQuery({
+  const { data: weeklyData = [], isLoading: weeklyLoading } = useQuery({
     queryKey: ['/api/admin/weekly-attendance', user?.institutionId],
     enabled: !!user?.institutionId && showWeeklyDetailModal,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   // Fetch employees for selection
@@ -138,17 +140,7 @@ export function ReportsManagement() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {presetReports.map((report) => (
-              <Card 
-                key={report.id} 
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => {
-                  if (report.id === 'weekly_summary') {
-                    setShowWeeklyDetailModal(true);
-                  } else {
-                    generateReport();
-                  }
-                }}
-              >
+              <Card key={report.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{report.name}</CardTitle>
@@ -161,12 +153,26 @@ export function ReportsManagement() {
                     size="sm" 
                     className="w-full"
                     onClick={() => {
-                      setReportType(report.type);
-                      generateReport();
+                      if (report.id === 'weekly_summary') {
+                        setShowWeeklyDetailModal(true);
+                      } else {
+                        setReportType(report.type);
+                        generateReport();
+                      }
                     }}
+                    data-testid={`button-generate-${report.id}`}
                   >
-                    <Download className="h-4 w-4 mr-2" />
-                    Generar
+                    {report.id === 'weekly_summary' ? (
+                      <>
+                        <Users className="h-4 w-4 mr-2" />
+                        Veure Llista Usuaris
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4 mr-2" />
+                        Generar
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -317,6 +323,13 @@ export function ReportsManagement() {
           </DialogHeader>
 
           <div className="space-y-4">
+            {weeklyLoading && (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p>Carregant dades dels empleats...</p>
+              </div>
+            )}
+            
             {/* Employee List */}
             <div className="grid gap-4">
               {(weeklyData as any[]).map((employee: any) => (
@@ -380,9 +393,11 @@ export function ReportsManagement() {
               ))}
             </div>
 
-            {weeklyData.length === 0 && (
+            {!weeklyLoading && weeklyData.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
-                No hi ha dades d'empleats disponibles
+                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No hi ha dades d'empleats disponibles</p>
+                <p className="text-sm">Verifiqueu que hi hagi empleats registrats al sistema</p>
               </div>
             )}
           </div>

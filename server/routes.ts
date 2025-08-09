@@ -817,6 +817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
 
+      console.log('Weekly attendance data:', employeesWithDetails.length, 'employees found');
       res.json(employeesWithDetails);
     } catch (error) {
       console.error('Error fetching weekly attendance:', error);

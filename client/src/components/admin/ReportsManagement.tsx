@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { WeeklyScheduleModal } from "./WeeklyScheduleModal";
 
 export function ReportsManagement() {
   const { user } = useAuth();
@@ -41,12 +42,27 @@ export function ReportsManagement() {
     end: new Date().toISOString().split('T')[0]
   });
   const [reportType, setReportType] = useState("attendance");
+  const [showWeeklyDetailModal, setShowWeeklyDetailModal] = useState(false);
+  const [selectedUserForDetail, setSelectedUserForDetail] = useState<string | null>(null);
+
+  // Fetch weekly attendance data for all employees
+  const { data: weeklyData = [] } = useQuery({
+    queryKey: ['/api/admin/weekly-attendance', user?.institutionId],
+    enabled: !!user?.institutionId && showWeeklyDetailModal,
+  });
 
   // Fetch employees for selection
   const { data: employees = [] } = useQuery({
     queryKey: ['/api/admin/employees', user?.institutionId],
     enabled: !!user?.institutionId,
   });
+
+  interface Employee {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }
 
   const handleEmployeeSelection = (employeeId: string, checked: boolean) => {
     if (checked) {
@@ -78,9 +94,9 @@ export function ReportsManagement() {
     },
     {
       id: 'weekly_summary',
-      name: 'Resum Setmanal',
-      description: 'Estadístiques d\'assistència de la setmana actual',
-      type: 'summary'
+      name: 'Informe Setmanal',
+      description: 'Llista d\'usuaris amb fitxatges reals vs horaris previstos',
+      type: 'weekly_detailed'
     },
     {
       id: 'employee_performance',
@@ -122,7 +138,17 @@ export function ReportsManagement() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {presetReports.map((report) => (
-              <Card key={report.id} className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card 
+                key={report.id} 
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => {
+                  if (report.id === 'weekly_summary') {
+                    setShowWeeklyDetailModal(true);
+                  } else {
+                    generateReport();
+                  }
+                }}
+              >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{report.name}</CardTitle>
@@ -206,10 +232,10 @@ export function ReportsManagement() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSelectedEmployees(employees.map((e: any) => e.id))}
+                  onClick={() => setSelectedEmployees((employees as Employee[]).map((e: Employee) => e.id))}
                   data-testid="button-select-all-employees"
                 >
-                  Tots ({employees.length})
+                  Tots ({(employees as Employee[]).length})
                 </Button>
                 <Button
                   variant="outline"
@@ -222,7 +248,7 @@ export function ReportsManagement() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto border rounded p-4">
-              {employees.map((employee: any) => (
+              {(employees as Employee[]).map((employee: Employee) => (
                 <div key={employee.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={employee.id}
@@ -276,6 +302,100 @@ export function ReportsManagement() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Weekly Detailed Report Modal */}
+      <Dialog open={showWeeklyDetailModal} onOpenChange={setShowWeeklyDetailModal}>
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Informe Setmanal Detallat
+            </DialogTitle>
+            <DialogDescription>
+              Llista d'usuaris amb comparació entre fitxatges reals i horaris previstos
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Employee List */}
+            <div className="grid gap-4">
+              {(weeklyData as any[]).map((employee: any) => (
+                <Card 
+                  key={employee.id} 
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => setSelectedUserForDetail(employee.id)}
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">{employee.firstName} {employee.lastName}</h3>
+                        <p className="text-sm text-muted-foreground">{employee.email}</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Badge variant={employee.totalAttendance > 0 ? "default" : "secondary"}>
+                          {employee.totalAttendance || 0} fitxatges
+                        </Badge>
+                        <Badge variant={employee.scheduledHours > 0 ? "outline" : "secondary"}>
+                          {employee.scheduledHours || 0}h previstes
+                        </Badge>
+                        {employee.complianceRate !== undefined && (
+                          <Badge 
+                            variant={employee.complianceRate >= 80 ? "default" : 
+                                   employee.complianceRate >= 60 ? "secondary" : "destructive"}
+                          >
+                            {employee.complianceRate}% compliment
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="grid grid-cols-5 gap-2 text-sm">
+                      {['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres'].map((day, index) => {
+                        const dayData = employee.weeklyDetails?.[index];
+                        return (
+                          <div key={day} className="text-center">
+                            <div className="font-medium">{day}</div>
+                            <div className={`mt-1 p-1 rounded text-xs ${
+                              dayData?.status === 'present' ? 'bg-green-100 text-green-800' :
+                              dayData?.status === 'late' ? 'bg-yellow-100 text-yellow-800' :
+                              dayData?.status === 'absent' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              {dayData?.status === 'present' ? 'Present' :
+                               dayData?.status === 'late' ? 'Retard' :
+                               dayData?.status === 'absent' ? 'Absent' : 'Sense dades'}
+                            </div>
+                            {dayData?.actualHours && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {dayData.actualHours}h / {dayData.scheduledHours || 0}h
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {weeklyData.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                No hi ha dades d'empleats disponibles
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* User Detail Modal */}
+      {selectedUserForDetail && (
+        <WeeklyScheduleModal 
+          userId={selectedUserForDetail} 
+          onClose={() => setSelectedUserForDetail(null)} 
+        />
+      )}
     </div>
   );
 }

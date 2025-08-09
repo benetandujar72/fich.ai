@@ -746,6 +746,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Risk Assessment endpoints (CONFIG-009)
+  // Weekly attendance report for all employees
+  app.get('/api/admin/weekly-attendance/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'director', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
+      const friday = endOfWeek(monday);
+
+      const result = await db.execute(sql`
+        SELECT 
+          u.id,
+          u.first_name as "firstName",
+          u.last_name as "lastName", 
+          u.email,
+          COUNT(ar.id) as total_attendance,
+          8 as scheduled_hours,
+          CASE 
+            WHEN COUNT(ar.id) > 0 
+            THEN ROUND((COUNT(ar.id)::numeric / 10) * 100, 0)
+            ELSE 0 
+          END as compliance_rate
+        FROM users u
+        LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+          AND ar.timestamp >= ${monday.toISOString()}
+          AND ar.timestamp <= ${friday.toISOString()}
+        WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
+        GROUP BY u.id, u.first_name, u.last_name, u.email
+        ORDER BY u.first_name, u.last_name
+      `);
+
+      // Add weekly details for each employee
+      const employeesWithDetails = await Promise.all(
+        result.rows.map(async (employee: any) => {
+          const weekDays = [];
+          for (let i = 0; i < 5; i++) {
+            const currentDay = addDays(monday, i);
+            const dayAttendance = await db.execute(sql`
+              SELECT 
+                COUNT(CASE WHEN type = 'check_in' THEN 1 END) as check_ins,
+                COUNT(CASE WHEN type = 'check_out' THEN 1 END) as check_outs
+              FROM attendance_records 
+              WHERE employee_id = ${employee.id}
+                AND DATE(timestamp AT TIME ZONE 'Europe/Madrid') = ${format(currentDay, 'yyyy-MM-dd')}
+            `);
+
+            const dayData = dayAttendance.rows[0];
+            const hasAttendance = dayData.check_ins > 0;
+            
+            weekDays.push({
+              date: format(currentDay, 'yyyy-MM-dd'),
+              status: hasAttendance ? 'present' : 'absent',
+              actualHours: hasAttendance ? 8 : 0,
+              scheduledHours: 8
+            });
+          }
+
+          return {
+            ...employee,
+            totalAttendance: employee.total_attendance,
+            scheduledHours: employee.scheduled_hours,
+            complianceRate: employee.compliance_rate,
+            weeklyDetails: weekDays
+          };
+        })
+      );
+
+      res.json(employeesWithDetails);
+    } catch (error) {
+      console.error('Error fetching weekly attendance:', error);
+      res.status(500).json({ error: 'Error fetching weekly attendance data' });
+    }
+  });
+
   app.get('/api/admin/risk-assessments/:institutionId', isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;

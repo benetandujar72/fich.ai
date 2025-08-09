@@ -9,6 +9,13 @@ interface WeeklyScheduleModalProps {
   onClose: () => void;
 }
 
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 interface ScheduleEntry {
   dayOfWeek: number;
   startTime: string;
@@ -22,18 +29,18 @@ interface ScheduleEntry {
 export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProps) {
   const { data: user } = useQuery({
     queryKey: ['/api/users', userId],
-  });
+  }) as { data: User | undefined };
 
   const { data: schedule = [], isLoading } = useQuery({
     queryKey: ['/api/admin/users', userId, 'schedule'],
-  });
+  }) as { data: ScheduleEntry[]; isLoading: boolean };
 
   const dayNames = [
     'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'
   ];
 
   const getScheduleForDay = (dayIndex: number): ScheduleEntry | null => {
-    return schedule.find((entry: ScheduleEntry) => entry.dayOfWeek === dayIndex + 1) || null;
+    return schedule.find((entry) => entry.dayOfWeek === dayIndex + 1) || null;
   };
 
   const formatTime = (time: string) => {
@@ -41,7 +48,7 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
   };
 
   const calculateTotalHours = () => {
-    return schedule.reduce((total: number, entry: ScheduleEntry) => {
+    return schedule.reduce((total, entry) => {
       const start = new Date(`2024-01-01T${entry.startTime}`);
       const end = new Date(`2024-01-01T${entry.endTime}`);
       const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);

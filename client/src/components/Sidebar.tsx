@@ -111,6 +111,12 @@ export default function Sidebar() {
       icon: UserCheck,
       show: true,
     },
+    {
+      name: language === "ca" ? "Administració" : "Administración",
+      href: "/admin",
+      icon: Settings,
+      show: user?.role === 'admin' || user?.role === 'superadmin',
+    },
   ].filter(item => item.show);
 
   const handleLogout = async () => {

@@ -144,7 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             'medium' as priority,
             'completed' as status
           FROM attendance_records a
-          LEFT JOIN users u ON a.user_id = u.id
+          LEFT JOIN users u ON a.employee_id = u.id
           WHERE u.institution_id = ${institutionId}
           ORDER BY a.timestamp DESC
           LIMIT ${Math.floor(limit/2)}
@@ -588,6 +588,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching users by institution:", error);
       res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Admin overview endpoint
+  app.get('/api/admin/overview/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const employeesResult = await db.execute(sql`
+        SELECT COUNT(*) as total_employees
+        FROM users WHERE institution_id = ${institutionId} AND role = 'employee'
+      `);
+
+      const alertsResult = await db.execute(sql`
+        SELECT COUNT(*) as pending_alerts  
+        FROM alert_notifications WHERE institution_id = ${institutionId} AND email_sent = false
+      `);
+
+      const communicationsResult = await db.execute(sql`
+        SELECT COUNT(*) as total_communications
+        FROM communications WHERE institution_id = ${institutionId} AND deleted_by_user_at IS NULL
+      `);
+
+      res.json({
+        totalEmployees: Number(employeesResult.rows[0]?.total_employees) || 0,
+        pendingAlerts: Number(alertsResult.rows[0]?.pending_alerts) || 0,
+        totalCommunications: Number(communicationsResult.rows[0]?.total_communications) || 0,
+        privacyRequests: 2 // Placeholder
+      });
+    } catch (error) {
+      console.error("Error fetching admin overview:", error);
+      res.status(500).json({ message: "Failed to fetch admin overview" });
+    }
+  });
+
+  // Admin employees endpoint
+  app.get('/api/admin/employees/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          u.id,
+          u.first_name as "firstName",
+          u.last_name as "lastName", 
+          u.email,
+          u.role,
+          u.created_at as "createdAt",
+          MAX(a.timestamp) as "lastAttendance",
+          COALESCE(
+            EXTRACT(EPOCH FROM (
+              MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
+              MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
+            ))/3600, 
+            0
+          ) as "totalHours"
+        FROM users u
+        LEFT JOIN attendance_records a ON u.id = a.employee_id 
+          AND a.timestamp >= date_trunc('week', CURRENT_DATE)
+        WHERE u.institution_id = ${institutionId}
+        GROUP BY u.id, u.first_name, u.last_name, u.email, u.role, u.created_at
+        ORDER BY u.created_at DESC
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching admin employees:", error);
+      res.status(500).json({ message: "Failed to fetch employees" });
+    }
+  });
+
+  // Admin alerts endpoint  
+  app.get('/api/admin/alerts/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          a.id,
+          a.type,
+          a.subject,
+          a.content,
+          a.employee_id as "employeeId",
+          u.first_name || ' ' || COALESCE(u.last_name, '') as "employeeName",
+          a.sent_at as "sentAt",
+          a.email_sent as "emailSent",
+          a.delay_minutes as "delayMinutes",
+          a.accumulated_minutes as "accumulatedMinutes"
+        FROM alert_notifications a
+        LEFT JOIN users u ON a.employee_id = u.id
+        WHERE a.institution_id = ${institutionId}
+        ORDER BY a.sent_at DESC
+        LIMIT 100
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching admin alerts:", error);
+      res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
+  // Admin communications endpoint
+  app.get('/api/admin/communications/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          c.id,
+          c.sender_id as "senderId",
+          s.first_name || ' ' || COALESCE(s.last_name, '') as "senderName",
+          c.recipient_id as "recipientId", 
+          r.first_name || ' ' || COALESCE(r.last_name, '') as "recipientName",
+          c.message_type as "messageType",
+          c.subject,
+          c.message,
+          c.status,
+          c.priority,
+          c.created_at as "createdAt",
+          c.read_at as "readAt",
+          c.email_sent as "emailSent"
+        FROM communications c
+        LEFT JOIN users s ON c.sender_id = s.id
+        LEFT JOIN users r ON c.recipient_id = r.id
+        WHERE c.institution_id = ${institutionId} AND c.deleted_by_user_at IS NULL
+        ORDER BY c.created_at DESC
+        LIMIT 100
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching admin communications:", error);
+      res.status(500).json({ message: "Failed to fetch communications" });
     }
   });
 

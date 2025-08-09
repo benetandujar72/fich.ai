@@ -318,7 +318,8 @@ export const messageTypeEnum = pgEnum("message_type", [
   "alert",          // Alertas automáticas del sistema
   "notification",   // Notificaciones oficiales
   "communication",  // Comunicaciones entre usuarios
-  "announcement"    // Comunicados generales
+  "announcement",   // Comunicados generales
+  "privacy_policy"  // Comunicaciones política de privacidad
 ]);
 
 // Communication message status
@@ -339,7 +340,7 @@ export const communications = pgTable("communications", {
   recipientId: varchar("recipient_id").notNull(), // Usuario que recibe
   messageType: messageTypeEnum("message_type").notNull().default("communication"),
   subject: varchar("subject").notNull(),
-  content: text("content").notNull(),
+  message: text("message").notNull(),
   status: messageStatusEnum("status").notNull().default("sent"),
   priority: varchar("priority").notNull().default("normal"), // low, normal, high, urgent
   
@@ -401,6 +402,74 @@ export const messageTemplates = pgTable("message_templates", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Employee import templates and logs
+export const employeeImportLogs = pgTable("employee_import_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  importedBy: varchar("imported_by").notNull(), // Admin user ID
+  fileName: varchar("file_name").notNull(),
+  totalRecords: integer("total_records").notNull(),
+  successfulImports: integer("successful_imports").default(0),
+  failedImports: integer("failed_imports").default(0),
+  errors: jsonb("errors"), // Array of error objects
+  status: varchar("status").notNull().default("processing"), // processing, completed, failed
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+// Admin alert configurations
+export const adminAlertConfigs = pgTable("admin_alert_configs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  alertType: varchar("alert_type").notNull(), // manual, scheduled, threshold
+  recipients: text("recipients").array().notNull(), // Array of user IDs or 'all'
+  subject: varchar("subject").notNull(),
+  messageTemplate: text("message_template").notNull(),
+  scheduleSettings: jsonb("schedule_settings"), // For scheduled alerts
+  thresholdSettings: jsonb("threshold_settings"), // For threshold-based alerts
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Privacy policy requests tracking
+export const privacyRequests = pgTable("privacy_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  userId: varchar("user_id").notNull(), // Usuario que hace la solicitud
+  requestType: varchar("request_type").notNull(), // access, rectification, deletion, portability
+  description: text("description"),
+  status: varchar("status").notNull().default("initiated"), // initiated, in_progress, resolved, rejected
+  adminResponse: text("admin_response"),
+  assignedTo: varchar("assigned_to"), // Admin user ID
+  dueDate: timestamp("due_date"), // GDPR compliance deadlines
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Weekly schedule templates for users (for the popup view)
+export const userScheduleTemplates = pgTable("user_schedule_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  institutionId: varchar("institution_id").notNull(),
+  dayOfWeek: integer("day_of_week").notNull(), // 1=Monday, 7=Sunday
+  startTime: varchar("start_time").notNull(), // HH:MM format
+  endTime: varchar("end_time").notNull(), // HH:MM format
+  breakStart: varchar("break_start"), // Optional break time
+  breakEnd: varchar("break_end"), // Optional break time
+  location: varchar("location"),
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  uniqueUserDay: unique().on(table.userId, table.dayOfWeek),
+}));
 
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({

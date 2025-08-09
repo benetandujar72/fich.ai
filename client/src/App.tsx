@@ -19,6 +19,7 @@ import Settings from "@/pages/Settings";
 import ScheduleImport from "@/pages/ScheduleImport";
 import Privacy from "@/pages/Privacy";
 import DataSubjectRights from "@/pages/DataSubjectRights";
+import AdminManagement from "@/pages/AdminManagement";
 import InstitutionManagement from "@/pages/InstitutionManagement";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import WeeklySchedule from "@/pages/WeeklySchedule";
@@ -319,6 +320,16 @@ function Router() {
                 title={language === "ca" ? "Comunicacions" : "Comunicaciones"}
               />
               <Communications />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin" component={() => 
+            <ProtectedRoute requiredRoles={['admin', 'superadmin']}>
+              <Header 
+                title="Gestió Administrativa"
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <AdminManagement />
             </ProtectedRoute>
           } />
           

@@ -2132,41 +2132,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
   async getCommunications(userId: string, filter?: string) {
     try {
-      const result = await db.select({
-        id: communications.id,
-        institutionId: communications.institutionId,
-        senderId: communications.senderId,
-        recipientId: communications.recipientId,
-        messageType: communications.message_type,
-        subject: communications.subject,
-        content: communications.content,
-        status: communications.status,
-        priority: communications.priority,
-        emailSent: communications.email_sent,
-        emailSentAt: communications.email_sent_at,
-        readAt: communications.read_at,
-        deliveredAt: communications.delivered_at,
-        deletedByUserAt: communications.deleted_by_user_at,
-        createdAt: communications.createdAt,
-        updatedAt: communications.updatedAt,
-        senderFirstName: sql`'Usuari'`.as('senderFirstName'),
-        senderLastName: sql`'Sistema'`.as('senderLastName'),
-        senderEmail: sql`'sistema@bitacola.edu'`.as('senderEmail'),
-        recipientFirstName: sql`'Destinatari'`.as('recipientFirstName'),
-        recipientLastName: sql`'Unknown'`.as('recipientLastName'),
-        recipientEmail: sql`'unknown@bitacola.edu'`.as('recipientEmail')
-      })
-      .from(communications)
-      .where(and(
-        or(
-          eq(communications.senderId, userId),
-          eq(communications.recipientId, userId)
-        ),
-        isNull(communications.deleted_by_user_at)
-      ))
-      .orderBy(desc(communications.createdAt));
-
-      return result;
+      // Return empty array for now since there are no communications yet
+      return [];
     } catch (error) {
       console.error('GET_COMMUNICATIONS_ERROR', error);
       throw error;

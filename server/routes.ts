@@ -6,7 +6,8 @@ import {
   insertEmployeeSchema,
   insertAttendanceRecordSchema,
   insertAbsenceSchema,
-  insertSettingSchema 
+  insertSettingSchema,
+  insertCommunicationSchema 
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1537,6 +1538,197 @@ Total Absences This Month,${overview.totalAbsencesThisMonth}`;
     } catch (error) {
       console.error("Error exporting CSV:", error);
       res.status(500).json({ message: "Failed to export CSV" });
+    }
+  });
+
+  // Users by institution route for communications
+  app.get('/api/users/institution/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const users = await storage.getUsersByInstitution(institutionId);
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users by institution:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Communications routes
+  app.get('/api/communications/:userId/all', isAuthenticated, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { filter } = req.query;
+      const communications = await storage.getCommunications(userId, filter as string);
+      res.json(communications);
+    } catch (error) {
+      console.error("Error fetching communications:", error);
+      res.status(500).json({ message: "Failed to fetch communications" });
+    }
+  });
+
+  app.get('/api/communications/:userId/:communicationId', isAuthenticated, async (req, res) => {
+    try {
+      const { userId, communicationId } = req.params;
+      const communication = await storage.getCommunicationById(communicationId, userId);
+      
+      if (!communication) {
+        return res.status(404).json({ message: "Communication not found" });
+      }
+
+      res.json(communication);
+    } catch (error) {
+      console.error("Error fetching communication:", error);
+      res.status(500).json({ message: "Failed to fetch communication" });
+    }
+  });
+
+  app.post('/api/communications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.institutionId) {
+        return res.status(400).json({ message: "User institution not found" });
+      }
+
+      // Validate communication data
+      const validatedData = insertCommunicationSchema.parse({
+        ...req.body,
+        institutionId: user.institutionId,
+        senderId: userId,
+        senderIpAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
+      const communication = await storage.createCommunication(validatedData);
+
+      // Send email notification if recipient has email and email is enabled
+      if (communication.recipientId && validatedData.emailSent !== false) {
+        const recipient = await storage.getUser(communication.recipientId);
+        if (recipient?.email) {
+          const { sendGridService } = await import('./sendgridService');
+          const emailSent = await sendGridService.sendCommunicationEmail(
+            recipient.email,
+            user.email || '',
+            `${user.firstName} ${user.lastName}`,
+            communication.subject,
+            communication.content,
+            communication.id
+          );
+
+          if (emailSent) {
+            await storage.updateCommunication(communication.id, {
+              emailSent: true,
+              emailSentAt: new Date()
+            });
+          }
+        }
+      }
+
+      res.json(communication);
+    } catch (error) {
+      console.error("Error creating communication:", error);
+      res.status(500).json({ message: "Failed to create communication" });
+    }
+  });
+
+  app.patch('/api/communications/:communicationId/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const { communicationId } = req.params;
+      const userId = req.user.id;
+      
+      const communication = await storage.markCommunicationAsRead(communicationId, userId);
+      res.json(communication);
+    } catch (error) {
+      console.error("Error marking communication as read:", error);
+      res.status(500).json({ message: "Failed to mark communication as read" });
+    }
+  });
+
+  app.delete('/api/communications/:communicationId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { communicationId } = req.params;
+      const userId = req.user.id;
+      
+      const communication = await storage.deleteCommunication(communicationId, userId);
+      res.json(communication);
+    } catch (error) {
+      console.error("Error deleting communication:", error);
+      res.status(500).json({ message: "Failed to delete communication" });
+    }
+  });
+
+  app.get('/api/communications/:communicationId/attachments', isAuthenticated, async (req, res) => {
+    try {
+      const { communicationId } = req.params;
+      const attachments = await storage.getCommunicationAttachments(communicationId);
+      res.json(attachments);
+    } catch (error) {
+      console.error("Error fetching communication attachments:", error);
+      res.status(500).json({ message: "Failed to fetch attachments" });
+    }
+  });
+
+  // Object storage routes for communication attachments
+  app.post('/api/communications/upload', isAuthenticated, async (req, res) => {
+    try {
+      const { ObjectStorageService } = await import('./objectStorage');
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  app.post('/api/communications/:communicationId/attachments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { communicationId } = req.params;
+      const userId = req.user.id;
+      const { fileName, originalFileName, fileSize, mimeType, objectPath } = req.body;
+
+      const attachment = await storage.addCommunicationAttachment({
+        communicationId,
+        fileName,
+        originalFileName,
+        fileSize,
+        mimeType,
+        objectPath,
+        uploadedBy: userId,
+      });
+
+      res.json(attachment);
+    } catch (error) {
+      console.error("Error adding communication attachment:", error);
+      res.status(500).json({ message: "Failed to add attachment" });
+    }
+  });
+
+  app.get('/objects/:objectPath(*)', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { ObjectStorageService } = await import('./objectStorage');
+      const objectStorageService = new ObjectStorageService();
+      
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+      });
+      
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error accessing object:", error);
+      const { ObjectNotFoundError } = await import('./objectStorage');
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 

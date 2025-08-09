@@ -168,22 +168,7 @@ export const schedules = pgTable("schedules", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Communications table for teacher-admin messaging
-export const communications = pgTable("communications", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  institutionId: varchar("institution_id").notNull(),
-  senderId: varchar("sender_id").notNull(), // User ID
-  recipientId: varchar("recipient_id"), // User ID (null for broadcast)
-  employeeId: varchar("employee_id"), // Employee ID if related to specific employee
-  subject: varchar("subject").notNull(),
-  message: text("message").notNull(),
-  type: varchar("type").notNull().default("message"), // message, alert, notification
-  priority: varchar("priority").notNull().default("normal"), // low, normal, high, urgent
-  status: varchar("status").notNull().default("unread"), // unread, read, archived
-  readAt: timestamp("read_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// Communications table removed - using newer definition below
 
 // Weekly schedule view for employees (derived from Untis sessions)
 export const weeklySchedule = pgTable("weekly_schedule", {
@@ -327,6 +312,95 @@ export const attendanceNetworkSettings = pgTable("attendance_network_settings", 
 }, (table) => ({
   uniqueInstitution: unique().on(table.institutionId),
 }));
+
+// Communication message types
+export const messageTypeEnum = pgEnum("message_type", [
+  "alert",          // Alertas automáticas del sistema
+  "notification",   // Notificaciones oficiales
+  "communication",  // Comunicaciones entre usuarios
+  "announcement"    // Comunicados generales
+]);
+
+// Communication message status
+export const messageStatusEnum = pgEnum("message_status", [
+  "draft",          // Borrador
+  "sent",           // Enviado
+  "delivered",      // Entregado
+  "read",           // Leído
+  "deleted_by_user", // Eliminado por usuario (soft delete)
+  "failed"          // Falló el envío
+]);
+
+// Main communications table
+export const communications = pgTable("communications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  senderId: varchar("sender_id").notNull(), // Usuario que envía
+  recipientId: varchar("recipient_id").notNull(), // Usuario que recibe
+  messageType: messageTypeEnum("message_type").notNull().default("communication"),
+  subject: varchar("subject").notNull(),
+  content: text("content").notNull(),
+  status: messageStatusEnum("status").notNull().default("sent"),
+  priority: varchar("priority").notNull().default("normal"), // low, normal, high, urgent
+  
+  // Email integration
+  emailSent: boolean("email_sent").default(false),
+  emailSentAt: timestamp("email_sent_at"),
+  
+  // Tracking
+  readAt: timestamp("read_at"),
+  deliveredAt: timestamp("delivered_at"),
+  deletedByUserAt: timestamp("deleted_by_user_at"),
+  
+  // Metadata for forensic tracking
+  senderIpAddress: varchar("sender_ip_address"),
+  userAgent: text("user_agent"),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Communication attachments (PDFs, justificantes, etc.)
+export const communicationAttachments = pgTable("communication_attachments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communicationId: varchar("communication_id").notNull(),
+  fileName: varchar("file_name").notNull(),
+  originalFileName: varchar("original_file_name").notNull(),
+  fileSize: integer("file_size").notNull(), // en bytes
+  mimeType: varchar("mime_type").notNull(),
+  objectPath: varchar("object_path").notNull(), // Path en object storage
+  uploadedBy: varchar("uploaded_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Audit log for forensic tracking of all communication actions
+export const communicationAuditLog = pgTable("communication_audit_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communicationId: varchar("communication_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  action: varchar("action").notNull(), // created, sent, read, deleted, attempted_modification
+  oldValues: jsonb("old_values"), // Valores anteriores para cambios
+  newValues: jsonb("new_values"), // Valores nuevos para cambios
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  metadata: jsonb("metadata"), // Información adicional para auditoría
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Message templates for automated communications
+export const messageTemplates = pgTable("message_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  name: varchar("name").notNull(),
+  messageType: messageTypeEnum("message_type").notNull(),
+  subject: varchar("subject").notNull(),
+  content: text("content").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -503,6 +577,59 @@ export const attendanceNetworkSettingsRelations = relations(attendanceNetworkSet
   }),
 }));
 
+// Communications relations
+export const communicationsRelations = relations(communications, ({ one, many }) => ({
+  institution: one(institutions, {
+    fields: [communications.institutionId],
+    references: [institutions.id],
+  }),
+  sender: one(users, {
+    fields: [communications.senderId],
+    references: [users.id],
+    relationName: "sentMessages",
+  }),
+  recipient: one(users, {
+    fields: [communications.recipientId],
+    references: [users.id],
+    relationName: "receivedMessages",
+  }),
+  attachments: many(communicationAttachments),
+  auditLogs: many(communicationAuditLog),
+}));
+
+export const communicationAttachmentsRelations = relations(communicationAttachments, ({ one }) => ({
+  communication: one(communications, {
+    fields: [communicationAttachments.communicationId],
+    references: [communications.id],
+  }),
+  uploadedByUser: one(users, {
+    fields: [communicationAttachments.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+export const communicationAuditLogRelations = relations(communicationAuditLog, ({ one }) => ({
+  communication: one(communications, {
+    fields: [communicationAuditLog.communicationId],
+    references: [communications.id],
+  }),
+  user: one(users, {
+    fields: [communicationAuditLog.userId],
+    references: [users.id],
+  }),
+}));
+
+export const messageTemplatesRelations = relations(messageTemplates, ({ one }) => ({
+  institution: one(institutions, {
+    fields: [messageTemplates.institutionId],
+    references: [institutions.id],
+  }),
+  createdByUser: one(users, {
+    fields: [messageTemplates.createdBy],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertInstitutionSchema = createInsertSchema(institutions).omit({
   id: true,
@@ -601,6 +728,22 @@ export const insertCommunicationSchema = createInsertSchema(communications).omit
   updatedAt: true,
 });
 
+export const insertCommunicationAttachmentSchema = createInsertSchema(communicationAttachments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCommunicationAuditLogSchema = createInsertSchema(communicationAuditLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMessageTemplateSchema = createInsertSchema(messageTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertWeeklyScheduleSchema = createInsertSchema(weeklySchedule).omit({
   id: true,
   createdAt: true,
@@ -648,6 +791,12 @@ export type InsertAlertNotification = z.infer<typeof insertAlertNotificationSche
 
 export type Communication = typeof communications.$inferSelect;
 export type InsertCommunication = z.infer<typeof insertCommunicationSchema>;
+export type CommunicationAttachment = typeof communicationAttachments.$inferSelect;
+export type InsertCommunicationAttachment = z.infer<typeof insertCommunicationAttachmentSchema>;
+export type CommunicationAuditLog = typeof communicationAuditLog.$inferSelect;
+export type InsertCommunicationAuditLog = z.infer<typeof insertCommunicationAuditLogSchema>;
+export type MessageTemplate = typeof messageTemplates.$inferSelect;
+export type InsertMessageTemplate = z.infer<typeof insertMessageTemplateSchema>;
 
 export type WeeklySchedule = typeof weeklySchedule.$inferSelect;
 export type InsertWeeklySchedule = z.infer<typeof insertWeeklyScheduleSchema>;

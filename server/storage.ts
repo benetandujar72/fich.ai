@@ -18,6 +18,11 @@ import {
   classGroups,
   classrooms,
   untisScheduleSessions,
+  communications,
+  communicationAttachments,
+  communicationAuditLog,
+  messageTemplates,
+  weeklySchedule,
   type User,
   type UpsertUser,
   type Institution,
@@ -54,16 +59,21 @@ import {
   type InsertClassroom,
   type UntisScheduleSession,
   type InsertUntisScheduleSession,
-  communications,
   type Communication,
   type InsertCommunication,
-  weeklySchedule,
+  type CommunicationAttachment,
+  type InsertCommunicationAttachment,
+  type CommunicationAuditLog,
+  type InsertCommunicationAuditLog,
+  type MessageTemplate,
+  type InsertMessageTemplate,
   type WeeklySchedule,
   type InsertWeeklySchedule,
 } from "@shared/schema";
 import { logger } from './logger';
 import { db } from "./db";
 import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { format } from "date-fns";
 
 export interface IStorage {
@@ -1867,99 +1877,60 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
   // Communications methods
   async getCommunications(userId: string, filter?: string) {
     try {
-      let query = db.select({
+      const baseSelect = {
         id: communications.id,
+        institutionId: communications.institutionId,
         senderId: communications.senderId,
         recipientId: communications.recipientId,
+        messageType: communications.messageType,
         subject: communications.subject,
-        message: communications.message,
-        type: communications.type,
-        priority: communications.priority,
+        content: communications.content,
         status: communications.status,
+        priority: communications.priority,
+        emailSent: communications.emailSent,
+        emailSentAt: communications.emailSentAt,
         readAt: communications.readAt,
+        deliveredAt: communications.deliveredAt,
+        deletedByUserAt: communications.deletedByUserAt,
         createdAt: communications.createdAt,
+        updatedAt: communications.updatedAt,
         sender: {
           firstName: users.firstName,
           lastName: users.lastName,
           email: users.email
         }
-      })
-      .from(communications)
-      .leftJoin(users, eq(communications.senderId, users.id));
+      };
 
-      // Apply filters by rebuilding the query with proper where clauses
+      let whereCondition;
+      
       if (filter === 'unread') {
-        query = db.select({
-          id: communications.id,
-          senderId: communications.senderId,
-          recipientId: communications.recipientId,
-          subject: communications.subject,
-          message: communications.message,
-          type: communications.type,
-          priority: communications.priority,
-          status: communications.status,
-          readAt: communications.readAt,
-          createdAt: communications.createdAt,
-          sender: {
-            firstName: users.firstName,
-            lastName: users.lastName,
-            email: users.email
-          }
-        })
-        .from(communications)
-        .leftJoin(users, eq(communications.senderId, users.id))
-        .where(and(
+        whereCondition = and(
           eq(communications.recipientId, userId),
-          eq(communications.status, 'unread')
-        ));
+          eq(communications.status, 'sent'),
+          isNull(communications.readAt),
+          isNull(communications.deletedByUserAt)
+        );
       } else if (filter === 'sent') {
-        query = db.select({
-          id: communications.id,
-          senderId: communications.senderId,
-          recipientId: communications.recipientId,
-          subject: communications.subject,
-          message: communications.message,
-          type: communications.type,
-          priority: communications.priority,
-          status: communications.status,
-          readAt: communications.readAt,
-          createdAt: communications.createdAt,
-          sender: {
-            firstName: users.firstName,
-            lastName: users.lastName,
-            email: users.email
-          }
-        })
-        .from(communications)
-        .leftJoin(users, eq(communications.senderId, users.id))
-        .where(eq(communications.senderId, userId));
-      } else {
-        query = db.select({
-          id: communications.id,
-          senderId: communications.senderId,
-          recipientId: communications.recipientId,
-          subject: communications.subject,
-          message: communications.message,
-          type: communications.type,
-          priority: communications.priority,
-          status: communications.status,
-          readAt: communications.readAt,
-          createdAt: communications.createdAt,
-          sender: {
-            firstName: users.firstName,
-            lastName: users.lastName,
-            email: users.email
-          }
-        })
-        .from(communications)
-        .leftJoin(users, eq(communications.senderId, users.id))
-        .where(or(
+        whereCondition = and(
           eq(communications.senderId, userId),
-          eq(communications.recipientId, userId)
-        ));
+          isNull(communications.deletedByUserAt)
+        );
+      } else {
+        whereCondition = and(
+          or(
+            eq(communications.senderId, userId),
+            eq(communications.recipientId, userId)
+          ),
+          isNull(communications.deletedByUserAt)
+        );
       }
 
-      const results = await query.orderBy(desc(communications.createdAt));
+      const results = await db.select(baseSelect)
+        .from(communications)
+        .leftJoin(users, eq(communications.senderId, users.id))
+        .where(whereCondition)
+        .orderBy(desc(communications.createdAt));
+        
       return results;
     } catch (error) {
       console.error('GET_COMMUNICATIONS_ERROR', error);
@@ -1967,11 +1938,33 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     }
   }
 
-  async createCommunication(communicationData: any) {
+  async createCommunication(communicationData: InsertCommunication) {
     try {
+      // Add audit trail for forensic tracking
+      const auditData: InsertCommunicationAuditLog = {
+        communicationId: '', // Will be set after communication is created
+        userId: communicationData.senderId,
+        action: 'created',
+        newValues: communicationData,
+        ipAddress: communicationData.senderIpAddress,
+        userAgent: communicationData.userAgent,
+        metadata: { timestamp: new Date().toISOString() }
+      };
+
       const [communication] = await db.insert(communications)
-        .values(communicationData)
+        .values({
+          ...communicationData,
+          deliveredAt: new Date(), // Mark as delivered immediately for internal messages
+        })
         .returning();
+
+      // Insert audit log
+      await db.insert(communicationAuditLog)
+        .values({
+          ...auditData,
+          communicationId: communication.id,
+        });
+
       return communication;
     } catch (error) {
       console.error('CREATE_COMMUNICATION_ERROR', error);
@@ -1981,19 +1974,211 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
   async markCommunicationAsRead(communicationId: string, userId: string) {
     try {
+      const readTime = new Date();
       const [communication] = await db.update(communications)
         .set({
           status: 'read',
-          readAt: new Date()
+          readAt: readTime
         })
         .where(and(
           eq(communications.id, communicationId),
           eq(communications.recipientId, userId)
         ))
         .returning();
+
+      // Add audit trail
+      if (communication) {
+        await db.insert(communicationAuditLog)
+          .values({
+            communicationId: communication.id,
+            userId: userId,
+            action: 'read',
+            metadata: { readAt: readTime.toISOString() }
+          });
+      }
+
       return communication;
     } catch (error) {
       console.error('MARK_COMMUNICATION_READ_ERROR', error);
+      throw error;
+    }
+  }
+
+  async deleteCommunication(communicationId: string, userId: string) {
+    try {
+      const deleteTime = new Date();
+      const [communication] = await db.update(communications)
+        .set({
+          deletedByUserAt: deleteTime
+        })
+        .where(and(
+          eq(communications.id, communicationId),
+          or(
+            eq(communications.senderId, userId),
+            eq(communications.recipientId, userId)
+          )
+        ))
+        .returning();
+
+      // Add audit trail
+      if (communication) {
+        await db.insert(communicationAuditLog)
+          .values({
+            communicationId: communication.id,
+            userId: userId,
+            action: 'deleted',
+            metadata: { deletedAt: deleteTime.toISOString() }
+          });
+      }
+
+      return communication;
+    } catch (error) {
+      console.error('DELETE_COMMUNICATION_ERROR', error);
+      throw error;
+    }
+  }
+
+  async getCommunicationById(communicationId: string, userId: string) {
+    try {
+      const [communication] = await db.select({
+        id: communications.id,
+        institutionId: communications.institutionId,
+        senderId: communications.senderId,
+        recipientId: communications.recipientId,
+        messageType: communications.messageType,
+        subject: communications.subject,
+        content: communications.content,
+        status: communications.status,
+        priority: communications.priority,
+        emailSent: communications.emailSent,
+        emailSentAt: communications.emailSentAt,
+        readAt: communications.readAt,
+        deliveredAt: communications.deliveredAt,
+        deletedByUserAt: communications.deletedByUserAt,
+        createdAt: communications.createdAt,
+        updatedAt: communications.updatedAt,
+        sender: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email
+        },
+        recipient: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email
+        }
+      })
+      .from(communications)
+      .leftJoin(users, eq(communications.senderId, users.id))
+      .leftJoin(users, eq(communications.recipientId, users.id))
+      .where(and(
+        eq(communications.id, communicationId),
+        or(
+          eq(communications.senderId, userId),
+          eq(communications.recipientId, userId)
+        ),
+        isNull(communications.deletedByUserAt)
+      ));
+
+      return communication;
+    } catch (error) {
+      console.error('GET_COMMUNICATION_BY_ID_ERROR', error);
+      throw error;
+    }
+  }
+
+  async getCommunicationAttachments(communicationId: string) {
+    try {
+      const attachments = await db.select()
+        .from(communicationAttachments)
+        .where(eq(communicationAttachments.communicationId, communicationId));
+
+      return attachments;
+    } catch (error) {
+      console.error('GET_COMMUNICATION_ATTACHMENTS_ERROR', error);
+      throw error;
+    }
+  }
+
+  async addCommunicationAttachment(attachmentData: InsertCommunicationAttachment) {
+    try {
+      const [attachment] = await db.insert(communicationAttachments)
+        .values(attachmentData)
+        .returning();
+
+      return attachment;
+    } catch (error) {
+      console.error('ADD_COMMUNICATION_ATTACHMENT_ERROR', error);
+      throw error;
+    }
+  }
+
+  async updateCommunication(communicationId: string, updateData: Partial<InsertCommunication>) {
+    try {
+      const [communication] = await db.update(communications)
+        .set({
+          ...updateData,
+          updatedAt: new Date()
+        })
+        .where(eq(communications.id, communicationId))
+        .returning();
+
+      return communication;
+    } catch (error) {
+      console.error('UPDATE_COMMUNICATION_ERROR', error);
+      throw error;
+    }
+  }
+
+  async getCommunications(userId: string, filter?: string) {
+    try {
+      const senderUser = alias(users, 'senderUser');
+      const recipientUser = alias(users, 'recipientUser');
+
+      let query = db.select({
+        id: communications.id,
+        institutionId: communications.institutionId,
+        senderId: communications.senderId,
+        recipientId: communications.recipientId,
+        messageType: communications.messageType,
+        subject: communications.subject,
+        content: communications.content,
+        status: communications.status,
+        priority: communications.priority,
+        emailSent: communications.emailSent,
+        emailSentAt: communications.emailSentAt,
+        readAt: communications.readAt,
+        deliveredAt: communications.deliveredAt,
+        deletedByUserAt: communications.deletedByUserAt,
+        createdAt: communications.createdAt,
+        updatedAt: communications.updatedAt,
+        sender: {
+          firstName: senderUser.firstName,
+          lastName: senderUser.lastName,
+          email: senderUser.email
+        },
+        recipient: {
+          firstName: recipientUser.firstName,
+          lastName: recipientUser.lastName,
+          email: recipientUser.email
+        }
+      })
+      .from(communications)
+      .leftJoin(senderUser, eq(communications.senderId, senderUser.id))
+      .leftJoin(recipientUser, eq(communications.recipientId, recipientUser.id))
+      .where(and(
+        or(
+          eq(communications.senderId, userId),
+          eq(communications.recipientId, userId)
+        ),
+        isNull(communications.deletedByUserAt)
+      ))
+      .orderBy(desc(communications.createdAt));
+
+      const result = await query;
+      return result;
+    } catch (error) {
+      console.error('GET_COMMUNICATIONS_ERROR', error);
       throw error;
     }
   }

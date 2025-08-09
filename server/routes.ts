@@ -745,6 +745,239 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Risk Assessment endpoints (CONFIG-009)
+  app.get('/api/admin/risk-assessments/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          ra.id,
+          ra.employee_id as "employeeId",
+          u.first_name || ' ' || COALESCE(u.last_name, '') as "employeeName",
+          u.email as "employeeEmail",
+          ra.risk_level as "riskLevel",
+          ra.delay_minutes as "delayMinutes",
+          ra.absence_days as "absenceDays",
+          ra.last_calculated as "lastCalculated",
+          ra.notes
+        FROM risk_assessments ra
+        LEFT JOIN users u ON ra.employee_id = u.id
+        WHERE ra.institution_id = ${institutionId}
+        ORDER BY 
+          CASE ra.risk_level 
+            WHEN 'critical' THEN 1 
+            WHEN 'high' THEN 2 
+            WHEN 'medium' THEN 3 
+            WHEN 'low' THEN 4 
+          END,
+          ra.delay_minutes DESC
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching risk assessments:", error);
+      res.status(500).json({ message: "Failed to fetch risk assessments" });
+    }
+  });
+
+  app.post('/api/admin/send-notification', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId, message } = req.body;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // Create communication record
+      await db.execute(sql`
+        INSERT INTO communications (
+          institution_id, sender_id, recipient_id, message_type, 
+          subject, message, status, priority
+        ) VALUES (
+          ${req.user.institutionId}, ${req.user.id}, ${employeeId}, 'alert',
+          'Notificació d''assistència', ${message}, 'sent', 'high'
+        )
+      `);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      res.status(500).json({ message: "Failed to send notification" });
+    }
+  });
+
+  // SMTP Configuration endpoints (CONFIG-010)
+  app.get('/api/admin/smtp-config/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          id, host, port, username, is_secure as "isSecure",
+          from_email as "fromEmail", from_name as "fromName", 
+          is_active as "isActive"
+        FROM smtp_configurations 
+        WHERE institution_id = ${institutionId} AND is_active = true
+        LIMIT 1
+      `);
+
+      res.json(result.rows[0] || null);
+    } catch (error) {
+      console.error("Error fetching SMTP config:", error);
+      res.status(500).json({ message: "Failed to fetch SMTP configuration" });
+    }
+  });
+
+  app.post('/api/admin/smtp-config', isAuthenticated, async (req: any, res) => {
+    try {
+      const { host, port, username, password, isSecure, fromEmail, fromName, isActive } = req.body;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // Deactivate existing configs
+      await db.execute(sql`
+        UPDATE smtp_configurations 
+        SET is_active = false 
+        WHERE institution_id = ${req.user.institutionId}
+      `);
+
+      // Insert new config
+      await db.execute(sql`
+        INSERT INTO smtp_configurations (
+          institution_id, host, port, username, password, 
+          is_secure, from_email, from_name, is_active
+        ) VALUES (
+          ${req.user.institutionId}, ${host}, ${port}, ${username}, ${password},
+          ${isSecure}, ${fromEmail}, ${fromName}, ${isActive}
+        )
+      `);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving SMTP config:", error);
+      res.status(500).json({ message: "Failed to save SMTP configuration" });
+    }
+  });
+
+  // Email Templates endpoints
+  app.get('/api/admin/email-templates/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          id, name, subject, content, 
+          template_type as "templateType", is_active as "isActive"
+        FROM email_templates 
+        WHERE institution_id = ${institutionId}
+        ORDER BY name
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching email templates:", error);
+      res.status(500).json({ message: "Failed to fetch email templates" });
+    }
+  });
+
+  app.post('/api/admin/email-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const { name, subject, content, templateType, isActive } = req.body;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      await db.execute(sql`
+        INSERT INTO email_templates (
+          institution_id, name, subject, content, template_type, is_active
+        ) VALUES (
+          ${req.user.institutionId}, ${name}, ${subject}, ${content}, ${templateType}, ${isActive}
+        )
+      `);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving email template:", error);
+      res.status(500).json({ message: "Failed to save email template" });
+    }
+  });
+
+  app.post('/api/admin/test-email', isAuthenticated, async (req: any, res) => {
+    try {
+      const { email } = req.body;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // Here would be the actual email sending logic using the SMTP configuration
+      // For now, we'll just simulate success
+      console.log(`Test email would be sent to: ${email}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({ message: "Failed to send test email" });
+    }
+  });
+
+  // Email Configuration System for CONFIG-001
+  app.post('/api/admin/configure-email-alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const { alertThreshold, emailFrequency, senderEmail, legalTemplate } = req.body;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // Save email alert configuration in settings
+      const settingsToSave = [
+        { key: 'email_alert_threshold', value: alertThreshold?.toString() || '30' },
+        { key: 'email_frequency', value: emailFrequency || 'daily' },
+        { key: 'sender_email', value: senderEmail || '' },
+        { key: 'legal_template', value: legalTemplate || '' }
+      ];
+
+      for (const setting of settingsToSave) {
+        await db.execute(sql`
+          INSERT INTO settings (institution_id, key, value)
+          VALUES (${req.user.institutionId}, ${setting.key}, ${setting.value})
+          ON CONFLICT (institution_id, key) 
+          DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+        `);
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error configuring email alerts:", error);
+      res.status(500).json({ message: "Failed to configure email alerts" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

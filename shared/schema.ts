@@ -251,14 +251,48 @@ export const substituteAssignments = pgTable("substitute_assignments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Settings for alert thresholds and configurations
+// Settings for alert thresholds and configurations - Fixed unique constraint
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   institutionId: varchar("institution_id").notNull(),
   key: varchar("key").notNull(),
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  settingsUniqueInstitutionKey: unique("settings_institution_key_unique").on(table.institutionId, table.key),
+}));
+
+// SMTP Configuration table for CONFIG-010  
+export const smtpConfigurations = pgTable("smtp_configurations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  host: varchar("host").notNull(),
+  port: integer("port").notNull(),
+  username: varchar("username").notNull(),
+  password: varchar("password").notNull(), // Should be encrypted
+  isSecure: boolean("is_secure").notNull().default(true),
+  fromEmail: varchar("from_email").notNull(),
+  fromName: varchar("from_name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Risk Assessment table for CONFIG-009
+export const riskAssessments = pgTable("risk_assessments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").notNull(),
+  institutionId: varchar("institution_id").notNull(),
+  riskLevel: varchar("risk_level").notNull(), // 'low', 'medium', 'high', 'critical'
+  delayMinutes: integer("delay_minutes").notNull().default(0),
+  absenceDays: integer("absence_days").notNull().default(0),
+  lastCalculated: timestamp("last_calculated").notNull().defaultNow(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  riskAssessmentUniqueEmployee: unique("risk_assessment_employee_unique").on(table.employeeId, table.institutionId),
+}));
 
 // Email configuration settings
 export const emailSettings = pgTable("email_settings", {

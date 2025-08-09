@@ -450,3 +450,5 @@ export function PrivacyManagement() {
     </div>
   );
 }
+
+export default PrivacyManagement;

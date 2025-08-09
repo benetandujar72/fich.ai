@@ -401,3 +401,5 @@ export function CommunicationsManagement() {
     </div>
   );
 }
+
+export default CommunicationsManagement;

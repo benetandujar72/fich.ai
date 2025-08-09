@@ -9,11 +9,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 
 // Import individual admin components
-import { StaffManagement } from "@/components/admin/StaffManagement";
-import { AlertsManagement } from "@/components/admin/AlertsManagement";
-import { ReportsManagement } from "@/components/admin/ReportsManagement";
-import { CommunicationsManagement } from "@/components/admin/CommunicationsManagement";
-import { PrivacyManagement } from "@/components/admin/PrivacyManagement";
+import StaffManagement from "@/components/admin/StaffManagement";
+import AlertsManagement from "@/components/admin/AlertsManagement";
+import ReportsManagement from "@/components/admin/ReportsManagement";
+import CommunicationsManagement from "@/components/admin/CommunicationsManagement";
+import PrivacyManagement from "@/components/admin/PrivacyManagement";
+import RiskAssessmentDashboard from "@/components/admin/RiskAssessmentDashboard";
+import EmailConfigurationPanel from "@/components/admin/EmailConfigurationPanel";
 
 export default function AdminManagement() {
   const { user } = useAuth();
@@ -108,7 +110,7 @@ export default function AdminManagement() {
 
       {/* Main Admin Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="staff" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Personal
@@ -128,6 +130,14 @@ export default function AdminManagement() {
           <TabsTrigger value="privacy" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             Privacitat
+          </TabsTrigger>
+          <TabsTrigger value="risk" className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Riscos
+          </TabsTrigger>
+          <TabsTrigger value="email" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Email
           </TabsTrigger>
         </TabsList>
 
@@ -149,6 +159,14 @@ export default function AdminManagement() {
 
         <TabsContent value="privacy" className="space-y-4">
           <PrivacyManagement />
+        </TabsContent>
+
+        <TabsContent value="risk" className="space-y-4">
+          <RiskAssessmentDashboard />
+        </TabsContent>
+
+        <TabsContent value="email" className="space-y-4">
+          <EmailConfigurationPanel />
         </TabsContent>
       </Tabs>
     </div>

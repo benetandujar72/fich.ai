@@ -87,7 +87,7 @@ export default function Communications() {
   const [composeEmailEnabled, setComposeEmailEnabled] = useState(true);
 
   // Fetch communications
-  const { data: communications = [], isLoading } = useQuery({
+  const { data: communicationsResponse = [], isLoading } = useQuery({
     queryKey: ['/api/communications', user?.id, 'all'],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -198,6 +198,9 @@ export default function Communications() {
     }
     setSelectedCommunication(communication);
   };
+
+  // Asegurar que communications siempre sea un array
+  const communications = Array.isArray(communicationsResponse) ? communicationsResponse : [];
 
   const filteredCommunications = communications.filter((comm: Communication) => {
     const matchesSearch = searchTerm === '' || 

@@ -1,0 +1,59 @@
+7:10:22 AM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+7:10:36 AM [express] GET /api/auth/user 304 in 180ms :: {"id":"1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855"…
+7:10:36 AM [express] GET /api/dashboard/recent-activity/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in …
+Fetched 16 attendance records for user 1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855 (employee 27c082f9-fdb8-48b4-88de-c49d9c604c07)
+7:10:36 AM [express] GET /api/attendance/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855 304 in 247ms :: [{"id"…
+7:10:36 AM [express] GET /api/dashboard/stats/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 302ms :: {…
+GET_COMMUNICATIONS_ERROR error: column communications.message_type does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.getCommunications (/home/runner/workspace/server/storage.ts:2178:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:1561:30) {
+  length: 126,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '129',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn'
+}
+Error fetching communications: error: column communications.message_type does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.getCommunications (/home/runner/workspace/server/storage.ts:2178:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:1561:30) {
+  length: 126,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '129',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn'
+}
+7:10:39 AM [express] GET /api/communications/1cfb4d65-e9ca-46e5-906c-3ff6a7ee9855/all 500 in 199ms :…
+7:10:39 AM [express] GET /api/users/institution/5262a4a1-44ec-48e5-b520-102b2dffea43 200 in 192ms ::…

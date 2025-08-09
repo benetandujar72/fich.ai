@@ -11,19 +11,19 @@ export default function LanguageSwitcher() {
           variant={language === "ca" ? "default" : "ghost"}
           size="sm"
           onClick={() => setLanguage("ca")}
-          className="rounded-none border-r"
+          className="rounded-none border-r font-semibold"
           data-testid="language-ca"
         >
-          🏴󠁥󠁳󠁣󠁴󠁿
+          CA
         </Button>
         <Button
           variant={language === "es" ? "default" : "ghost"}
           size="sm"
           onClick={() => setLanguage("es")}
-          className="rounded-none"
+          className="rounded-none font-semibold"
           data-testid="language-es"
         >
-          🇪🇸
+          ES
         </Button>
       </div>
     </div>

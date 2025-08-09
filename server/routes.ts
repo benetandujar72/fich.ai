@@ -111,10 +111,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             a.id,
             'attendance' as type,
             CASE 
-              WHEN a.action = 'check_in' THEN 'check-in'
+              WHEN a.type = 'check_in' THEN 'check-in'
               ELSE 'check-out'
             END as action,
-            'Fitxatge ' || CASE WHEN a.action = 'check_in' THEN 'entrada' ELSE 'sortida' END as title,
+            'Fitxatge ' || CASE WHEN a.type = 'check_in' THEN 'entrada' ELSE 'sortida' END as title,
             'Registrat a les ' || TO_CHAR(a.timestamp AT TIME ZONE 'Europe/Madrid', 'HH24:MI') as description,
             a.timestamp,
             COALESCE(u.first_name, '') || ' ' || COALESCE(u.last_name, '') as "relatedUserName",
@@ -122,8 +122,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             'medium' as priority,
             'completed' as status
           FROM attendance_records a
-          LEFT JOIN users u ON a.user_id = u.id
-          WHERE a.user_id = ${userId}
+          LEFT JOIN users u ON a.employee_id = u.id
+          WHERE a.employee_id = ${userId}
           ORDER BY a.timestamp DESC
           LIMIT ${Math.floor(limit/2)}
         `
@@ -132,11 +132,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             a.id,
             'attendance' as type,
             CASE 
-              WHEN a.action = 'check_in' THEN 'check-in'
+              WHEN a.type = 'check_in' THEN 'check-in'
               ELSE 'check-out'  
             END as action,
             COALESCE(u.first_name, '') || ' - Fitxatge ' || 
-            CASE WHEN a.action = 'check_in' THEN 'entrada' ELSE 'sortida' END as title,
+            CASE WHEN a.type = 'check_in' THEN 'entrada' ELSE 'sortida' END as title,
             'Registrat a les ' || TO_CHAR(a.timestamp AT TIME ZONE 'Europe/Madrid', 'HH24:MI') as description,
             a.timestamp,
             COALESCE(u.first_name, '') || ' ' || COALESCE(u.last_name, '') as "relatedUserName",
@@ -195,16 +195,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const result = await db.execute(sql`
           SELECT 
             DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
-            COUNT(CASE WHEN a.action = 'check_in' THEN 1 END) as check_ins,
-            COUNT(CASE WHEN a.action = 'check_out' THEN 1 END) as check_outs,
-            MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END) as first_check_in,
-            MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) as last_check_out,
+            COUNT(CASE WHEN a.type = 'check_in' THEN 1 END) as check_ins,
+            COUNT(CASE WHEN a.type = 'check_out' THEN 1 END) as check_outs,
+            MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END) as first_check_in,
+            MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) as last_check_out,
             EXTRACT(EPOCH FROM (
-              MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) - 
-              MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END)
+              MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
+              MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
             ))/3600 as hours_worked
           FROM attendance_records a
-          WHERE a.user_id = ${userId}
+          WHERE a.employee_id = ${userId}
             AND a.timestamp >= ${monday.toISOString()}
             AND a.timestamp <= ${friday.toISOString()}
           GROUP BY DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
@@ -226,16 +226,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             u.first_name || ' ' || COALESCE(u.last_name, '') as name,
             u.email,
             DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
-            COUNT(CASE WHEN a.action = 'check_in' THEN 1 END) as check_ins,
-            COUNT(CASE WHEN a.action = 'check_out' THEN 1 END) as check_outs,
-            MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END) as first_check_in,
-            MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) as last_check_out,
+            COUNT(CASE WHEN a.type = 'check_in' THEN 1 END) as check_ins,
+            COUNT(CASE WHEN a.type = 'check_out' THEN 1 END) as check_outs,
+            MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END) as first_check_in,
+            MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) as last_check_out,
             EXTRACT(EPOCH FROM (
-              MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) - 
-              MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END)
+              MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
+              MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
             ))/3600 as hours_worked
           FROM users u
-          LEFT JOIN attendance_records a ON u.id = a.user_id 
+          LEFT JOIN attendance_records a ON u.id = a.employee_id 
             AND a.timestamp >= ${monday.toISOString()}
             AND a.timestamp <= ${friday.toISOString()}
           WHERE u.institution_id = ${institutionId} AND u.role = 'employee'

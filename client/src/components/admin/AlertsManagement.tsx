@@ -72,6 +72,9 @@ export function AlertsManagement() {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [userFilter, setUserFilter] = useState("all");
   const [newAlertDialogOpen, setNewAlertDialogOpen] = useState(false);
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
@@ -93,7 +96,7 @@ export function AlertsManagement() {
     enabled: !!user?.institutionId,
   });
 
-  // Filter alerts
+  // Enhanced filtered alerts with multiple filters
   const filteredAlerts = alerts.filter((alert: Alert) => {
     const matchesSearch = 
       alert.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,7 +104,33 @@ export function AlertsManagement() {
     
     const matchesType = typeFilter === "all" || alert.type === typeFilter;
     
-    return matchesSearch && matchesType;
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "sent" && alert.emailSent) ||
+      (statusFilter === "pending" && !alert.emailSent);
+    
+    const matchesUser = userFilter === "all" || alert.employeeId === userFilter;
+    
+    const matchesDate = dateFilter === "all" || (() => {
+      const alertDate = new Date(alert.sentAt);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const lastWeek = new Date(today);
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      
+      switch (dateFilter) {
+        case "today":
+          return alertDate.toDateString() === today.toDateString();
+        case "yesterday":
+          return alertDate.toDateString() === yesterday.toDateString();
+        case "week":
+          return alertDate >= lastWeek;
+        default:
+          return true;
+      }
+    })();
+    
+    return matchesSearch && matchesType && matchesStatus && matchesUser && matchesDate;
   });
 
   // Send manual alert mutation

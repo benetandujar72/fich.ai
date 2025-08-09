@@ -207,8 +207,9 @@ export function ReportsManagement() {
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedEmployees(employees.map((e: any) => e.id))}
+                  data-testid="button-select-all-employees"
                 >
-                  Seleccionar Tots
+                  Tots ({employees.length})
                 </Button>
                 <Button
                   variant="outline"
@@ -247,9 +248,10 @@ export function ReportsManagement() {
               onClick={generateReport}
               disabled={selectedEmployees.length === 0}
               className="min-w-32"
+              data-testid="button-generate-report"
             >
               <Download className="h-4 w-4 mr-2" />
-              Generar Informe
+              Generar Informe ({selectedEmployees.length} seleccionats)
             </Button>
           </div>
         </CardContent>

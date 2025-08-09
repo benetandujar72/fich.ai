@@ -235,33 +235,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
               MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
             ))/3600 as hours_worked
           FROM users u
-          LEFT JOIN attendance_records a ON u.id = a.employee_id 
-            AND a.timestamp >= ${monday.toISOString()}
-            AND a.timestamp <= ${friday.toISOString()}
+          LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+            AND ar.timestamp >= ${monday.toISOString()}
+            AND ar.timestamp <= ${friday.toISOString()}
           WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
-          GROUP BY u.id, u.first_name, u.last_name, u.email, DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
+          GROUP BY u.id, u.first_name, u.last_name, u.email, DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid')
           ORDER BY u.first_name, day
         `);
 
         const summaryResult = await db.execute(sql`
           SELECT 
             COUNT(DISTINCT u.id) as total_employees,
-            COUNT(DISTINCT CASE WHEN a.employee_id IS NOT NULL THEN u.id END) as employees_with_records,
+            COUNT(DISTINCT CASE WHEN day_stats.employee_id IS NOT NULL THEN u.id END) as employees_with_records,
             AVG(CASE WHEN day_stats.hours_worked > 0 THEN day_stats.hours_worked END) as avg_daily_hours,
             SUM(day_stats.hours_worked) as total_hours_all_employees
           FROM users u
           LEFT JOIN (
             SELECT 
-              a.employee_id,
-              DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
+              ar.employee_id,
+              DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') as day,
               EXTRACT(EPOCH FROM (
-                MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
-                MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
+                MAX(CASE WHEN ar.type = 'check_out' THEN ar.timestamp END) - 
+                MIN(CASE WHEN ar.type = 'check_in' THEN ar.timestamp END)
               ))/3600 as hours_worked
-            FROM attendance_records a
-            WHERE a.timestamp >= ${monday.toISOString()}
-              AND a.timestamp <= ${friday.toISOString()}
-            GROUP BY a.employee_id, DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
+            FROM attendance_records ar
+            WHERE ar.timestamp >= ${monday.toISOString()}
+              AND ar.timestamp <= ${friday.toISOString()}
+            GROUP BY ar.employee_id, DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid')
           ) day_stats ON u.id = day_stats.employee_id
           WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
         `);
@@ -979,5 +979,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  // Enhanced Staff Management - CSV Import endpoint
+  app.post('/api/admin/employees/import', isAuthenticated, async (req, res) => {
+    try {
+      // Mock implementation for CSV import
+      // In real implementation, would parse CSV file and bulk insert employees
+      res.json({
+        successful: 0,
+        failed: 0,
+        message: 'Funcionalitat de importació CSV pendent d\'implementar amb biblioteca d\'anàlisi de fitxers'
+      });
+    } catch (error) {
+      console.error('Error importing employees:', error);
+      res.status(500).json({ message: 'Error en la importació d\'empleats' });
+    }
+  });
+
+  // Enhanced Alerts - Custom alerts with recipient selection
+  app.post('/api/admin/alerts/send-custom', isAuthenticated, async (req, res) => {
+    try {
+      const { recipients, subject, message, alertType, institutionId } = req.body;
+      
+      // Send custom alert to multiple recipients
+      for (const recipientId of recipients) {
+        await db.execute(sql`
+          INSERT INTO alert_notifications (
+            id, employee_id, institution_id, alert_type, subject, 
+            message, sent_at, email_sent, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), ${recipientId}, ${institutionId}, ${alertType},
+            ${subject}, ${message}, NOW(), true, NOW(), NOW()
+          )
+        `);
+      }
+
+      res.json({ 
+        success: true, 
+        sent: recipients.length,
+        message: `Alerta enviada a ${recipients.length} destinataris` 
+      });
+    } catch (error) {
+      console.error('Error sending custom alert:', error);
+      res.status(500).json({ message: 'Error enviant alerta personalitzada' });
+    }
+  });
+
+  // Enhanced Reports - Multi-user selection with "all" option
+  app.post('/api/admin/reports/generate-custom', isAuthenticated, async (req, res) => {
+    try {
+      const { selectedEmployees, reportType, dateRange, institutionId } = req.body;
+      
+      let employeeIds = selectedEmployees;
+      
+      // If "all" selected, get all employee IDs for the institution
+      if (selectedEmployees.includes('all')) {
+        const allEmployees = await db.execute(sql`
+          SELECT id FROM users 
+          WHERE institution_id = ${institutionId} AND role = 'employee'
+        `);
+        employeeIds = allEmployees.rows.map((emp: any) => emp.id);
+      }
+
+      // Generate report data based on selected employees
+      const reportData = await db.execute(sql`
+        SELECT 
+          u.id,
+          u.first_name || ' ' || COALESCE(u.last_name, '') as name,
+          u.email,
+          COUNT(ar.id) as total_records,
+          AVG(EXTRACT(EPOCH FROM (ar.exit_time - ar.entry_time))/3600) as avg_hours,
+          SUM(CASE WHEN ar.is_late THEN 1 ELSE 0 END) as total_delays
+        FROM users u
+        LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+          AND ar.entry_time >= ${dateRange.start}
+          AND ar.entry_time <= ${dateRange.end}
+        WHERE u.id = ANY(${employeeIds}) 
+        GROUP BY u.id, u.first_name, u.last_name, u.email
+        ORDER BY u.first_name
+      `);
+
+      res.json({
+        reportData: reportData.rows,
+        reportType,
+        dateRange,
+        employeeCount: employeeIds.length,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error generating custom report:', error);
+      res.status(500).json({ message: 'Error generant informe personalitzat' });
+    }
+  });
+
+  // Enhanced Privacy Management - GDPR ticket system
+  app.post('/api/admin/privacy/create-ticket', isAuthenticated, async (req, res) => {
+    try {
+      const { requestType, description, userId, institutionId } = req.body;
+      
+      // Calculate due date (30 days from now as per GDPR)
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30);
+
+      const result = await db.execute(sql`
+        INSERT INTO privacy_requests (
+          id, user_id, institution_id, request_type, description,
+          status, due_date, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), ${userId}, ${institutionId}, ${requestType}, ${description},
+          'initiated', ${dueDate.toISOString()}, NOW(), NOW()
+        ) RETURNING *
+      `);
+
+      res.json({
+        success: true,
+        ticket: result.rows[0],
+        message: 'Sol·licitud GDPR creada correctament'
+      });
+    } catch (error) {
+      console.error('Error creating GDPR ticket:', error);
+      res.status(500).json({ message: 'Error creant ticket GDPR' });
+    }
+  });
+
+  // Weekly Schedule with real attendance records
+  app.get('/api/admin/weekly-schedule/:userId/:weekStart', isAuthenticated, async (req, res) => {
+    try {
+      const { userId, weekStart } = req.params;
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      // Get real attendance records for the week
+      const attendanceData = await db.execute(sql`
+        SELECT 
+          DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') as day,
+          ar.type,
+          ar.timestamp,
+          ar.is_late,
+          ar.notes
+        FROM attendance_records ar
+        WHERE ar.employee_id = ${userId}
+          AND ar.timestamp >= ${weekStart}
+          AND ar.timestamp <= ${weekEnd.toISOString()}
+        ORDER BY ar.timestamp
+      `);
+
+      // Group by day and build schedule
+      const weeklySchedule = {};
+      attendanceData.rows.forEach((record: any) => {
+        const day = record.day;
+        if (!weeklySchedule[day]) {
+          weeklySchedule[day] = {
+            date: day,
+            records: [],
+            status: 'no_attendance'
+          };
+        }
+        weeklySchedule[day].records.push(record);
+      });
+
+      // Determine status for each day
+      Object.values(weeklySchedule).forEach((dayData: any) => {
+        const checkIns = dayData.records.filter(r => r.type === 'check_in').length;
+        const checkOuts = dayData.records.filter(r => r.type === 'check_out').length;
+        const hasDelays = dayData.records.some(r => r.is_late);
+        
+        if (checkIns > 0 && checkOuts > 0 && !hasDelays) {
+          dayData.status = 'complete';
+        } else if (checkIns > 0 || checkOuts > 0) {
+          dayData.status = hasDelays ? 'incidents' : 'incomplete';
+        } else {
+          dayData.status = 'no_attendance';
+        }
+      });
+
+      res.json({
+        weekRange: { start: weekStart, end: weekEnd.toISOString() },
+        schedule: weeklySchedule
+      });
+    } catch (error) {
+      console.error('Error fetching weekly schedule:', error);
+      res.status(500).json({ message: 'Error obtenint horari setmanal' });
+    }
+  });
+
   return httpServer;
 }

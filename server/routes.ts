@@ -41,6 +41,249 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Recent activity endpoint with role-based filtering
+  app.get('/api/dashboard/recent-activity/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userId = req.user.id;
+      const userRole = req.user.role;
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      console.log('RECENT_ACTIVITY: Fetching for institution:', institutionId, 'user:', userId, 'role:', userRole);
+
+      let activities = [];
+
+      // Get recent communications
+      const commQuery = userRole === 'employee' 
+        ? sql`
+          SELECT 
+            c.id,
+            'communication' as type,
+            CASE 
+              WHEN c.sender_id = ${userId} THEN 'sent'
+              ELSE 'received'
+            END as action,
+            c.subject as title,
+            SUBSTRING(c.content, 1, 100) as description,
+            c.created_at as "timestamp",
+            COALESCE(u1.first_name, 'Sistema') as "relatedUserName",
+            COALESCE(u1.email, 'sistema@centre.edu') as "relatedUserEmail",
+            c.priority,
+            c.status
+          FROM communications c
+          LEFT JOIN users u1 ON c.sender_id = u1.id
+          WHERE (c.sender_id = ${userId} OR c.recipient_id = ${userId})
+            AND c.deleted_by_user_at IS NULL
+          ORDER BY c.created_at DESC
+          LIMIT ${Math.floor(limit/2)}
+        `
+        : sql`
+          SELECT 
+            c.id,
+            'communication' as type,
+            CASE 
+              WHEN c.sender_id = ${userId} THEN 'sent'
+              ELSE 'received'  
+            END as action,
+            c.subject as title,
+            SUBSTRING(c.content, 1, 100) as description,
+            c.created_at as "timestamp",
+            COALESCE(u1.first_name, 'Sistema') || ' ' || COALESCE(u1.last_name, '') as "relatedUserName",
+            COALESCE(u1.email, 'sistema@centre.edu') as "relatedUserEmail",
+            c.priority,
+            c.status
+          FROM communications c
+          LEFT JOIN users u1 ON c.sender_id = u1.id
+          LEFT JOIN users u2 ON c.recipient_id = u2.id
+          WHERE c.institution_id = ${institutionId}
+            AND c.deleted_by_user_at IS NULL
+          ORDER BY c.created_at DESC
+          LIMIT ${Math.floor(limit/2)}
+        `;
+
+      const commResult = await db.execute(commQuery);
+      activities.push(...commResult.rows);
+
+      // Get recent attendance records
+      const attendanceQuery = userRole === 'employee'
+        ? sql`
+          SELECT 
+            a.id,
+            'attendance' as type,
+            CASE 
+              WHEN a.action = 'check_in' THEN 'check-in'
+              ELSE 'check-out'
+            END as action,
+            'Fitxatge ' || CASE WHEN a.action = 'check_in' THEN 'entrada' ELSE 'sortida' END as title,
+            'Registrat a les ' || TO_CHAR(a.timestamp AT TIME ZONE 'Europe/Madrid', 'HH24:MI') as description,
+            a.timestamp,
+            COALESCE(u.first_name, '') || ' ' || COALESCE(u.last_name, '') as "relatedUserName",
+            COALESCE(u.email, '') as "relatedUserEmail",
+            'medium' as priority,
+            'completed' as status
+          FROM attendance_records a
+          LEFT JOIN users u ON a.user_id = u.id
+          WHERE a.user_id = ${userId}
+          ORDER BY a.timestamp DESC
+          LIMIT ${Math.floor(limit/2)}
+        `
+        : sql`
+          SELECT 
+            a.id,
+            'attendance' as type,
+            CASE 
+              WHEN a.action = 'check_in' THEN 'check-in'
+              ELSE 'check-out'  
+            END as action,
+            COALESCE(u.first_name, '') || ' - Fitxatge ' || 
+            CASE WHEN a.action = 'check_in' THEN 'entrada' ELSE 'sortida' END as title,
+            'Registrat a les ' || TO_CHAR(a.timestamp AT TIME ZONE 'Europe/Madrid', 'HH24:MI') as description,
+            a.timestamp,
+            COALESCE(u.first_name, '') || ' ' || COALESCE(u.last_name, '') as "relatedUserName",
+            COALESCE(u.email, '') as "relatedUserEmail",
+            'medium' as priority,
+            'completed' as status
+          FROM attendance_records a
+          LEFT JOIN users u ON a.user_id = u.id
+          WHERE u.institution_id = ${institutionId}
+          ORDER BY a.timestamp DESC
+          LIMIT ${Math.floor(limit/2)}
+        `;
+
+      const attendanceResult = await db.execute(attendanceQuery);
+      activities.push(...attendanceResult.rows);
+
+      // Sort all activities by timestamp  
+      activities.sort((a: any, b: any) => new Date(b.timestamp as string).getTime() - new Date(a.timestamp as string).getTime());
+      activities = activities.slice(0, limit);
+
+      console.log('RECENT_ACTIVITY: Found', activities.length, 'activities');
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching recent activity:", error);
+      res.status(500).json({ message: "Failed to fetch recent activity" });
+    }
+  });
+
+  // Weekly attendance stats endpoint
+  app.get('/api/dashboard/weekly-stats/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userId = req.user.id;
+      const userRole = req.user.role;
+
+      console.log('WEEKLY_STATS: Fetching for institution:', institutionId, 'user:', userId, 'role:', userRole);
+
+      // Get current week dates (Monday to Friday)
+      const now = new Date();
+      const currentDay = now.getDay();
+      const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // Sunday = 0, adjust to Monday = 0
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - daysFromMonday);
+      monday.setHours(0, 0, 0, 0);
+      
+      const friday = new Date(monday);
+      friday.setDate(monday.getDate() + 4);
+      friday.setHours(23, 59, 59, 999);
+
+      console.log('WEEKLY_STATS: Week range from', monday.toISOString(), 'to', friday.toISOString());
+
+      let weeklyStats = {};
+
+      if (userRole === 'employee') {
+        // Personal weekly stats
+        const result = await db.execute(sql`
+          SELECT 
+            DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
+            COUNT(CASE WHEN a.action = 'check_in' THEN 1 END) as check_ins,
+            COUNT(CASE WHEN a.action = 'check_out' THEN 1 END) as check_outs,
+            MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END) as first_check_in,
+            MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) as last_check_out,
+            EXTRACT(EPOCH FROM (
+              MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) - 
+              MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END)
+            ))/3600 as hours_worked
+          FROM attendance_records a
+          WHERE a.user_id = ${userId}
+            AND a.timestamp >= ${monday.toISOString()}
+            AND a.timestamp <= ${friday.toISOString()}
+          GROUP BY DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
+          ORDER BY day
+        `);
+
+        weeklyStats = {
+          personalStats: result.rows,
+          totalHours: result.rows.reduce((sum: number, day: any) => sum + (day.hours_worked || 0), 0),
+          daysPresent: result.rows.filter((day: any) => day.check_ins > 0).length,
+          averageHoursPerDay: result.rows.length > 0 ? 
+            result.rows.reduce((sum: number, day: any) => sum + (day.hours_worked || 0), 0) / result.rows.length : 0
+        };
+      } else {
+        // Institution-wide weekly stats for admin/director
+        const employeeStatsResult = await db.execute(sql`
+          SELECT 
+            u.id as user_id,
+            u.first_name || ' ' || COALESCE(u.last_name, '') as name,
+            u.email,
+            DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
+            COUNT(CASE WHEN a.action = 'check_in' THEN 1 END) as check_ins,
+            COUNT(CASE WHEN a.action = 'check_out' THEN 1 END) as check_outs,
+            MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END) as first_check_in,
+            MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) as last_check_out,
+            EXTRACT(EPOCH FROM (
+              MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) - 
+              MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END)
+            ))/3600 as hours_worked
+          FROM users u
+          LEFT JOIN attendance_records a ON u.id = a.user_id 
+            AND a.timestamp >= ${monday.toISOString()}
+            AND a.timestamp <= ${friday.toISOString()}
+          WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
+          GROUP BY u.id, u.first_name, u.last_name, u.email, DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
+          ORDER BY u.first_name, day
+        `);
+
+        const summaryResult = await db.execute(sql`
+          SELECT 
+            COUNT(DISTINCT u.id) as total_employees,
+            COUNT(DISTINCT CASE WHEN a.user_id IS NOT NULL THEN u.id END) as employees_with_records,
+            AVG(CASE WHEN day_stats.hours_worked > 0 THEN day_stats.hours_worked END) as avg_daily_hours,
+            SUM(day_stats.hours_worked) as total_hours_all_employees
+          FROM users u
+          LEFT JOIN (
+            SELECT 
+              a.user_id,
+              DATE(a.timestamp AT TIME ZONE 'Europe/Madrid') as day,
+              EXTRACT(EPOCH FROM (
+                MAX(CASE WHEN a.action = 'check_out' THEN a.timestamp END) - 
+                MIN(CASE WHEN a.action = 'check_in' THEN a.timestamp END)
+              ))/3600 as hours_worked
+            FROM attendance_records a
+            WHERE a.timestamp >= ${monday.toISOString()}
+              AND a.timestamp <= ${friday.toISOString()}
+            GROUP BY a.user_id, DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
+          ) day_stats ON u.id = day_stats.user_id
+          WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
+        `);
+
+        weeklyStats = {
+          employeeStats: employeeStatsResult.rows,
+          summary: summaryResult.rows[0],
+          weekRange: {
+            start: monday.toISOString(),
+            end: friday.toISOString()
+          }
+        };
+      }
+
+      console.log('WEEKLY_STATS: Returning stats with', Object.keys(weeklyStats).length, 'main keys');
+      res.json(weeklyStats);
+    } catch (error) {
+      console.error("Error fetching weekly stats:", error);
+      res.status(500).json({ message: "Failed to fetch weekly stats" });
+    }
+  });
+
   // Institution management routes
   app.get('/api/institutions', isAuthenticated, async (req, res) => {
     try {

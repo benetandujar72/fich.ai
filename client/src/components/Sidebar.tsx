@@ -257,7 +257,7 @@ export default function Sidebar() {
       {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/80 z-40 md:hidden" 
+          className="fixed inset-0 bg-black/80 z-40 md:hidden pointer-events-auto" 
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -277,7 +277,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed top-0 left-0 h-full bg-gradient-to-b from-white via-rose-50/95 to-pink-50/95 dark:from-gray-950 dark:via-slate-900/98 dark:to-slate-800/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-50 transition-all duration-300 flex flex-col shadow-2xl",
+        "fixed top-0 left-0 h-full bg-gradient-to-b from-white via-rose-50/95 to-pink-50/95 dark:from-gray-950 dark:via-slate-900/98 dark:to-slate-800/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-50 transition-all duration-300 flex flex-col shadow-2xl pointer-events-auto",
         // Desktop behavior
         !isMobile && (isCollapsed ? "w-16" : "w-60"),
         // Mobile behavior
@@ -365,9 +365,11 @@ export default function Sidebar() {
                           className={cn(
                             "nav-link",
                             isActive && "active",
-                            isCollapsed && !isMobile ? "justify-center px-3" : "justify-start"
+                            isCollapsed && !isMobile ? "justify-center px-3" : "justify-start",
+                            isMobile && "pointer-events-auto"
                           )}
                           data-testid={`nav-${item.href.replace('/', '').replace('/', '-')}`}
+                          onClick={isMobile ? () => setIsMobileMenuOpen(false) : undefined}
                         >
                           <Icon className={cn(
                             "flex-shrink-0 transition-all duration-200",
@@ -410,7 +412,10 @@ export default function Sidebar() {
               "w-full group hover:bg-destructive/10 hover:text-destructive transition-all duration-200",
               isCollapsed && !isMobile ? "justify-center px-3" : "justify-start"
             )}
-            onClick={handleLogout}
+            onClick={() => {
+              if (isMobile) setIsMobileMenuOpen(false);
+              handleLogout();
+            }}
             data-testid="logout-button"
           >
             <LogOut className="w-4 h-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />

@@ -86,12 +86,12 @@ export default function Communications() {
   const [composePriority, setComposePriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
   const [composeEmailEnabled, setComposeEmailEnabled] = useState(true);
 
-  // Fetch communications using test endpoint (working version)
+  // Fetch communications using normal endpoint 
   const { data: communicationsResponse = [], isLoading } = useQuery({
-    queryKey: ['/api/communications', user?.id, 'test'],
+    queryKey: ['/api/communications', user?.id, 'all', selectedFilter],
     queryFn: async () => {
       if (!user?.id) return [];
-      const response = await fetch(`/api/communications/${user.id}/test?filter=${selectedFilter}`);
+      const response = await fetch(`/api/communications/${user.id}/all?filter=${selectedFilter}`);
       return response.json();
     },
     enabled: !!user?.id,
@@ -108,17 +108,13 @@ export default function Communications() {
     enabled: !!user?.institutionId,
   });
 
-  // Create communication mutation using test endpoint (working version)
+  // Create communication mutation using normal endpoint
   const createCommunicationMutation = useMutation({
     mutationFn: async (communicationData: any) => {
-      return fetch('/api/communications/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(communicationData),
-      }).then(res => res.json());
+      return apiRequest("POST", '/api/communications', communicationData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'all'] });
       toast({
         title: "Missatge enviat",
         description: "El missatge s'ha enviat correctament.",
@@ -135,29 +131,23 @@ export default function Communications() {
     },
   });
 
-  // Mark as read mutation using test endpoint
+  // Mark as read mutation using normal endpoint
   const markAsReadMutation = useMutation({
     mutationFn: async (communicationId: string) => {
-      return fetch(`/api/communications/${communicationId}/test-read`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-      }).then(res => res.json());
+      return apiRequest("PATCH", `/api/communications/${communicationId}/read`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'all'] });
     },
   });
 
-  // Delete communication mutation using test endpoint
+  // Delete communication mutation using normal endpoint
   const deleteCommunicationMutation = useMutation({
     mutationFn: async (communicationId: string) => {
-      return fetch(`/api/communications/${communicationId}/test-delete`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      }).then(res => res.json());
+      return apiRequest("DELETE", `/api/communications/${communicationId}`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'test'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications', user?.id, 'all'] });
       toast({
         title: "Missatge eliminat",
         description: "El missatge s'ha eliminat correctament.",

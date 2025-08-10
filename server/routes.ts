@@ -1474,12 +1474,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           a.start_date as "startDate",
           a.end_date as "endDate",
           a.reason,
-          a.justification_status as "justificationStatus",
-          a.created_at as "createdAt",
-          a.updated_at as "updatedAt"
+          a.status as "justificationStatus",
+          a.created_at as "createdAt"
         FROM absences a
         LEFT JOIN users u ON a.employee_id = u.id
-        WHERE a.institution_id = ${institutionId}
+        LEFT JOIN employees e ON a.employee_id = e.id
+        WHERE e.institution_id = ${institutionId}
         ORDER BY a.created_at DESC
         LIMIT 100
       `);

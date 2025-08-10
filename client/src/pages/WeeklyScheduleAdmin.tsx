@@ -227,7 +227,7 @@ export default function WeeklyScheduleAdmin() {
 
             <div className="grid grid-cols-6 gap-2">
               {timeSlots.map(slot => (
-                <React.Fragment key={slot.period}>
+                <div key={slot.period} className="contents">
                   <div className="p-2 text-xs text-center bg-muted/50 rounded text-muted-foreground">
                     {slot.label}
                   </div>
@@ -257,7 +257,7 @@ export default function WeeklyScheduleAdmin() {
                       </div>
                     );
                   })}
-                </React.Fragment>
+                </div>
               ))}
             </div>
           </div>

@@ -284,23 +284,23 @@ export default function Sidebar(props: SidebarProps = {}) {
         isMobile && mobileMenuOpen && "translate-x-0 shadow-2xl"
       )}>
         
-        {/* Header Section */}
-        <div className="flex-shrink-0 px-4 py-5 border-b border-rose-100 dark:border-slate-600 bg-gradient-to-r from-rose-100/80 to-pink-100/80 dark:from-slate-800/50 dark:to-slate-700/50">
-          <div className="flex items-center justify-between">
-            {(!isCollapsed || isMobile) && (
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-rose-400 via-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Activity className="w-6 h-6 text-white" />
+        {/* Header Section - Only show on desktop */}
+        {!isMobile && (
+          <div className="flex-shrink-0 px-4 py-5 border-b border-rose-100 dark:border-slate-600 bg-gradient-to-r from-rose-100/80 to-pink-100/80 dark:from-slate-800/50 dark:to-slate-700/50">
+            <div className="flex items-center justify-between">
+              {!isCollapsed && (
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-rose-400 via-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">
+                      EduPresència
+                    </h2>
+                    <p className="text-xs text-muted-foreground font-medium">Sistema de Presència</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-foreground">
-                    EduPresència
-                  </h2>
-                  <p className="text-xs text-muted-foreground font-medium">Sistema de Presència</p>
-                </div>
-              </div>
-            )}
-            {!isMobile && (
+              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -310,12 +310,12 @@ export default function Sidebar(props: SidebarProps = {}) {
               >
                 {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
               </Button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* User Profile Section */}
-        {(!isCollapsed || isMobile) && user && (
+        {/* User Profile Section - Only show on desktop */}
+        {!isCollapsed && !isMobile && user && (
           <div className="flex-shrink-0 p-4 border-b border-border">
             <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-rose-50/70 to-pink-50/70 dark:from-slate-700/50 dark:to-slate-600/50 border border-rose-200 dark:border-slate-500/50">
               <Avatar className="w-12 h-12 ring-2 ring-rose-200 dark:ring-slate-500">

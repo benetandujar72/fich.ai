@@ -257,7 +257,7 @@ export default function Sidebar() {
       {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" 
+          className="fixed inset-0 bg-black/80 z-40 md:hidden" 
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -268,7 +268,7 @@ export default function Sidebar() {
           variant="ghost"
           size="sm"
           onClick={toggleMobileMenu}
-          className="fixed top-4 left-4 z-50 md:hidden bg-background shadow-lg"
+          className="fixed top-4 left-4 z-50 md:hidden bg-white dark:bg-gray-900 shadow-lg border border-border/50"
           data-testid="mobile-menu-button"
         >
           {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -277,7 +277,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed top-0 left-0 h-full bg-gradient-to-b from-rose-50/95 via-pink-50/95 to-purple-50/98 dark:from-slate-900/95 dark:via-slate-800/95 dark:to-slate-700/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-50 transition-all duration-300 flex flex-col shadow-2xl",
+        "fixed top-0 left-0 h-full bg-gradient-to-b from-white via-rose-50/95 to-pink-50/95 dark:from-gray-950 dark:via-slate-900/98 dark:to-slate-800/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-50 transition-all duration-300 flex flex-col shadow-2xl",
         // Desktop behavior
         !isMobile && (isCollapsed ? "w-16" : "w-60"),
         // Mobile behavior

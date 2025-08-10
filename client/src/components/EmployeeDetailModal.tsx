@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isWeekend, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isWeekend, startOfMonth, endOfMonth, getDay } from "date-fns";
 import { ca, es } from "date-fns/locale";
 import { 
   Dialog, 
@@ -93,58 +93,37 @@ export default function EmployeeDetailModal({
   });
 
   const getDayColor = (record: AttendanceRecord | null, isWorkDay: boolean) => {
-    if (!isWorkDay) {
-      return "bg-gray-100 text-gray-400 border-gray-200"; // Weekend/holiday - explicitly set border
-    }
-    
     if (!record) {
       return "bg-red-100 text-red-700 border-red-200"; // No record = absent
     }
     
-    switch (record.status) {
-      case 'present':
-        // Check if truly on time (no late minutes)
-        if (!record.lateMinutes || record.lateMinutes <= 0) {
-          return "bg-green-100 text-green-700 border-green-200";
-        } else if (record.lateMinutes <= 15) {
-          return "bg-yellow-100 text-yellow-700 border-yellow-200";
-        } else if (record.lateMinutes <= 30) {
-          return "bg-orange-100 text-orange-700 border-orange-200";
-        } else {
-          return "bg-red-100 text-red-700 border-red-200";
-        }
-      case 'late':
-        if (record.lateMinutes && record.lateMinutes <= 15) {
-          return "bg-yellow-100 text-yellow-700 border-yellow-200";
-        } else if (record.lateMinutes && record.lateMinutes <= 30) {
-          return "bg-orange-100 text-orange-700 border-orange-200";
-        } else {
-          return "bg-red-100 text-red-700 border-red-200";
-        }
-      case 'partial':
-        return "bg-orange-100 text-orange-700 border-orange-200";
-      case 'absent':
-      default:
-        return "bg-red-100 text-red-700 border-red-200";
+    // Check late minutes for color coding
+    const lateMinutes = parseFloat(record.lateMinutes?.toString() || '0');
+    
+    if (lateMinutes <= 0) {
+      return "bg-green-100 text-green-700 border-green-200"; // On time
+    } else if (lateMinutes <= 15) {
+      return "bg-yellow-100 text-yellow-700 border-yellow-200"; // Slightly late
+    } else if (lateMinutes <= 30) {
+      return "bg-orange-100 text-orange-700 border-orange-200"; // Late
+    } else {
+      return "bg-red-100 text-red-700 border-red-200"; // Very late
     }
   };
 
   const getStatusIcon = (record: AttendanceRecord | null, isWorkDay: boolean) => {
-    if (!isWorkDay) return null;
-    
     if (!record) {
       return <XCircle className="h-3 w-3" />;
     }
     
-    switch (record.status) {
-      case 'present':
-        return <CheckCircle className="h-3 w-3" />;
-      case 'late':
-      case 'partial':
-        return <AlertCircle className="h-3 w-3" />;
-      case 'absent':
-      default:
-        return <XCircle className="h-3 w-3" />;
+    const lateMinutes = parseFloat(record.lateMinutes?.toString() || '0');
+    
+    if (lateMinutes <= 0) {
+      return <CheckCircle className="h-3 w-3" />; // On time
+    } else if (lateMinutes <= 30) {
+      return <AlertCircle className="h-3 w-3" />; // Late but present
+    } else {
+      return <XCircle className="h-3 w-3" />; // Very late
     }
   };
 
@@ -161,10 +140,14 @@ export default function EmployeeDetailModal({
     });
   };
 
-  // Generate calendar days for current month
+  // Generate ONLY weekdays (Monday-Friday) for current month
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const allDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const calendarDays = allDays.filter(day => {
+    const dayOfWeek = getDay(day);
+    return dayOfWeek >= 1 && dayOfWeek <= 5; // Only Monday (1) to Friday (5)
+  });
 
   // Create attendance record map for quick lookup
   const attendanceMap = new Map<string, AttendanceRecord>();
@@ -228,31 +211,41 @@ export default function EmployeeDetailModal({
                 </h4>
                 <div className="text-xs space-y-1">
                   <div className="flex justify-between">
-                    <span>{t("month_hours", language)}:</span>
+                    <span>{t("actual_hours", language)}:</span>
                     <span className="font-mono">
-                      {attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours) || 0), 0).toFixed(1)}h
+                      {attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours.toString()) || 0), 0).toFixed(1)}h
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t("work_days", language)}:</span>
                     <span className="font-mono">
-                      {attendanceHistory.filter(r => r.status !== 'absent').length}/{attendanceHistory.length || 0}
+                      {attendanceHistory.filter(r => r.checkIn).length}/{calendarDays.length}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t("punctuality", language)}:</span>
                     <span className="font-mono">
                       {attendanceHistory.length > 0 
-                        ? Math.round((attendanceHistory.filter(r => r.status === 'present' && (!r.lateMinutes || parseFloat(r.lateMinutes.toString()) <= 0)).length / attendanceHistory.length) * 100)
+                        ? Math.round((attendanceHistory.filter(r => r.checkIn && (!r.lateMinutes || parseFloat(r.lateMinutes.toString()) <= 0)).length / Math.max(attendanceHistory.filter(r => r.checkIn).length, 1)) * 100)
                         : 0}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>{t("avg_daily_hours", language)}:</span>
-                    <span className="font-mono">
-                      {attendanceHistory.length > 0 
-                        ? (attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours) || 0), 0) / Math.max(attendanceHistory.filter(r => r.status !== 'absent').length, 1)).toFixed(1)
-                        : "0.0"}h
+                    <span className="flex items-center gap-1">
+                      {t("hours_difference", language)}:
+                    </span>
+                    <span className={`font-mono ${(() => {
+                      const actualHours = attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours) || 0), 0);
+                      const expectedHours = calendarDays.length * 8; // Assuming 8h per day standard
+                      const diff = actualHours - expectedHours;
+                      return diff >= 0 ? 'text-green-600' : diff >= -5 ? 'text-orange-600' : 'text-red-600';
+                    })()}`}>
+                      {(() => {
+                        const actualHours = attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours.toString()) || 0), 0);
+                        const expectedHours = calendarDays.length * 8; // Standard 8h workday
+                        const diff = actualHours - expectedHours;
+                        return `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}h`;
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -317,16 +310,19 @@ export default function EmployeeDetailModal({
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                <div className="grid grid-cols-7 gap-1">
-                  {/* Day headers */}
-                  {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(day => (
-                    <div key={day} className="p-2 text-center text-xs font-medium text-muted-foreground">
-                      {day}
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {/* Day headers - Only weekdays */}
+                  <div className="grid grid-cols-5 gap-1 mb-2">
+                    {['L', 'M', 'X', 'J', 'V'].map(day => (
+                      <div key={day} className="p-2 text-center text-xs font-medium text-muted-foreground">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
                   
-                  {/* Calendar days */}
-                  {calendarDays.map(day => {
+                  {/* Calendar days - Only weekdays */}
+                  <div className="grid grid-cols-5 gap-1">
+                    {calendarDays.map(day => {
                     const dateStr = format(day, 'yyyy-MM-dd');
                     const record = attendanceMap.get(dateStr) || null;
                     const isWorkDay = !isWeekend(day);
@@ -342,8 +338,8 @@ export default function EmployeeDetailModal({
                         `}
                         title={
                           record 
-                            ? `${format(day, 'dd/MM/yyyy', { locale })}\n${t('check_in', language)}: ${formatTime(record.checkIn)}\n${t('check_out', language)}: ${formatTime(record.checkOut)}`
-                            : `${format(day, 'dd/MM/yyyy', { locale })}\n${isWorkDay ? t('no_attendance', language) : t('weekend', language)}`
+                            ? `${format(day, 'dd/MM/yyyy', { locale })}\n${t('check_in', language)}: ${formatTime(record.checkIn)}\n${t('check_out', language)}: ${formatTime(record.checkOut)}\nRetard: ${record.lateMinutes || 0} min\nHores: ${parseFloat(record.totalHours?.toString() || '0').toFixed(1)}h`
+                            : `${format(day, 'dd/MM/yyyy', { locale })}\nSense assistència`
                         }
                         data-testid={`day-${dateStr}`}
                       >
@@ -353,7 +349,7 @@ export default function EmployeeDetailModal({
                           </span>
                           {statusIcon}
                         </div>
-                        {record && isWorkDay && (
+                        {record && (
                           <div className="mt-1 space-y-0.5 text-[10px]">
                             <div>{formatTime(record.checkIn)}</div>
                             <div>{formatTime(record.checkOut)}</div>
@@ -362,6 +358,7 @@ export default function EmployeeDetailModal({
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               )}
             </CardContent>

@@ -286,7 +286,7 @@ export function StaffManagement() {
                       }
                     </TableCell>
                     <TableCell>
-                      {employee.totalHours?.toFixed(1) || '0.0'}h
+                      {typeof employee.totalHours === 'number' ? employee.totalHours.toFixed(1) : parseFloat(employee.totalHours?.toString() || '0').toFixed(1)}h
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

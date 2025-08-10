@@ -111,6 +111,8 @@ export const translations = {
     "check_out": "Sortida",
     "no_attendance": "Sense registre",
     "weekend": "Cap de setmana",
+    "actual_hours": "Hores reals",
+    "hours_difference": "Diferència d'hores",
   },
   es: {
     // Navigation
@@ -224,6 +226,8 @@ export const translations = {
     "check_out": "Salida",
     "no_attendance": "Sin registro",
     "weekend": "Fin de semana",
+    "actual_hours": "Horas reales",
+    "hours_difference": "Diferencia de horas",
   },
 };
 

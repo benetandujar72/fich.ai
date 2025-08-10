@@ -323,22 +323,33 @@ export default function Alerts() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={alert.emailSent ? 'default' : 'outline'}>
-                          {alert.emailSent ? 
-                            (language === "ca" ? "Enviat" : "Enviado") : 
-                            (language === "ca" ? "Pendent" : "Pendiente")
+                        <Badge variant={alert.status === 'resolved' ? 'secondary' : (alert.emailSent ? 'default' : 'outline')}>
+                          {alert.status === 'resolved' ? 
+                            (language === "ca" ? "Resolta" : "Resuelta") : 
+                            (alert.emailSent ? 
+                              (language === "ca" ? "Enviat" : "Enviado") : 
+                              (language === "ca" ? "Pendent" : "Pendiente")
+                            )
                           }
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => resolveAlertMutation.mutate(alert.id)}
-                          disabled={resolveAlertMutation.isPending}
-                        >
-                          {language === "ca" ? "Resoldre" : "Resolver"}
-                        </Button>
+                        {alert.status === 'resolved' ? (
+                          <div className="text-sm text-muted-foreground">
+                            {language === "ca" ? "Resolta per" : "Resuelta por"} {alert.resolvedByName}
+                            <br />
+                            {new Date(alert.resolvedAt).toLocaleString(language === "ca" ? "ca-ES" : "es-ES")}
+                          </div>
+                        ) : (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => resolveAlertMutation.mutate(alert.id)}
+                            disabled={resolveAlertMutation.isPending}
+                          >
+                            {language === "ca" ? "Resoldre" : "Resolver"}
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))

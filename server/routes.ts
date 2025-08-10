@@ -648,7 +648,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const alertsResult = await db.execute(sql`
         SELECT COUNT(*) as pending_alerts  
-        FROM alert_notifications WHERE institution_id = ${institutionId} AND email_sent = false
+        FROM alert_notifications WHERE institution_id = ${institutionId} AND resolved_at IS NULL
       `);
 
       const communicationsResult = await db.execute(sql`
@@ -898,9 +898,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           a.email_sent as "emailSent",
           a.delay_minutes as "delayMinutes",
           a.accumulated_minutes as "accumulatedMinutes",
-          'active' as status
+          a.resolved_at as "resolvedAt",
+          r.first_name || ' ' || COALESCE(r.last_name, '') as "resolvedByName",
+          CASE 
+            WHEN a.resolved_at IS NOT NULL THEN 'resolved'
+            ELSE 'active'
+          END as status
         FROM alert_notifications a
         LEFT JOIN users u ON a.employee_id = u.id
+        LEFT JOIN users r ON a.resolved_by = r.id
         WHERE a.institution_id = ${institutionId}
         ORDER BY a.sent_at DESC
         LIMIT 50
@@ -918,14 +924,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { alertId } = req.params;
       const userRole = req.user.role;
+      const userId = req.user.id;
 
       if (!['admin', 'superadmin', 'employee'].includes(userRole)) {
         return res.status(403).json({ message: 'Access denied' });
       }
 
-      // Delete the alert (mark as resolved)
+      // Mark alert as resolved instead of deleting
       const result = await db.execute(sql`
-        DELETE FROM alert_notifications 
+        UPDATE alert_notifications 
+        SET resolved_at = NOW(), resolved_by = ${userId}
         WHERE id = ${alertId}
       `);
 

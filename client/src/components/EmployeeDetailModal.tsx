@@ -343,18 +343,24 @@ export default function EmployeeDetailModal({
                           record 
                             ? `${format(day, 'dd/MM/yyyy', { locale })}
 ━━━━━━━━━━━━━━━━━━━━━━━━
-📅 HORARI PROGRAMAT:
-   Entrada: ${record.scheduledStart ? formatTime(record.scheduledStart) : '09:00'} (previst)
-   Sortida: ${record.scheduledEnd ? formatTime(record.scheduledEnd) : '17:00'} (previst)
-   Períodes: ${record.scheduledPeriods || 'N/D'}
+📅 HORARI UNTIS PERSONALITZAT:
+   Entrada: ${record.scheduledStart || 'Sense horari'} (programat)
+   Sortida: ${record.scheduledEnd || 'Sense horari'} (programat)
+   Períodes lectius: ${record.scheduledPeriods || '0'}
 
 ⏰ MARCATGE REAL:
    Entrada: ${formatTime(record.checkIn)}
    Sortida: ${formatTime(record.checkOut)}
 
-📊 RESUM DEL DIA:
-   Retard: ${Math.round(parseFloat(record.lateMinutes?.toString() || '0'))} min
-   Hores: ${parseFloat(record.totalHours?.toString() || '0').toFixed(1)}h
+📊 ANÀLISI DEL DIA:
+   Retard entrada: ${Math.round(parseFloat(record.lateMinutes?.toString() || '0'))} min
+   Hores treballades: ${parseFloat(record.totalHours?.toString() || '0').toFixed(1)}h
+   ${(() => {
+     const scheduled = record.scheduledPeriods ? record.scheduledPeriods * 0.9 : 0;
+     const worked = parseFloat(record.totalHours?.toString() || '0');
+     const overtime = worked - scheduled;
+     return overtime > 1 ? `⚠️ Hores extres: +${overtime.toFixed(1)}h` : 'Jornada normal';
+   })()}
    Estat: ${(() => {
      const late = parseFloat(record.lateMinutes?.toString() || '0');
      if (late <= 0) return 'Puntual ✅';
@@ -364,11 +370,11 @@ export default function EmployeeDetailModal({
    })()}`
                             : `${format(day, 'dd/MM/yyyy', { locale })}
 ━━━━━━━━━━━━━━━━━━━━━━━━
-📅 HORARI PROGRAMAT:
-   Consultar horaris personalitzats
+📅 HORARI UNTIS PERSONALITZAT:
+   ${isWorkDay ? 'Horari segons sessions importades d\'Untis' : 'Cap sessió programada'}
 
 ❌ SENSE ASSISTÈNCIA
-No s'ha registrat cap marcatge aquest dia`
+${isWorkDay ? 'No s\'ha registrat cap marcatge aquest dia' : 'Dia no lectiu (cap sessió a Untis)'}`
                         }
                         data-testid={`day-${dateStr}`}
                       >

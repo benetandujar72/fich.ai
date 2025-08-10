@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   FileText,
   Settings,
+  Cog,
   Building2,
   GraduationCap,
   ChevronLeft,
@@ -143,7 +144,7 @@ export default function Sidebar() {
           name: language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas",
           href: "/alert-config",
           icon: Settings,
-          show: permissions.canManageSystem,
+          show: permissions.canManageUsers,
           badge: null,
         },
         {

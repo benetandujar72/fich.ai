@@ -483,6 +483,34 @@ export default function Settings() {
         />
       )}
 
+      {/* Quick Access to Alert Configuration */}
+      {permissions.canManageUsers && (
+        <Card data-testid="alert-config-card">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Settings className="mr-2 h-5 w-5" />
+              {language === "ca" ? "Configuració d'Alertes Automàtiques" : "Configuración de Alertas Automáticas"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              {language === "ca" 
+                ? "Gestiona les regles d'alertes automàtiques per detectar retards, absències i altres incidents."
+                : "Gestiona las reglas de alertas automáticas para detectar retrasos, ausencias y otros incidentes."
+              }
+            </p>
+            <Button 
+              onClick={() => window.location.href = '/alert-config'}
+              className="w-full"
+              data-testid="configure-alerts-button"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              {language === "ca" ? "Configurar Alertes" : "Configurar Alertas"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Automated Alerts Configuration - Only for Admins */}
       {permissions.canManageUsers && (
         <AutomatedAlertsConfig 

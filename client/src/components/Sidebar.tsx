@@ -267,7 +267,7 @@ export default function Sidebar(props: SidebarProps = {}) {
       {/* Mobile Overlay */}
       {isMobile && mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/80 z-40 md:hidden pointer-events-auto" 
+          className="fixed inset-0 bg-black/80 z-[50] md:hidden pointer-events-auto top-16" 
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -276,11 +276,11 @@ export default function Sidebar(props: SidebarProps = {}) {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed top-0 left-0 h-full bg-gradient-to-b from-white via-rose-50/95 to-pink-50/95 dark:from-gray-950 dark:via-slate-900/98 dark:to-slate-800/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-50 transition-all duration-300 flex flex-col shadow-2xl pointer-events-auto",
+        "fixed top-0 left-0 h-full bg-gradient-to-b from-white via-rose-50/95 to-pink-50/95 dark:from-gray-950 dark:via-slate-900/98 dark:to-slate-800/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-[55] transition-all duration-300 flex flex-col shadow-2xl pointer-events-auto",
         // Desktop behavior
         !isMobile && (isCollapsed ? "w-16" : "w-60"),
-        // Mobile behavior
-        isMobile && (mobileMenuOpen ? "w-72" : "w-0 -translate-x-full"),
+        // Mobile behavior  
+        isMobile && (mobileMenuOpen ? "w-72 top-16" : "w-0 -translate-x-full top-16"),
         isMobile && mobileMenuOpen && "translate-x-0 shadow-2xl"
       )}>
         

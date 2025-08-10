@@ -18,7 +18,7 @@ export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, on
   const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'U';
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 md:hidden bg-white dark:bg-gray-900 border-b border-border shadow-sm">
+    <div className="fixed top-0 left-0 right-0 z-[60] md:hidden bg-white dark:bg-gray-900 border-b border-border shadow-sm">
       <div className="flex items-center justify-between px-4 py-3">
         {/* App Logo and Name */}
         <div className="flex items-center gap-3">

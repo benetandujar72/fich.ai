@@ -36,6 +36,7 @@ import EmailSettingsForm from "@/components/EmailSettingsForm";
 import { PasswordChangeModal } from "@/components/PasswordChangeModal";
 import AbsenceJustificationReview from "@/components/AbsenceJustificationReview";
 import AutomatedAlertsConfig from "@/components/AutomatedAlertsConfig";
+import AlertConfigModal from "@/components/modals/AlertConfigModal";
 
 interface CenterSettings {
   centerName: string;
@@ -64,6 +65,7 @@ export default function Settings() {
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true); // Default enabled for regulatory compliance
   const [showAddAdminForm, setShowAddAdminForm] = useState(false);
   const [passwordChangeUser, setPasswordChangeUser] = useState<{ id: string; email: string } | null>(null);
+  const [showAlertConfigModal, setShowAlertConfigModal] = useState(false);
   const [newAdminData, setNewAdminData] = useState({
     email: "",
     firstName: "",
@@ -500,7 +502,7 @@ export default function Settings() {
               }
             </p>
             <Button 
-              onClick={() => window.location.href = '/alert-config'}
+              onClick={() => setShowAlertConfigModal(true)}
               className="w-full"
               data-testid="configure-alerts-button"
             >
@@ -764,6 +766,13 @@ export default function Settings() {
       )}
 
       {/* Password Change Modal - handled by PasswordChangeModal component itself */}
+      
+      <AlertConfigModal
+        isOpen={showAlertConfigModal}
+        onClose={() => setShowAlertConfigModal(false)}
+        institutionId={institutionId}
+        language={language}
+      />
     </main>
   );
 }

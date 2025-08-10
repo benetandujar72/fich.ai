@@ -16,11 +16,13 @@ import CommunicationsManagement from "@/components/admin/CommunicationsManagemen
 import PrivacyManagement from "@/components/admin/PrivacyManagement";
 import RiskAssessmentDashboard from "@/components/admin/RiskAssessmentDashboard";
 import EmailConfigurationPanel from "@/components/admin/EmailConfigurationPanel";
+import AlertConfigModal from "@/components/modals/AlertConfigModal";
 
 export default function AdminManagement() {
   const { user } = useAuth();
   const permissions = usePermissions();
   const [activeTab, setActiveTab] = useState("staff");
+  const [showAlertConfigModal, setShowAlertConfigModal] = useState(false);
 
   // Only allow admins and superadmins
   if (!permissions.canManageUsers) {
@@ -146,6 +148,17 @@ export default function AdminManagement() {
         </TabsContent>
 
         <TabsContent value="alerts" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Gestió d'Alertes</h2>
+            <Button 
+              onClick={() => setShowAlertConfigModal(true)}
+              className="flex items-center gap-2"
+              data-testid="open-alert-config-button"
+            >
+              <Settings className="h-4 w-4" />
+              Configurar Alertes Automàtiques
+            </Button>
+          </div>
           <AlertsManagement />
         </TabsContent>
 
@@ -169,6 +182,13 @@ export default function AdminManagement() {
           <EmailConfigurationPanel />
         </TabsContent>
       </Tabs>
+
+      <AlertConfigModal
+        isOpen={showAlertConfigModal}
+        onClose={() => setShowAlertConfigModal(false)}
+        institutionId={user?.institutionId || null}
+        language="ca"
+      />
     </div>
   );
 }

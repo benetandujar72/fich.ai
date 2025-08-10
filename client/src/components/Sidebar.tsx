@@ -140,13 +140,7 @@ export default function Sidebar() {
           show: permissions.canViewAlerts,
           badge: Array.isArray(alerts) && alerts.filter((alert: any) => alert.status === 'active').length > 0 ? alerts.filter((alert: any) => alert.status === 'active').length.toString() : null,
         },
-        {
-          name: language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas",
-          href: "/alert-config",
-          icon: Settings,
-          show: permissions.canManageUsers,
-          badge: null,
-        },
+
         {
           name: t("reports", language),
           href: "/reports",
@@ -185,6 +179,13 @@ export default function Sidebar() {
           href: "/admin",
           icon: Shield,
           show: user?.role === 'admin' || user?.role === 'superadmin',
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas",
+          href: "/alert-config",
+          icon: Settings,
+          show: permissions.canManageUsers,
           badge: null,
         },
         {

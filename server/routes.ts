@@ -749,42 +749,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
             AND DATE(timestamp) BETWEEN ${startDate} AND ${endDate}
           GROUP BY DATE(timestamp)
         ),
-        employee_schedules AS (
+        user_info AS (
+          SELECT u.first_name, u.email
+          FROM users u 
+          WHERE u.id = ${employeeId}
+        ),
+        employee_untis_schedule AS (
           SELECT 
-            s.day_of_week,
-            s.start_time,
-            s.end_time,
-            s.is_lective_time
-          FROM schedules s
-          WHERE s.employee_id = ${employeeId} AND s.is_active = true
-          UNION ALL
-          SELECT 
-            ws.day_of_week,
+            us.day_of_week,
+            us.hour_period,
             CASE 
-              WHEN ws.hour_period = 1 THEN '08:00:00'::time
-              WHEN ws.hour_period = 2 THEN '09:00:00'::time
-              WHEN ws.hour_period = 3 THEN '10:00:00'::time
-              WHEN ws.hour_period = 4 THEN '11:00:00'::time
-              WHEN ws.hour_period = 5 THEN '12:00:00'::time
-              WHEN ws.hour_period = 6 THEN '13:00:00'::time
-              WHEN ws.hour_period = 7 THEN '14:00:00'::time
-              WHEN ws.hour_period = 8 THEN '15:00:00'::time
+              WHEN us.hour_period = 1 THEN '08:00:00'::time
+              WHEN us.hour_period = 2 THEN '09:00:00'::time
+              WHEN us.hour_period = 3 THEN '10:00:00'::time
+              WHEN us.hour_period = 4 THEN '11:00:00'::time
+              WHEN us.hour_period = 5 THEN '12:00:00'::time
+              WHEN us.hour_period = 6 THEN '13:00:00'::time
+              WHEN us.hour_period = 7 THEN '14:00:00'::time
+              WHEN us.hour_period = 8 THEN '15:00:00'::time
               ELSE '09:00:00'::time
             END as start_time,
             CASE 
-              WHEN ws.hour_period = 1 THEN '08:55:00'::time
-              WHEN ws.hour_period = 2 THEN '09:55:00'::time
-              WHEN ws.hour_period = 3 THEN '10:55:00'::time
-              WHEN ws.hour_period = 4 THEN '11:55:00'::time
-              WHEN ws.hour_period = 5 THEN '12:55:00'::time
-              WHEN ws.hour_period = 6 THEN '13:55:00'::time
-              WHEN ws.hour_period = 7 THEN '14:55:00'::time
-              WHEN ws.hour_period = 8 THEN '15:55:00'::time
+              WHEN us.hour_period = 1 THEN '08:55:00'::time
+              WHEN us.hour_period = 2 THEN '09:55:00'::time
+              WHEN us.hour_period = 3 THEN '10:55:00'::time
+              WHEN us.hour_period = 4 THEN '11:55:00'::time
+              WHEN us.hour_period = 5 THEN '12:55:00'::time
+              WHEN us.hour_period = 6 THEN '13:55:00'::time
+              WHEN us.hour_period = 7 THEN '14:55:00'::time
+              WHEN us.hour_period = 8 THEN '15:55:00'::time
               ELSE '09:55:00'::time
             END as end_time,
-            ws.is_lective_hour as is_lective_time
-          FROM weekly_schedule ws
-          WHERE ws.employee_id = ${employeeId}
+            us.is_lective_hour
+          FROM untis_schedule_sessions us
+          CROSS JOIN user_info ui
+          WHERE us.teacher_code = ui.first_name
         ),
         daily_schedule AS (
           SELECT 
@@ -792,33 +791,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
             MIN(start_time) as expected_start,
             MAX(end_time) as expected_end,
             COUNT(*) as scheduled_periods
-          FROM employee_schedules
+          FROM employee_untis_schedule
           GROUP BY day_of_week
         )
         SELECT 
           da.attendance_date::text as date,
           da.check_in::text,
           da.check_out::text,
-          ds.expected_start::text as scheduled_start,
-          ds.expected_end::text as scheduled_end,
-          ds.scheduled_periods,
+          COALESCE(ds.expected_start::text, '09:00:00') as scheduled_start,
+          COALESCE(ds.expected_end::text, '17:00:00') as scheduled_end,
+          COALESCE(ds.scheduled_periods, 0) as scheduled_periods,
           CASE 
             WHEN da.check_in IS NULL THEN 'absent'
-            WHEN da.check_in::time > (ds.expected_start + interval '30 minutes') THEN 'late'
+            WHEN da.check_in::time > (COALESCE(ds.expected_start, '09:00:00'::time) + interval '30 minutes') THEN 'late'
             WHEN da.check_out IS NULL THEN 'partial'
             ELSE 'present'
           END as status,
           CASE 
-            WHEN da.check_in IS NOT NULL AND da.check_in::time > ds.expected_start 
-            THEN EXTRACT(EPOCH FROM (da.check_in::time - ds.expected_start))/60
+            WHEN da.check_in IS NOT NULL AND da.check_in::time > COALESCE(ds.expected_start, '09:00:00'::time)
+            THEN EXTRACT(EPOCH FROM (da.check_in::time - COALESCE(ds.expected_start, '09:00:00'::time)))/60
             ELSE 0
           END as "lateMinutes",
           CASE 
             WHEN da.check_in IS NOT NULL AND da.check_out IS NOT NULL
             THEN EXTRACT(EPOCH FROM (da.check_out - da.check_in))/3600
-            WHEN ds.scheduled_periods IS NOT NULL
-            THEN ds.scheduled_periods * 0.9  -- 55-minute periods
-            ELSE 0
+            WHEN ds.scheduled_periods IS NOT NULL AND ds.scheduled_periods > 0
+            THEN ds.scheduled_periods * 0.9
+            ELSE 8.0
           END as "totalHours"
         FROM daily_attendance da
         LEFT JOIN daily_schedule ds ON da.day_of_week = ds.day_of_week

@@ -54,7 +54,7 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
         </div>
 
         {/* Right section with actions */}
-        <div className="flex items-center space-x-2 md:space-x-3">
+        <div className="flex items-center space-x-2 md:space-x-3 relative z-50">
           {onQuickAttendance && (
             <Button 
               onClick={onQuickAttendance}
@@ -83,19 +83,19 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
           {/* Language selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="hover:bg-rose-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
+              <Button variant="ghost" size="sm" className="hover:bg-rose-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 relative z-10">
                 <Globe className="h-4 w-4" />
                 <span className="ml-1 hidden sm:inline text-xs font-medium">
                   {language.toUpperCase()}
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[120px] bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-slate-600">
+            <DropdownMenuContent align="end" className="min-w-[120px] bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-slate-600 z-50">
               <DropdownMenuItem 
                 onClick={() => setLanguage("ca")}
                 className={cn("cursor-pointer hover:bg-rose-100 dark:hover:bg-slate-700", language === "ca" && "bg-rose-100 dark:bg-slate-700")}
               >
-                🇨🇦 Català
+                🏴󠁥󠁳󠁣󠁴󠁿 Català
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setLanguage("es")}
@@ -112,20 +112,20 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="relative hover:bg-rose-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
+                className="relative hover:bg-rose-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 z-10"
                 data-testid="notifications-button"
               >
                 <Bell className="h-4 w-4" />
                 <Badge 
                   variant="destructive" 
-                  className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] font-semibold"
+                  className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] font-semibold z-20"
                   data-testid="notification-count"
                 >
                   3
                 </Badge>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-slate-600">
+            <DropdownMenuContent align="end" className="w-80 bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-slate-600 z-50">
               <div className="p-3 border-b">
                 <h3 className="font-semibold text-sm">
                   {language === "ca" ? "Notificacions" : "Notificaciones"}

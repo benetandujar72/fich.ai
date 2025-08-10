@@ -367,7 +367,7 @@ export default function Sidebar(props: SidebarProps = {}) {
                             isCollapsed && !isMobile ? "justify-center px-3" : "justify-start",
                             isMobile && "pointer-events-auto"
                           )}
-                          data-testid={`nav-${item.href.replace('/', '').replace('/', '-')}`}
+                          data-testid={`nav-${item.href.replace('/', '').replace('/', '-')}-link`}
                           onClick={isMobile ? () => setMobileMenuOpen(false) : undefined}
                         >
                           <Icon className={cn(

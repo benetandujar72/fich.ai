@@ -94,7 +94,7 @@ export default function EmployeeDetailModal({
 
   const getDayColor = (record: AttendanceRecord | null, isWorkDay: boolean) => {
     if (!isWorkDay) {
-      return "bg-gray-100 text-gray-400"; // Weekend/holiday
+      return "bg-gray-100 text-gray-400 border-gray-200"; // Weekend/holiday - explicitly set border
     }
     
     if (!record) {
@@ -103,7 +103,16 @@ export default function EmployeeDetailModal({
     
     switch (record.status) {
       case 'present':
-        return "bg-green-100 text-green-700 border-green-200";
+        // Check if truly on time (no late minutes)
+        if (!record.lateMinutes || record.lateMinutes <= 0) {
+          return "bg-green-100 text-green-700 border-green-200";
+        } else if (record.lateMinutes <= 15) {
+          return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        } else if (record.lateMinutes <= 30) {
+          return "bg-orange-100 text-orange-700 border-orange-200";
+        } else {
+          return "bg-red-100 text-red-700 border-red-200";
+        }
       case 'late':
         if (record.lateMinutes && record.lateMinutes <= 15) {
           return "bg-yellow-100 text-yellow-700 border-yellow-200";
@@ -215,20 +224,35 @@ export default function EmployeeDetailModal({
               <div className="space-y-2">
                 <h4 className="text-sm font-medium flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  {t("attendance_summary", language)}
+                  {t("monthly_summary", language)}
                 </h4>
                 <div className="text-xs space-y-1">
                   <div className="flex justify-between">
-                    <span>{t("total_hours", language)}:</span>
-                    <span className="font-mono">{employee.totalHours || "0"}h</span>
+                    <span>{t("month_hours", language)}:</span>
+                    <span className="font-mono">
+                      {attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours) || 0), 0).toFixed(1)}h
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>{t("last_attendance", language)}:</span>
+                    <span>{t("work_days", language)}:</span>
                     <span className="font-mono">
-                      {employee.lastAttendance 
-                        ? format(new Date(employee.lastAttendance), "dd/MM/yyyy", { locale })
-                        : "--/--/----"
-                      }
+                      {attendanceHistory.filter(r => r.status !== 'absent').length}/{attendanceHistory.length || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("punctuality", language)}:</span>
+                    <span className="font-mono">
+                      {attendanceHistory.length > 0 
+                        ? Math.round((attendanceHistory.filter(r => r.status === 'present' && (!r.lateMinutes || parseFloat(r.lateMinutes.toString()) <= 0)).length / attendanceHistory.length) * 100)
+                        : 0}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("avg_daily_hours", language)}:</span>
+                    <span className="font-mono">
+                      {attendanceHistory.length > 0 
+                        ? (attendanceHistory.reduce((total, record) => total + (parseFloat(record.totalHours) || 0), 0) / Math.max(attendanceHistory.filter(r => r.status !== 'absent').length, 1)).toFixed(1)
+                        : "0.0"}h
                     </span>
                   </div>
                 </div>

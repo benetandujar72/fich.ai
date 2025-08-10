@@ -25,9 +25,11 @@ import {
   Search, 
   Edit, 
   Clock, 
-  Trash2
+  Trash2,
+  User
 } from "lucide-react";
 import EmployeeModal from "@/components/modals/EmployeeModal";
+import EmployeeDetailModal from "@/components/EmployeeDetailModal";
 import type { Employee } from "@shared/schema";
 
 export default function Employees() {
@@ -41,6 +43,8 @@ export default function Employees() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [viewingEmployee, setViewingEmployee] = useState<any | null>(null);
 
   // Get institution ID from authenticated user
   const institutionId = user?.institutionId;
@@ -101,6 +105,16 @@ export default function Employees() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setEditingEmployee(null);
+  };
+
+  const handleViewDetails = (employee: any) => {
+    setViewingEmployee(employee);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleDetailModalClose = () => {
+    setIsDetailModalOpen(false);
+    setViewingEmployee(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -281,18 +295,26 @@ export default function Employees() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  employees.map((employee: Employee) => (
+                  employees.map((employee: any) => (
                     <TableRow key={employee.id} data-testid={`employee-row-${employee.id}`}>
                       <TableCell>
                         <div className="flex items-center">
-                          <img 
-                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face"
-                            alt={employee.fullName}
-                            className="w-10 h-10 rounded-full object-cover mr-4"
-                          />
+                          <div
+                            className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-4 cursor-pointer hover:bg-primary/20 transition-colors"
+                            onClick={() => handleViewDetails(employee)}
+                            data-testid={`employee-avatar-${employee.id}`}
+                            title={language === "ca" ? "Veure detalls de l'empleat" : "Ver detalles del empleado"}
+                          >
+                            <User className="h-5 w-5 text-primary" />
+                          </div>
                           <div>
-                            <div className="font-medium text-text" data-testid={`employee-name-${employee.id}`}>
-                              {employee.fullName}
+                            <div 
+                              className="font-medium text-text cursor-pointer hover:text-primary transition-colors" 
+                              data-testid={`employee-name-${employee.id}`}
+                              onClick={() => handleViewDetails(employee)}
+                              title={language === "ca" ? "Veure detalls de l'empleat" : "Ver detalles del empleado"}
+                            >
+                              {employee.firstName} {employee.lastName}
                             </div>
                             <div className="text-sm text-gray-500" data-testid={`employee-email-${employee.id}`}>
                               {employee.email}
@@ -301,16 +323,18 @@ export default function Employees() {
                         </div>
                       </TableCell>
                       <TableCell data-testid={`employee-dni-${employee.id}`}>
-                        {employee.dni}
+                        {employee.dni || "--"}
                       </TableCell>
                       <TableCell data-testid={`employee-department-${employee.id}`}>
                         {employee.departmentId || t("administration", language)}
                       </TableCell>
                       <TableCell data-testid={`employee-schedule-${employee.id}`}>
-                        {getContractTypeLabel(employee.contractType)}
+                        {employee.role || "Employee"}
                       </TableCell>
                       <TableCell data-testid={`employee-status-${employee.id}`}>
-                        {getStatusBadge(employee.status)}
+                        <Badge variant="default" className="bg-secondary/10 text-secondary">
+                          {t("active", language)}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
@@ -354,6 +378,14 @@ export default function Employees() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         employee={editingEmployee}
+        institutionId={institutionId || ""}
+      />
+
+      {/* Employee Detail Modal */}
+      <EmployeeDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={handleDetailModalClose}
+        employee={viewingEmployee}
         institutionId={institutionId || ""}
       />
     </main>

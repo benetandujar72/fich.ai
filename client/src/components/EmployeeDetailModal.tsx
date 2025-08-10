@@ -1,0 +1,349 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/lib/i18n";
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isWeekend, startOfMonth, endOfMonth } from "date-fns";
+import { ca, es } from "date-fns/locale";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { 
+  User, 
+  Mail, 
+  Calendar, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle, 
+  XCircle,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
+// Define the employee type expected from the admin employees endpoint
+interface AdminEmployee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  lastAttendance: string | null;
+  totalHours: string;
+}
+
+interface EmployeeDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  employee: AdminEmployee | null;
+  institutionId: string;
+}
+
+interface AttendanceRecord {
+  id: string;
+  employeeId: string;
+  date: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  totalHours: number;
+  status: 'present' | 'late' | 'absent' | 'partial';
+  lateMinutes?: number;
+}
+
+export default function EmployeeDetailModal({ 
+  isOpen, 
+  onClose, 
+  employee, 
+  institutionId 
+}: EmployeeDetailModalProps) {
+  const { language } = useLanguage();
+  const locale = language === "ca" ? ca : es;
+  
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const { data: attendanceHistory = [], isLoading } = useQuery<AttendanceRecord[]>({
+    queryKey: ["/api/attendance-history", employee?.id, format(currentMonth, "yyyy-MM")],
+    queryFn: async () => {
+      if (!employee?.id) return [];
+      
+      const startDate = format(startOfMonth(currentMonth), "yyyy-MM-dd");
+      const endDate = format(endOfMonth(currentMonth), "yyyy-MM-dd");
+      
+      console.log('ATTENDANCE_HISTORY: Fetching for employee:', employee.id, 'period:', startDate, 'to', endDate);
+      
+      const response = await fetch(
+        `/api/attendance-history/${employee.id}?startDate=${startDate}&endDate=${endDate}`,
+        { credentials: 'include' }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch attendance history');
+      }
+      
+      const data = await response.json();
+      console.log('ATTENDANCE_HISTORY: Received data:', data);
+      return data;
+    },
+    enabled: !!employee?.id && isOpen,
+  });
+
+  const getDayColor = (record: AttendanceRecord | null, isWorkDay: boolean) => {
+    if (!isWorkDay) {
+      return "bg-gray-100 text-gray-400"; // Weekend/holiday
+    }
+    
+    if (!record) {
+      return "bg-red-100 text-red-700 border-red-200"; // No record = absent
+    }
+    
+    switch (record.status) {
+      case 'present':
+        return "bg-green-100 text-green-700 border-green-200";
+      case 'late':
+        if (record.lateMinutes && record.lateMinutes <= 15) {
+          return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        } else if (record.lateMinutes && record.lateMinutes <= 30) {
+          return "bg-orange-100 text-orange-700 border-orange-200";
+        } else {
+          return "bg-red-100 text-red-700 border-red-200";
+        }
+      case 'partial':
+        return "bg-orange-100 text-orange-700 border-orange-200";
+      case 'absent':
+      default:
+        return "bg-red-100 text-red-700 border-red-200";
+    }
+  };
+
+  const getStatusIcon = (record: AttendanceRecord | null, isWorkDay: boolean) => {
+    if (!isWorkDay) return null;
+    
+    if (!record) {
+      return <XCircle className="h-3 w-3" />;
+    }
+    
+    switch (record.status) {
+      case 'present':
+        return <CheckCircle className="h-3 w-3" />;
+      case 'late':
+      case 'partial':
+        return <AlertCircle className="h-3 w-3" />;
+      case 'absent':
+      default:
+        return <XCircle className="h-3 w-3" />;
+    }
+  };
+
+  const formatTime = (timeString: string | null) => {
+    if (!timeString) return '--:--';
+    return format(new Date(timeString), 'HH:mm');
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+      return newDate;
+    });
+  };
+
+  // Generate calendar days for current month
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  // Create attendance record map for quick lookup
+  const attendanceMap = new Map<string, AttendanceRecord>();
+  attendanceHistory.forEach(record => {
+    attendanceMap.set(record.date, record);
+  });
+
+  if (!employee) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+              <User className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">
+                {employee.firstName} {employee.lastName}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t("employee_details", language)}
+              </p>
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Personal Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                {t("personal_information", language)}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{t("email", language)}</p>
+                  <p className="text-sm text-muted-foreground">{employee.email}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{t("role", language)}</p>
+                  <Badge variant="secondary">{employee.role}</Badge>
+                </div>
+              </div>
+
+              <Separator />
+              
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  {t("attendance_summary", language)}
+                </h4>
+                <div className="text-xs space-y-1">
+                  <div className="flex justify-between">
+                    <span>{t("total_hours", language)}:</span>
+                    <span className="font-mono">{employee.totalHours || "0"}h</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("last_attendance", language)}:</span>
+                    <span className="font-mono">
+                      {employee.lastAttendance 
+                        ? format(new Date(employee.lastAttendance), "dd/MM/yyyy", { locale })
+                        : "--/--/----"
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Attendance Calendar */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  {t("attendance_history", language)}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateMonth('prev')}
+                    data-testid="prev-month-btn"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm font-medium min-w-[120px] text-center">
+                    {format(currentMonth, "MMMM yyyy", { locale })}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateMonth('next')}
+                    data-testid="next-month-btn"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Legend */}
+              <div className="flex flex-wrap gap-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-green-100 border border-green-200"></div>
+                  <span>{t("on_time", language)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-yellow-100 border border-yellow-200"></div>
+                  <span>{t("slightly_late", language)} (&lt;15min)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-orange-100 border border-orange-200"></div>
+                  <span>{t("late", language)} (&lt;30min)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-red-100 border border-red-200"></div>
+                  <span>{t("very_late_absent", language)}</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-7 gap-1">
+                  {/* Day headers */}
+                  {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(day => (
+                    <div key={day} className="p-2 text-center text-xs font-medium text-muted-foreground">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {/* Calendar days */}
+                  {calendarDays.map(day => {
+                    const dateStr = format(day, 'yyyy-MM-dd');
+                    const record = attendanceMap.get(dateStr) || null;
+                    const isWorkDay = !isWeekend(day);
+                    const dayColor = getDayColor(record, isWorkDay);
+                    const statusIcon = getStatusIcon(record, isWorkDay);
+                    
+                    return (
+                      <div
+                        key={dateStr}
+                        className={`
+                          p-2 text-xs rounded border cursor-pointer hover:opacity-80 transition-opacity
+                          ${dayColor}
+                        `}
+                        title={
+                          record 
+                            ? `${format(day, 'dd/MM/yyyy', { locale })}\n${t('check_in', language)}: ${formatTime(record.checkIn)}\n${t('check_out', language)}: ${formatTime(record.checkOut)}`
+                            : `${format(day, 'dd/MM/yyyy', { locale })}\n${isWorkDay ? t('no_attendance', language) : t('weekend', language)}`
+                        }
+                        data-testid={`day-${dateStr}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono">
+                            {format(day, 'd')}
+                          </span>
+                          {statusIcon}
+                        </div>
+                        {record && isWorkDay && (
+                          <div className="mt-1 space-y-0.5 text-[10px]">
+                            <div>{formatTime(record.checkIn)}</div>
+                            <div>{formatTime(record.checkOut)}</div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

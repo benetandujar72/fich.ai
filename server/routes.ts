@@ -709,6 +709,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Employee attendance history endpoint
+  app.get('/api/attendance-history/:employeeId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId } = req.params;
+      const { startDate, endDate } = req.query;
+      const userRole = req.user.role;
+
+      console.log('ATTENDANCE_HISTORY: Request for employee:', employeeId, 'from:', startDate, 'to:', endDate);
+
+      // Admins and superadmins can see any employee's history
+      // Employees can only see their own history
+      if (userRole === 'employee' && req.user.id !== employeeId) {
+        return res.status(403).json({ message: 'Access denied: can only view your own attendance' });
+      }
+
+      // For admins, verify employee belongs to their institution
+      if (userRole === 'admin') {
+        const employeeResult = await db.execute(sql`
+          SELECT institution_id 
+          FROM users 
+          WHERE id = ${employeeId}
+        `);
+        
+        if (!employeeResult.rows.length || employeeResult.rows[0].institution_id !== req.user.institutionId) {
+          return res.status(403).json({ message: 'Access denied: employee not in your institution' });
+        }
+      }
+
+      const result = await db.execute(sql`
+        WITH daily_attendance AS (
+          SELECT 
+            DATE(timestamp) as attendance_date,
+            MIN(CASE WHEN type = 'check_in' THEN timestamp END) as check_in,
+            MAX(CASE WHEN type = 'check_out' THEN timestamp END) as check_out
+          FROM attendance_records 
+          WHERE employee_id = ${employeeId}
+            AND DATE(timestamp) BETWEEN ${startDate} AND ${endDate}
+          GROUP BY DATE(timestamp)
+        ),
+        work_schedule AS (
+          SELECT 
+            '09:00:00'::time as standard_start,
+            '17:00:00'::time as standard_end
+        )
+        SELECT 
+          da.attendance_date::text as date,
+          da.check_in::text,
+          da.check_out::text,
+          CASE 
+            WHEN da.check_in IS NULL THEN 'absent'
+            WHEN da.check_in::time > (ws.standard_start + interval '30 minutes') THEN 'late'
+            WHEN da.check_out IS NULL THEN 'partial'
+            ELSE 'present'
+          END as status,
+          CASE 
+            WHEN da.check_in IS NOT NULL AND da.check_in::time > ws.standard_start 
+            THEN EXTRACT(EPOCH FROM (da.check_in::time - ws.standard_start))/60
+            ELSE 0
+          END as "lateMinutes",
+          CASE 
+            WHEN da.check_in IS NOT NULL AND da.check_out IS NOT NULL
+            THEN EXTRACT(EPOCH FROM (da.check_out - da.check_in))/3600
+            ELSE 0
+          END as "totalHours"
+        FROM daily_attendance da
+        CROSS JOIN work_schedule ws
+        ORDER BY da.attendance_date DESC
+      `);
+
+      console.log('ATTENDANCE_HISTORY: Found', result.rows.length, 'records');
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching attendance history:", error);
+      res.status(500).json({ message: "Failed to fetch attendance history" });
+    }
+  });
+
   // Admin alerts endpoint  
   app.get('/api/admin/alerts/:institutionId', isAuthenticated, async (req: any, res) => {
     try {

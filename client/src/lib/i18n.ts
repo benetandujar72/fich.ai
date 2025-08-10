@@ -90,6 +90,22 @@ export const translations = {
     "primary_education": "Educació Primària",
     "secondary_education": "Educació Secundària",
     "administration": "Administració",
+    
+    // Employee details
+    "employee_details": "Detalls de l'empleat",
+    "personal_information": "Informació personal",
+    "attendance_summary": "Resum d'assistència",
+    "total_hours": "Hores totals",
+    "last_attendance": "Última assistència",
+    "attendance_history": "Historial d'assistència",
+    "on_time": "Puntual",
+    "slightly_late": "Lleuger retard",
+    "late": "Retard",
+    "very_late_absent": "Molt tard/absent",
+    "check_in": "Entrada",
+    "check_out": "Sortida",
+    "no_attendance": "Sense registre",
+    "weekend": "Cap de setmana",
   },
   es: {
     // Navigation
@@ -182,6 +198,22 @@ export const translations = {
     "primary_education": "Educación Primaria",
     "secondary_education": "Educación Secundaria",
     "administration": "Administración",
+    
+    // Employee details
+    "employee_details": "Detalles del empleado",
+    "personal_information": "Información personal",
+    "attendance_summary": "Resumen de asistencia",
+    "total_hours": "Horas totales",
+    "last_attendance": "Última asistencia",
+    "attendance_history": "Historial de asistencia",
+    "on_time": "Puntual",
+    "slightly_late": "Ligero retraso",
+    "late": "Retraso",
+    "very_late_absent": "Muy tarde/ausente",
+    "check_in": "Entrada",
+    "check_out": "Salida",
+    "no_attendance": "Sin registro",
+    "weekend": "Fin de semana",
   },
 };
 

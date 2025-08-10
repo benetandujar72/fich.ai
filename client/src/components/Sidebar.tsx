@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useQuery } from "@tanstack/react-query";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import {
@@ -43,6 +44,13 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Get alert count for badge
+  const { data: alerts = [] } = useQuery({
+    queryKey: ["/api/alerts", user?.institutionId],
+    enabled: !!user?.institutionId && permissions.canViewAlerts,
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+  });
 
   // Detect mobile and handle responsive behavior
   useEffect(() => {
@@ -129,7 +137,7 @@ export default function Sidebar() {
           href: "/alerts",
           icon: AlertTriangle,
           show: permissions.canViewAlerts,
-          badge: "3",
+          badge: Array.isArray(alerts) && alerts.length > 0 ? alerts.length.toString() : null,
         },
         {
           name: t("reports", language),

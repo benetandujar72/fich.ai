@@ -874,6 +874,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Alerts endpoint for regular users and sidebar badge
+  app.get('/api/alerts/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      // For now, return same admin alerts for simplicity
+      // In the future, this could be filtered based on user role
+      if (!['admin', 'superadmin', 'employee'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          a.id,
+          a.type,
+          a.subject as title,
+          a.content as description,
+          a.employee_id as "employeeId",
+          u.first_name || ' ' || COALESCE(u.last_name, '') as "employeeName",
+          a.sent_at as "createdAt",
+          a.email_sent as "emailSent",
+          a.delay_minutes as "delayMinutes",
+          a.accumulated_minutes as "accumulatedMinutes",
+          'active' as status
+        FROM alert_notifications a
+        LEFT JOIN users u ON a.employee_id = u.id
+        WHERE a.institution_id = ${institutionId}
+        ORDER BY a.sent_at DESC
+        LIMIT 50
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
   // Admin communications endpoint
   app.get('/api/admin/communications/:institutionId', isAuthenticated, async (req: any, res) => {
     try {

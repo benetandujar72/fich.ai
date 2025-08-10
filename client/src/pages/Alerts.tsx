@@ -149,6 +149,10 @@ export default function Alerts() {
     );
   }
 
+  // Separate active and resolved alerts
+  const activeAlerts = alerts?.filter((alert: any) => alert.status === 'active') || [];
+  const alertHistory = alerts || [];
+
   return (
     <main className="p-6 space-y-6">
       {/* Alert Configuration */}
@@ -205,7 +209,7 @@ export default function Alerts() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {(alerts as any[]).length === 0 ? (
+          {activeAlerts.length === 0 ? (
             <div className="text-center py-8">
               <CheckCircle className="mx-auto h-12 w-12 text-secondary mb-4" />
               <p className="text-gray-600">
@@ -228,13 +232,8 @@ export default function Alerts() {
                     </div>
                   ))}
                 </div>
-              ) : (alerts as any[]).length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Shield className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>{language === "ca" ? "No hi ha alertes actives" : "No hay alertas activas"}</p>
-                </div>
               ) : (
-                (alerts as any[]).map((alert: any) => (
+                activeAlerts.map((alert: any) => (
                   <div 
                     key={alert.id}
                     className={`border-l-4 p-4 rounded-r-lg ${getAlertColor(alert.type)}`}
@@ -249,7 +248,7 @@ export default function Alerts() {
                           <p className="font-medium text-text">{alert.title}</p>
                           <p className="text-sm text-gray-600">{alert.description}</p>
                           <p className="text-xs text-gray-500">
-                            {new Date(alert.createdAt).toLocaleString(language === "ca" ? "ca-ES" : "es-ES")}
+                            {language === "ca" ? "Empleat:" : "Empleado:"} {alert.employeeName} - {new Date(alert.createdAt).toLocaleString(language === "ca" ? "ca-ES" : "es-ES")}
                           </p>
                         </div>
                       </div>
@@ -302,14 +301,14 @@ export default function Alerts() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(alerts as any[]).length === 0 ? (
+                {alertHistory.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       {language === "ca" ? "No hi ha historial d'alertes" : "No hay historial de alertas"}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  (alerts as any[]).map((alert: any) => (
+                  alertHistory.map((alert: any) => (
                     <TableRow key={alert.id}>
                       <TableCell>
                         {new Date(alert.createdAt).toLocaleString(language === "ca" ? "ca-ES" : "es-ES")}

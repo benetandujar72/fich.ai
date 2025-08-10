@@ -183,9 +183,24 @@
   }
 
   /* Modal and Dialog fixes */
+  [data-radix-dialog-overlay] {
+    @apply fixed inset-0 z-50 bg-black/80 !important;
+    backdrop-filter: blur(4px) !important;
+  }
+  
+  [data-radix-dialog-content] {
+    @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg !important;
+    background: rgb(248 250 252) !important;
+    border: 1px solid rgb(226 232 240) !important;
+  }
+
+  .dark [data-radix-dialog-content] {
+    background: rgb(15 23 42) !important;
+    border: 1px solid rgb(51 65 85) !important;
+  }
+
   [role="dialog"] {
-    @apply bg-slate-50 dark:bg-slate-800 backdrop-blur-sm border border-slate-200 dark:border-slate-600 shadow-2xl !important;
-    opacity: 1 !important;
+    @apply bg-background border shadow-2xl !important;
     z-index: 9999 !important;
   }
 
@@ -193,19 +208,13 @@
     z-index: 9999 !important;
   }
 
-  [data-state="open"] {
-    opacity: 1 !important;
-  }
-
   .dialog-overlay {
-    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-50;
-    opacity: 1 !important;
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-50 !important;
   }
 
   .dialog-content {
     @apply fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2
-    gap-4 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 p-6 shadow-2xl duration-200 rounded-xl;
-    opacity: 1 !important;
+    gap-4 border bg-background p-6 shadow-2xl duration-200 rounded-xl !important;
   }
 
   /* Status indicators */

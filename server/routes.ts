@@ -10,6 +10,8 @@ import {
   insertCommunicationSchema,
   smtpConfigurations
 } from "@shared/schema";
+import nodemailer from "nodemailer";
+import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { sql, and, eq } from "drizzle-orm";
 import { db } from "./db";
@@ -1263,14 +1265,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
 
-      // Here would be the actual email sending logic using the SMTP configuration
-      // For now, we'll just simulate success
-      console.log(`Test email would be sent to: ${email}`);
+      // Get SMTP configuration from database
+      const smtpResult = await db
+        .select()
+        .from(smtpConfigurations)
+        .where(
+          and(
+            eq(smtpConfigurations.institutionId, req.user.institutionId),
+            eq(smtpConfigurations.isActive, true)
+          )
+        )
+        .limit(1);
+
+      if (smtpResult.length === 0) {
+        return res.status(400).json({ message: 'No se ha encontrado configuración SMTP activa' });
+      }
+
+      const smtpConfig = smtpResult[0];
+
+      // Create transporter with SMTP configuration
+      const transporter = nodemailer.createTransporter({
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.isSecure, // true for 465, false for other ports
+        auth: {
+          user: smtpConfig.username,
+          pass: smtpConfig.password,
+        },
+      });
+
+      // Test email content
+      const mailOptions = {
+        from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
+        to: email,
+        subject: 'Email de prova - EduPresència',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Email de Prova - EduPresència</h2>
+            <p>Aquest és un email de prova per comprovar la configuració SMTP del sistema EduPresència.</p>
+            <p><strong>Data i hora:</strong> ${new Date().toLocaleString('ca-ES')}</p>
+            <p><strong>Institució:</strong> ${smtpConfig.fromName}</p>
+            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #059669;">✅ La configuració SMTP funciona correctament!</p>
+            </div>
+            <p style="color: #6b7280; font-size: 12px; margin-top: 30px;">
+              Aquest email ha estat generat automàticament pel sistema EduPresència.
+            </p>
+          </div>
+        `,
+      };
+
+      // Send email
+      await transporter.sendMail(mailOptions);
       
-      res.json({ success: true });
-    } catch (error) {
+      console.log(`Test email sent successfully to: ${email}`);
+      res.json({ success: true, message: 'Email de prova enviat correctament' });
+    } catch (error: any) {
       console.error("Error sending test email:", error);
-      res.status(500).json({ message: "Failed to send test email" });
+      res.status(500).json({ 
+        message: "Error enviant email de prova", 
+        details: error.message 
+      });
     }
   });
 

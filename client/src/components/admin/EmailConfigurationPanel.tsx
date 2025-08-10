@@ -197,7 +197,12 @@ export default function EmailConfigurationPanel() {
   });
 
   const onSaveSMTP = (data: SMTPConfig) => {
-    saveSMTPMutation.mutate(data);
+    // If password is empty and we have existing config, keep the existing password
+    const submitData = {
+      ...data,
+      password: data.password || (smtpConfig?.password ? "***KEEP_EXISTING***" : "")
+    };
+    saveSMTPMutation.mutate(submitData);
   };
 
   const onSaveTemplate = (data: EmailTemplate) => {
@@ -364,7 +369,11 @@ export default function EmailConfigurationPanel() {
                             {language === "ca" ? "Contrasenya" : "Contraseña"}
                           </FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} />
+                            <Input 
+                              type="password" 
+                              placeholder={smtpConfig ? "Deixa buit per mantenir l'actual" : "Contrasenya SMTP"} 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

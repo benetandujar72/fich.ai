@@ -1186,13 +1186,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({ isActive: false })
         .where(eq(smtpConfigurations.institutionId, req.user.institutionId));
 
+      // Get existing password if we're keeping it
+      let finalPassword = password;
+      if (password === "***KEEP_EXISTING***") {
+        const existingConfig = await db
+          .select({ password: smtpConfigurations.password })
+          .from(smtpConfigurations)
+          .where(
+            and(
+              eq(smtpConfigurations.institutionId, req.user.institutionId),
+              eq(smtpConfigurations.isActive, true)
+            )
+          )
+          .limit(1);
+        
+        if (existingConfig.length > 0) {
+          finalPassword = existingConfig[0].password;
+        }
+      }
+
       // Insert new SMTP configuration
       await db.insert(smtpConfigurations).values({
         institutionId: req.user.institutionId,
         host,
         port,
         username,
-        password, // In production, this should be encrypted
+        password: finalPassword, // In production, this should be encrypted
         isSecure,
         fromEmail,
         fromName,
@@ -1284,7 +1303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const smtpConfig = smtpResult[0];
 
       // Create transporter with SMTP configuration
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: smtpConfig.host,
         port: smtpConfig.port,
         secure: smtpConfig.isSecure, // true for 465, false for other ports

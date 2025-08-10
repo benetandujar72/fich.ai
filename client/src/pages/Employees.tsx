@@ -46,7 +46,22 @@ export default function Employees() {
   const institutionId = user?.institutionId;
 
   const { data: employees = [], isLoading } = useQuery<Employee[]>({
-    queryKey: ["/api/employees", institutionId, searchQuery],
+    queryKey: ["/api/admin/employees", institutionId, searchQuery],
+    queryFn: async () => {
+      console.log('EMPLOYEES: Fetching employees for admin, institution:', institutionId);
+      if (!institutionId) {
+        throw new Error('No institution ID available');
+      }
+      const response = await fetch(`/api/admin/employees/${institutionId}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch employees');
+      }
+      const data = await response.json();
+      console.log('EMPLOYEES: Received employees data:', data);
+      return data;
+    },
     enabled: !!institutionId,
   });
 
@@ -55,7 +70,7 @@ export default function Employees() {
       await apiRequest("DELETE", `/api/employees/${employeeId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/employees"] });
       toast({
         title: t("success", language),
         description: language === "ca" ? "Empleat eliminat correctament" : "Empleado eliminado correctamente",
@@ -339,7 +354,7 @@ export default function Employees() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         employee={editingEmployee}
-        institutionId={institutionId}
+        institutionId={institutionId || ""}
       />
     </main>
   );

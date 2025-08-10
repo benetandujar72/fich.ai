@@ -163,24 +163,24 @@ export default function Dashboard() {
       value: stats?.presentEmployees || 0,
       total: stats?.totalEmployees || 0,
       icon: Users,
-      color: "text-secondary",
-      bgColor: "bg-secondary/10",
+      color: "text-rose-600 dark:text-rose-400",
+      bgColor: "bg-rose-100/50 dark:bg-rose-900/20",
       testId: "stat-present-staff"
     },
     {
       title: t("total_employees", language),
       value: stats?.totalEmployees || 0,
       icon: UserPlus,
-      color: "text-info",
-      bgColor: "bg-info/10",
+      color: "text-pink-600 dark:text-pink-400",
+      bgColor: "bg-pink-100/50 dark:bg-pink-900/20",
       testId: "stat-total-employees"
     },
     {
       title: t("active_alerts", language),
       value: stats?.activeAlerts || 0,
       icon: AlertTriangle,
-      color: "text-error",
-      bgColor: "bg-error/10",
+      color: "text-orange-600 dark:text-orange-400",
+      bgColor: "bg-orange-100/50 dark:bg-orange-900/20",
       testId: "stat-active-alerts"
     },
     {
@@ -188,14 +188,14 @@ export default function Dashboard() {
       value: (stats?.totalEmployees && stats?.totalEmployees > 0) ? Math.round(((stats?.presentEmployees || 0) / stats.totalEmployees) * 100) : 0,
       suffix: "%",
       icon: BarChart3,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
+      color: "text-purple-600 dark:text-purple-400",
+      bgColor: "bg-purple-100/50 dark:bg-purple-900/20",
       testId: "stat-attendance-rate"
     },
   ];
 
   return (
-    <main className="p-6">
+    <main className="p-6 bg-gradient-to-br from-rose-50/20 via-pink-50/10 to-purple-50/20 dark:from-slate-900/20 dark:via-slate-800/10 dark:to-slate-900/20 min-h-screen">
       {/* Header with current time and user info */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -207,7 +207,7 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-primary">{timeString}</div>
+          <div className="text-2xl font-bold text-rose-600 dark:text-rose-400">{timeString}</div>
           <div className="text-sm text-muted-foreground">Hora actual</div>
         </div>
       </div>
@@ -219,7 +219,7 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{stat.title}</p>
                   <div className="text-2xl font-bold text-foreground">
                     {stat.total ? `${stat.value}/${stat.total}` : `${stat.value}${stat.suffix || ''}`}
                   </div>

@@ -25,8 +25,8 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
 
   return (
     <header className={cn(
-      "sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-      "border-b border-border shadow-sm"
+      "sticky top-0 z-40 bg-rose-50/95 dark:bg-slate-800/95 backdrop-blur supports-[backdrop-filter]:bg-rose-50/60 dark:supports-[backdrop-filter]:bg-slate-800/60",
+      "border-b border-rose-100 dark:border-slate-600 shadow-sm"
     )}>
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         
@@ -48,7 +48,7 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder={language === "ca" ? "Cercar..." : "Buscar..."}
-              className="pl-9 bg-muted/50 border-0 focus:bg-background transition-colors"
+              className="pl-9 bg-rose-50/50 dark:bg-slate-700/50 border-0 focus:bg-rose-100 dark:focus:bg-slate-600 transition-colors"
             />
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
             <Button 
               onClick={onQuickAttendance}
               size="sm"
-              className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-primary/25 hidden sm:flex"
+              className="bg-gradient-to-r from-rose-400 via-pink-400 to-purple-500 hover:from-rose-500 hover:via-pink-500 hover:to-purple-600 shadow-lg hover:shadow-rose-400/25 text-white hidden sm:flex"
               data-testid="quick-attendance-button"
             >
               <Clock className="mr-2 h-4 w-4" />
@@ -83,23 +83,23 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
           {/* Language selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="hover:bg-accent">
+              <Button variant="ghost" size="sm" className="hover:bg-rose-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
                 <Globe className="h-4 w-4" />
                 <span className="ml-1 hidden sm:inline text-xs font-medium">
                   {language.toUpperCase()}
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[120px]">
+            <DropdownMenuContent align="end" className="min-w-[120px] bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-slate-600">
               <DropdownMenuItem 
                 onClick={() => setLanguage("ca")}
-                className={cn("cursor-pointer", language === "ca" && "bg-accent")}
+                className={cn("cursor-pointer hover:bg-rose-100 dark:hover:bg-slate-700", language === "ca" && "bg-rose-100 dark:bg-slate-700")}
               >
                 🇪🇸 Català
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setLanguage("es")}
-                className={cn("cursor-pointer", language === "es" && "bg-accent")}
+                className={cn("cursor-pointer hover:bg-rose-100 dark:hover:bg-slate-700", language === "es" && "bg-rose-100 dark:bg-slate-700")}
               >
                 🇪🇸 Español
               </DropdownMenuItem>
@@ -112,7 +112,7 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="relative hover:bg-accent"
+                className="relative hover:bg-rose-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
                 data-testid="notifications-button"
               >
                 <Bell className="h-4 w-4" />
@@ -125,7 +125,7 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
                 </Badge>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuContent align="end" className="w-80 bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-slate-600">
               <div className="p-3 border-b">
                 <h3 className="font-semibold text-sm">
                   {language === "ca" ? "Notificacions" : "Notificaciones"}

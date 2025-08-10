@@ -267,7 +267,7 @@ export default function Sidebar(props: SidebarProps = {}) {
       {/* Mobile Overlay */}
       {isMobile && mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/80 z-[50] md:hidden pointer-events-auto top-16" 
+          className="fixed inset-0 bg-black/80 z-[50] md:hidden pointer-events-auto top-14" 
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -280,7 +280,7 @@ export default function Sidebar(props: SidebarProps = {}) {
         // Desktop behavior
         !isMobile && (isCollapsed ? "w-16" : "w-60"),
         // Mobile behavior  
-        isMobile && (mobileMenuOpen ? "w-72 top-16" : "w-0 -translate-x-full top-16"),
+        isMobile && (mobileMenuOpen ? "w-72 top-14" : "w-0 -translate-x-full top-14"),
         isMobile && mobileMenuOpen && "translate-x-0 shadow-2xl"
       )}>
         

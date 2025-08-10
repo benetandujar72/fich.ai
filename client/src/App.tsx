@@ -212,7 +212,7 @@ function Router() {
         }}
       />
       
-      <div className="flex-1 flex flex-col ml-0 md:ml-16 lg:ml-60 transition-all duration-300 min-h-0 pt-16 md:pt-0">
+      <div className="flex-1 flex flex-col ml-0 md:ml-16 lg:ml-60 transition-all duration-300 min-h-0 pt-14 md:pt-0">
         <Switch>
           <Route path="/" component={() => 
             <ProtectedRoute>

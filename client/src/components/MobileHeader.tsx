@@ -19,7 +19,7 @@ export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, on
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] md:hidden bg-white dark:bg-gray-900 border-b border-border shadow-sm">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-3 py-2.5">
         {/* App Logo and Name */}
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-rose-400 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
@@ -32,7 +32,7 @@ export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, on
         </div>
 
         {/* User Profile and Menu Button */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* User Profile */}
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8 bg-gradient-to-br from-rose-400 to-pink-500">
@@ -40,13 +40,13 @@ export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, on
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <div className="hidden xs:block">
-              <p className="text-xs font-medium text-foreground truncate max-w-20">
-                {user?.firstName} {user?.lastName}
+            <div className="flex flex-col items-start min-w-0">
+              <p className="text-xs font-medium text-foreground truncate max-w-16 sm:max-w-20">
+                {user?.firstName}
               </p>
-              <Badge variant="outline" className="text-xs px-1 py-0">
-                {user?.role === 'superadmin' ? 'Super Admin' : 
-                 user?.role === 'admin' ? 'Admin' : 'Empleat'}
+              <Badge variant="outline" className="text-[10px] px-1 py-0 leading-3 h-auto">
+                {user?.role === 'superadmin' ? 'SA' : 
+                 user?.role === 'admin' ? 'Admin' : 'Emp'}
               </Badge>
             </div>
           </div>

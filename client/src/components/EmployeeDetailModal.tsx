@@ -338,8 +338,34 @@ export default function EmployeeDetailModal({
                         `}
                         title={
                           record 
-                            ? `${format(day, 'dd/MM/yyyy', { locale })}\n${t('check_in', language)}: ${formatTime(record.checkIn)}\n${t('check_out', language)}: ${formatTime(record.checkOut)}\nRetard: ${record.lateMinutes || 0} min\nHores: ${parseFloat(record.totalHours?.toString() || '0').toFixed(1)}h`
-                            : `${format(day, 'dd/MM/yyyy', { locale })}\nSense assistència`
+                            ? `${format(day, 'dd/MM/yyyy', { locale })}
+━━━━━━━━━━━━━━━━━━━━━━━━
+📅 HORARI PROGRAMAT:
+   Entrada: 09:00 (previst)
+   Sortida: 17:00 (previst)
+
+⏰ MARCATGE REAL:
+   Entrada: ${formatTime(record.checkIn)}
+   Sortida: ${formatTime(record.checkOut)}
+
+📊 RESUM DEL DIA:
+   Retard: ${Math.round(parseFloat(record.lateMinutes?.toString() || '0'))} min
+   Hores: ${parseFloat(record.totalHours?.toString() || '0').toFixed(1)}h
+   Estat: ${(() => {
+     const late = parseFloat(record.lateMinutes?.toString() || '0');
+     if (late <= 0) return 'Puntual ✅';
+     if (late <= 15) return 'Lleuger retard ⚠️';
+     if (late <= 30) return 'Retard moderat 🟠';
+     return 'Retard greu ❌';
+   })()}`
+                            : `${format(day, 'dd/MM/yyyy', { locale })}
+━━━━━━━━━━━━━━━━━━━━━━━━
+📅 HORARI PROGRAMAT:
+   Entrada: 09:00 (previst)
+   Sortida: 17:00 (previst)
+
+❌ SENSE ASSISTÈNCIA
+No s'ha registrat cap marcatge aquest dia`
                         }
                         data-testid={`day-${dateStr}`}
                       >

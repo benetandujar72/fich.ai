@@ -111,8 +111,13 @@ export const translations = {
     "check_out": "Sortida",
     "no_attendance": "Sense registre",
     "weekend": "Cap de setmana",
-    "actual_hours": "Hores reals",
+    "actual_hours": "Hores reals", 
     "hours_difference": "Diferència d'hores",
+    "scheduled_time": "Horari programat",
+    "actual_time": "Marcatge real",
+    "day_summary": "Resum del dia",
+    "punctual": "Puntual",
+    "delay": "Retard",
   },
   es: {
     // Navigation
@@ -227,7 +232,12 @@ export const translations = {
     "no_attendance": "Sin registro",
     "weekend": "Fin de semana",
     "actual_hours": "Horas reales",
-    "hours_difference": "Diferencia de horas",
+    "hours_difference": "Diferencia de horas", 
+    "scheduled_time": "Horario programado",
+    "actual_time": "Marcaje real",
+    "day_summary": "Resumen del día",
+    "punctual": "Puntual",
+    "delay": "Retraso",
   },
 };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -70,6 +70,12 @@ export default function EmailConfigurationPanel() {
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
 
+  // Fetch SMTP configuration
+  const { data: smtpConfig, isLoading: smtpLoading } = useQuery<SMTPConfig>({
+    queryKey: ['/api/admin/smtp-config', user?.institutionId],
+    enabled: !!user?.institutionId,
+  });
+
   // SMTP Configuration form
   const smtpForm = useForm<SMTPConfig>({
     resolver: zodResolver(smtpConfigSchema),
@@ -97,15 +103,9 @@ export default function EmailConfigurationPanel() {
     },
   });
 
-  // Fetch SMTP configuration
-  const { data: smtpConfig, isLoading: loadingSMTP } = useQuery({
-    queryKey: [`/api/admin/smtp-config/${user?.institutionId}`],
-    enabled: !!user?.institutionId,
-  });
-
   // Fetch email templates
   const { data: emailTemplates, isLoading: loadingTemplates } = useQuery({
-    queryKey: [`/api/admin/email-templates/${user?.institutionId}`],
+    queryKey: ['/api/admin/email-templates', user?.institutionId],
     enabled: !!user?.institutionId,
   });
 
@@ -119,7 +119,7 @@ export default function EmailConfigurationPanel() {
         title: language === "ca" ? "Configuració guardada" : "Configuración guardada",
         description: language === "ca" ? "La configuració SMTP s'ha guardat correctament" : "La configuración SMTP se ha guardado correctamente",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/admin/smtp-config/${user?.institutionId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/smtp-config', user?.institutionId] });
     },
     onError: (error: any) => {
       toast({
@@ -144,7 +144,7 @@ export default function EmailConfigurationPanel() {
         title: language === "ca" ? "Plantilla guardada" : "Plantilla guardada",
         description: language === "ca" ? "La plantilla s'ha guardat correctament" : "La plantilla se ha guardado correctamente",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/admin/email-templates/${user?.institutionId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/email-templates', user?.institutionId] });
       setIsTemplateDialogOpen(false);
       setSelectedTemplate(null);
       templateForm.reset();
@@ -157,6 +157,22 @@ export default function EmailConfigurationPanel() {
       });
     },
   });
+
+  // Effect to update form when SMTP config is loaded
+  React.useEffect(() => {
+    if (smtpConfig && !smtpLoading) {
+      smtpForm.reset({
+        host: smtpConfig.host || "",
+        port: smtpConfig.port || 587,
+        username: smtpConfig.username || "",
+        password: "", // Don't populate password for security
+        isSecure: smtpConfig.isSecure ?? true,
+        fromEmail: smtpConfig.fromEmail || "",
+        fromName: smtpConfig.fromName || "",
+        isActive: smtpConfig.isActive ?? true,
+      });
+    }
+  }, [smtpConfig, smtpLoading, smtpForm]);
 
   // Test email mutation
   const testEmailMutation = useMutation({

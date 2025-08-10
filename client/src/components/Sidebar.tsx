@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -21,9 +21,19 @@ import {
   Upload,
   UserCheck,
   MessageSquare,
-  CalendarDays
+  CalendarDays,
+  Menu,
+  X,
+  Activity,
+  Shield,
+  Bell,
+  BarChart3,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -31,99 +41,168 @@ export default function Sidebar() {
   const permissions = usePermissions();
   const { language } = useLanguage();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const navItems = [
+  // Detect mobile and handle responsive behavior
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setIsCollapsed(true);
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    if (isMobile) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [location, isMobile]);
+
+  // Organized navigation structure by category
+  const navigationSections = [
     {
-      name: t("dashboard", language),
-      href: "/dashboard",
-      icon: Home,
-      show: true,
+      title: language === "ca" ? "Principal" : "Principal",
+      items: [
+        {
+          name: t("dashboard", language),
+          href: "/dashboard",
+          icon: Home,
+          show: true,
+          badge: null,
+        },
+        {
+          name: t("attendance", language),
+          href: "/attendance",
+          icon: Clock,
+          show: permissions.canViewOwnAttendance || permissions.canViewAllAttendance,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Horari Personal" : "Horario Personal",
+          href: "/weekly-schedule",
+          icon: CalendarDays,
+          show: permissions.canViewOwnAttendance,
+          badge: null,
+        },
+      ]
     },
     {
-      name: t("employee_management", language),
-      href: "/employees",
-      icon: Users,
-      show: permissions.canViewEmployees,
+      title: language === "ca" ? "Gestió" : "Gestión",
+      items: [
+        {
+          name: t("employee_management", language),
+          href: "/employees",
+          icon: Users,
+          show: permissions.canViewEmployees,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Horaris Personal (Admin)" : "Horarios Personal (Admin)",
+          href: "/admin/weekly-schedule",
+          icon: Calendar,
+          show: (user?.role === 'admin' || user?.role === 'superadmin'),
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Importar Horaris" : "Importar Horarios",
+          href: "/schedule-import",
+          icon: Upload,
+          show: permissions.canEditSchedules,
+          badge: null,
+        },
+      ]
     },
     {
-      name: t("attendance", language),
-      href: "/attendance",
-      icon: Clock,
-      show: permissions.canViewOwnAttendance || permissions.canViewAllAttendance,
+      title: language === "ca" ? "Monitoratge" : "Monitoreo",
+      items: [
+        {
+          name: t("alerts", language),
+          href: "/alerts",
+          icon: AlertTriangle,
+          show: permissions.canViewAlerts,
+          badge: "3",
+        },
+        {
+          name: t("reports", language),
+          href: "/reports",
+          icon: BarChart3,
+          show: permissions.canGeneratePersonalReports || permissions.canGenerateInstitutionReports,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Comunicacions" : "Comunicaciones",
+          href: "/communications",
+          icon: MessageSquare,
+          show: true,
+          badge: null,
+        },
+      ]
     },
     {
-      name: t("alerts", language),
-      href: "/alerts",
-      icon: AlertTriangle,
-      show: permissions.canViewAlerts,
+      title: language === "ca" ? "Administració" : "Administración",
+      items: [
+        {
+          name: language === "ca" ? "Gestió d'Institucions" : "Gestión de Instituciones",
+          href: "/institutions",
+          icon: Building2,
+          show: permissions.canViewInstitutions,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Cursos Acadèmics" : "Cursos Académicos",
+          href: "/academic-years",
+          icon: GraduationCap,
+          show: permissions.canCreateAcademicYear || permissions.canEditAcademicYear,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Administració" : "Administración",
+          href: "/admin",
+          icon: Shield,
+          show: user?.role === 'admin' || user?.role === 'superadmin',
+          badge: null,
+        },
+        {
+          name: t("settings", language),
+          href: "/settings",
+          icon: Settings,
+          show: permissions.canEditSettings || permissions.canManageUsers,
+          badge: null,
+        },
+      ]
     },
     {
-      name: t("reports", language),
-      href: "/reports",
-      icon: FileText,
-      show: permissions.canGeneratePersonalReports || permissions.canGenerateInstitutionReports,
-    },
-    {
-      name: language === "ca" ? "Importar Horaris" : "Importar Horarios",
-      href: "/schedule-import",
-      icon: Upload,
-      show: permissions.canEditSchedules,
-    },
-    {
-      name: language === "ca" ? "Gestió d'Institucions" : "Gestión de Instituciones",
-      href: "/institutions",
-      icon: Building2,
-      show: permissions.canViewInstitutions,
-    },
-    {
-      name: language === "ca" ? "Cursos Acadèmics" : "Cursos Académicos",
-      href: "/academic-years",
-      icon: GraduationCap,
-      show: permissions.canCreateAcademicYear || permissions.canEditAcademicYear,
-    },
-    {
-      name: language === "ca" ? "Horari Personal" : "Horario Personal",
-      href: "/weekly-schedule",
-      icon: CalendarDays,
-      show: permissions.canViewOwnAttendance,
-    },
-    {
-      name: language === "ca" ? "Horaris Personal (Admin)" : "Horarios Personal (Admin)",
-      href: "/admin/weekly-schedule",
-      icon: Calendar,
-      show: (user?.role === 'admin' || user?.role === 'superadmin'),
-    },
-    {
-      name: language === "ca" ? "Comunicacions" : "Comunicaciones",
-      href: "/communications",
-      icon: MessageSquare,
-      show: true, // All users can use communications
-    },
-    {
-      name: t("settings", language),
-      href: "/settings",
-      icon: Settings,
-      show: permissions.canEditSettings || permissions.canManageUsers,
-    },
-    {
-      name: language === "ca" ? "Política de Privacitat" : "Política de Privacidad",
-      href: "/privacy",
-      icon: FileText,
-      show: true,
-    },
-    {
-      name: language === "ca" ? "Els meus Drets" : "Mis Derechos",
-      href: "/data-rights",
-      icon: UserCheck,
-      show: true,
-    },
-    {
-      name: language === "ca" ? "Administració" : "Administración",
-      href: "/admin",
-      icon: Settings,
-      show: user?.role === 'admin' || user?.role === 'superadmin',
-    },
-  ].filter(item => item.show);
+      title: language === "ca" ? "Legal" : "Legal",
+      items: [
+        {
+          name: language === "ca" ? "Política de Privacitat" : "Política de Privacidad",
+          href: "/privacy",
+          icon: FileText,
+          show: true,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Els meus Drets" : "Mis Derechos",
+          href: "/data-rights",
+          icon: UserCheck,
+          show: true,
+          badge: null,
+        },
+      ]
+    }
+  ].map(section => ({
+    ...section,
+    items: section.items.filter(item => item.show)
+  })).filter(section => section.items.length > 0);
 
   const handleLogout = async () => {
     try {
@@ -150,92 +229,182 @@ export default function Sidebar() {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'U';
+
   return (
-    <div className={cn(
-      "fixed top-0 left-0 h-full bg-card border-r border-border z-50 transition-all duration-300",
-      isCollapsed ? "w-16" : "w-64"
-    )}>
-      <div className="flex flex-col h-full">
-        {/* Header */}
-        <div className="p-6 border-b border-border">
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+      
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleMobileMenu}
+          className="fixed top-4 left-4 z-50 md:hidden bg-background shadow-lg"
+          data-testid="mobile-menu-button"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </Button>
+      )}
+
+      {/* Sidebar */}
+      <div className={cn(
+        "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300 flex flex-col",
+        // Desktop behavior
+        !isMobile && (isCollapsed ? "w-20" : "w-72"),
+        // Mobile behavior
+        isMobile && (isMobileMenuOpen ? "w-80" : "w-0 -translate-x-full"),
+        isMobile && isMobileMenuOpen && "translate-x-0 shadow-2xl"
+      )}>
+        
+        {/* Header Section */}
+        <div className="flex-shrink-0 px-6 py-6 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
           <div className="flex items-center justify-between">
-            {!isCollapsed && (
-              <div>
-                <h1 className="text-xl font-bold text-primary">EduPresència</h1>
-                <p className="text-xs text-muted-foreground">
-                  {language === "ca" ? "Control de presència" : "Control de presencia"}
-                </p>
+            {(!isCollapsed || isMobile) && (
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                    EduPresència
+                  </h2>
+                  <p className="text-xs text-muted-foreground font-medium">Sistema de Presència</p>
+                </div>
               </div>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="ml-auto"
-            >
-              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </Button>
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="ml-auto hover:bg-primary/10"
+                data-testid="toggle-sidebar"
+              >
+                {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
-            const isActive = location === item.href || 
-              (item.href === "/dashboard" && location === "/");
-            
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={cn(
-                    "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  )}
-                  data-testid={`nav-${item.href.slice(1)}`}
-                >
-                  <item.icon size={20} className={cn("flex-shrink-0", !isCollapsed && "mr-3")} />
-                  {!isCollapsed && (
-                    <span className="truncate">{item.name}</span>
-                  )}
+        {/* User Profile Section */}
+        {(!isCollapsed || isMobile) && user && (
+          <div className="flex-shrink-0 p-4 border-b border-border">
+            <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20">
+              <Avatar className="w-12 h-12 ring-2 ring-primary/20">
+                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-semibold">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold truncate text-foreground">
+                  {user.firstName} {user.lastName}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user.email}
+                </p>
+                <Badge variant="outline" className="mt-1 text-xs">
+                  {user.role === 'superadmin' ? 'Super Admin' : 
+                   user.role === 'admin' ? 'Administrador' : 'Empleat'}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Sections */}
+        <nav className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent overscroll-contain">
+          <div className="space-y-6">
+            {navigationSections.map((section, sectionIndex) => (
+              <div key={section.title} className="space-y-2">
+                {(!isCollapsed || isMobile) && (
+                  <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {section.title}
+                  </h3>
+                )}
+                {isCollapsed && !isMobile && sectionIndex > 0 && (
+                  <Separator className="my-2" />
+                )}
+                
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location === item.href || location.startsWith(item.href + '/');
+                    
+                    return (
+                      <Link key={item.href} href={item.href}>
+                        <div
+                          className={cn(
+                            "group flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative cursor-pointer",
+                            isActive 
+                              ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25 translate-x-1" 
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent/50 hover:translate-x-0.5",
+                            isCollapsed && !isMobile ? "justify-center px-3" : "justify-start"
+                          )}
+                          data-testid={`nav-${item.href.replace('/', '').replace('/', '-')}`}
+                        >
+                          <Icon className={cn(
+                            "flex-shrink-0 transition-transform duration-200",
+                            isActive ? "w-5 h-5" : "w-4 h-4 group-hover:scale-110"
+                          )} />
+                          
+                          {(!isCollapsed || isMobile) && (
+                            <>
+                              <span className="ml-3 truncate">{item.name}</span>
+                              {item.badge && (
+                                <Badge 
+                                  variant={isActive ? "secondary" : "outline"} 
+                                  className="ml-auto text-xs"
+                                >
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </>
+                          )}
+                          
+                          {/* Active indicator */}
+                          {isActive && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full shadow-sm" />
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              </Link>
-            );
-          })}
+              </div>
+            ))}
+          </div>
         </nav>
 
-        {/* User info and logout */}
-        <div className="p-4 border-t border-border">
-          {!isCollapsed && user && (
-            <div className="mb-4 p-3 bg-muted rounded-lg">
-              <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
-              <p className="text-xs text-primary">
-                {user.role === 'superadmin' && (language === "ca" ? "Superadministrador" : "Superadministrador")}
-                {user.role === 'admin' && (language === "ca" ? "Administrador" : "Administrador")}
-                {user.role === 'employee' && (language === "ca" ? "Professor/a" : "Profesor/a")}
-              </p>
-            </div>
-          )}
-          
-          <Button
-            variant="ghost"
-            size={isCollapsed ? "sm" : "default"}
-            onClick={handleLogout}
+        {/* Footer Section */}
+        <div className="flex-shrink-0 p-4 border-t border-border bg-muted/30">
+          <Button 
+            variant="ghost" 
             className={cn(
-              "w-full justify-start text-muted-foreground hover:text-foreground",
-              isCollapsed && "px-2"
+              "w-full group hover:bg-destructive/10 hover:text-destructive transition-all duration-200",
+              isCollapsed && !isMobile ? "justify-center px-3" : "justify-start"
             )}
+            onClick={handleLogout}
             data-testid="logout-button"
           >
-            <LogOut size={20} className={cn("flex-shrink-0", !isCollapsed && "mr-3")} />
-            {!isCollapsed && (
-              <span>{language === "ca" ? "Tancar sessió" : "Cerrar sesión"}</span>
+            <LogOut className="w-4 h-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
+            {(!isCollapsed || isMobile) && (
+              <span className="ml-3 font-medium">{t("logout", language)}</span>
             )}
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

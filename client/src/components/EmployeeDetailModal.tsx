@@ -50,6 +50,9 @@ interface AttendanceRecord {
   date: string;
   checkIn: string | null;
   checkOut: string | null;
+  scheduledStart?: string;
+  scheduledEnd?: string;
+  scheduledPeriods?: number;
   totalHours: number;
   status: 'present' | 'late' | 'absent' | 'partial';
   lateMinutes?: number;
@@ -341,8 +344,9 @@ export default function EmployeeDetailModal({
                             ? `${format(day, 'dd/MM/yyyy', { locale })}
 ━━━━━━━━━━━━━━━━━━━━━━━━
 📅 HORARI PROGRAMAT:
-   Entrada: 09:00 (previst)
-   Sortida: 17:00 (previst)
+   Entrada: ${record.scheduledStart ? formatTime(record.scheduledStart) : '09:00'} (previst)
+   Sortida: ${record.scheduledEnd ? formatTime(record.scheduledEnd) : '17:00'} (previst)
+   Períodes: ${record.scheduledPeriods || 'N/D'}
 
 ⏰ MARCATGE REAL:
    Entrada: ${formatTime(record.checkIn)}
@@ -361,8 +365,7 @@ export default function EmployeeDetailModal({
                             : `${format(day, 'dd/MM/yyyy', { locale })}
 ━━━━━━━━━━━━━━━━━━━━━━━━
 📅 HORARI PROGRAMAT:
-   Entrada: 09:00 (previst)
-   Sortida: 17:00 (previst)
+   Consultar horaris personalitzats
 
 ❌ SENSE ASSISTÈNCIA
 No s'ha registrat cap marcatge aquest dia`

@@ -181,7 +181,13 @@ export default function Sidebar() {
           show: user?.role === 'admin' || user?.role === 'superadmin',
           badge: null,
         },
-
+        {
+          name: language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas",
+          href: "/alert-config",
+          icon: Settings,
+          show: permissions.canManageUsers,
+          badge: null,
+        },
         {
           name: t("settings", language),
           href: "/settings",

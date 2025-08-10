@@ -54,32 +54,11 @@ interface Alert {
   accumulatedMinutes?: number;
 }
 
-interface AlertConfig {
-  id: string;
-  name: string;
-  description: string;
-  alertType: string;
-  recipients: string[];
-  subject: string;
-  isActive: boolean;
-}
-
 interface Employee {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-}
-
-interface AlertConfig {
-  id: string;
-  name: string;
-  description: string;
-  alertType: string;
-  recipients: string[];
-  subject: string;
-  messageTemplate: string;
-  isActive: boolean;
 }
 
 export function AlertsManagement() {
@@ -93,7 +72,7 @@ export function AlertsManagement() {
   const [dateFilter, setDateFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
   const [newAlertDialogOpen, setNewAlertDialogOpen] = useState(false);
-  const [configDialogOpen, setConfigDialogOpen] = useState(false);
+
 
   // Fetch alerts history
   const { data: alerts = [], isLoading: alertsLoading } = useQuery({
@@ -101,11 +80,7 @@ export function AlertsManagement() {
     enabled: !!user?.institutionId,
   });
 
-  // Fetch alert configurations
-  const { data: alertConfigs = [], isLoading: configsLoading } = useQuery({
-    queryKey: ['/api/admin/alert-configs', user?.institutionId],
-    enabled: !!user?.institutionId,
-  });
+
 
   // Fetch employees for recipient selection
   const { data: employees = [] } = useQuery({
@@ -218,46 +193,6 @@ export function AlertsManagement() {
         </div>
         
         <div className="flex items-center gap-2">
-          <Dialog open={configDialogOpen} onOpenChange={setConfigDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Configurar Alertes
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Configuracions d'Alertes</DialogTitle>
-                <DialogDescription>
-                  Gestiona les configuracions automàtiques d'alertes del sistema
-                </DialogDescription>
-              </DialogHeader>
-              {/* Alert configs content */}
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {(alertConfigs as AlertConfig[]).map((config: AlertConfig) => (
-                  <Card key={config.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{config.name}</CardTitle>
-                        <Badge variant={config.isActive ? "default" : "secondary"}>
-                          {config.isActive ? "Actiu" : "Inactiu"}
-                        </Badge>
-                      </div>
-                      <CardDescription>{config.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <p><strong>Tipus:</strong> {config.alertType}</p>
-                        <p><strong>Destinataris:</strong> {config.recipients.length} usuaris</p>
-                        <p><strong>Assumpte:</strong> {config.subject}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </DialogContent>
-          </Dialog>
-
           <Dialog open={newAlertDialogOpen} onOpenChange={setNewAlertDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">

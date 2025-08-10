@@ -328,11 +328,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Communications routes - FIXED VERSION
-  app.get('/api/communications/:userId/all', isAuthenticated, async (req, res) => {
+  // Communications routes - FIXED VERSION with role-based access
+  app.get('/api/communications/:userId/all', isAuthenticated, async (req: any, res) => {
     try {
       const { userId } = req.params;
       const { filter } = req.query;
+      const requestingUser = req.user;
+      
+      // Role-based access control: users can only see their own communications
+      // unless they are superadmin or admin
+      if (requestingUser.role === 'employee' && requestingUser.id !== userId) {
+        return res.status(403).json({ message: "Access denied: can only view your own communications" });
+      }
+      
+      // Admins can see all communications within their institution
+      if (requestingUser.role === 'admin') {
+        const targetUser = await storage.getUser(userId);
+        if (targetUser?.institutionId !== requestingUser.institutionId) {
+          return res.status(403).json({ message: "Access denied: different institution" });
+        }
+      }
+      
       const communications = await storage.getCommunications(userId, filter as string);
       res.json(communications);
     } catch (error) {
@@ -421,20 +437,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Mark communication as read endpoint  
-  app.patch('/api/communications/:id/read', async (req, res) => {
+  app.patch('/api/communications/:id/read', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      console.log('MARK_READ: Marking communication as read:', id);
+      const userId = req.user.id;
+      console.log('MARK_READ: Marking communication as read:', id, 'by user:', userId);
       
+      // Only allow marking communications as read if user is the recipient
       const result = await db.execute(sql`
         UPDATE communications 
         SET status = 'read', read_at = NOW()
-        WHERE id = ${id}
+        WHERE id = ${id} AND recipient_id = ${userId}
         RETURNING *
       `);
       
       if (result.rows.length === 0) {
-        return res.status(404).json({ message: "Communication not found" });
+        return res.status(404).json({ message: "Communication not found or access denied" });
       }
       
       console.log('MARK_READ: Successfully marked as read');
@@ -446,20 +464,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete communication endpoint
-  app.delete('/api/communications/:id', async (req, res) => {
+  app.delete('/api/communications/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      console.log('DELETE_COMM: Deleting communication:', id);
+      const userId = req.user.id;
+      console.log('DELETE_COMM: Deleting communication:', id, 'by user:', userId);
       
+      // Only allow deletion if user is sender or recipient
       const result = await db.execute(sql`
         UPDATE communications 
         SET deleted_by_user_at = NOW(), status = 'deleted'
-        WHERE id = ${id}
+        WHERE id = ${id} AND (sender_id = ${userId} OR recipient_id = ${userId})
         RETURNING *
       `);
       
       if (result.rows.length === 0) {
-        return res.status(404).json({ message: "Communication not found" });
+        return res.status(404).json({ message: "Communication not found or access denied" });
       }
       
       console.log('DELETE_COMM: Successfully deleted');
@@ -525,7 +545,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('CREATE_COMM_DEBUG: Body:', req.body);
       console.log('CREATE_COMM_DEBUG: User from session:', req.user);
       
-      // Additional auth check to debug session issue
       if (!req.user || !req.user.id) {
         console.log('CREATE_COMM_DEBUG: No authenticated user found');
         return res.status(401).json({ message: "User not authenticated" });
@@ -536,6 +555,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!user || !user.institutionId) {
         return res.status(400).json({ message: "User institution not found" });
+      }
+
+      // Role-based restrictions for communication creation
+      const recipientUser = await storage.getUser(req.body.recipientId);
+      if (!recipientUser) {
+        return res.status(400).json({ message: "Recipient not found" });
+      }
+
+      // Employees can only send to users in the same institution
+      if (user.role === 'employee') {
+        if (recipientUser.institutionId !== user.institutionId) {
+          return res.status(403).json({ message: "Access denied: can only send to users in your institution" });
+        }
+      }
+
+      // Admins can send to users in their institution
+      if (user.role === 'admin') {
+        if (recipientUser.institutionId !== user.institutionId) {
+          return res.status(403).json({ message: "Access denied: can only send to users in your institution" });
+        }
       }
 
       // Validate communication data
@@ -554,9 +593,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updatedAt: new Date()
       };
 
+      console.log('CREATE_COMM_DEBUG: Creating communication with data:', communicationData);
       const communication = await storage.createCommunication(communicationData);
-
-      // Skip email sending for now
+      console.log('CREATE_COMM_DEBUG: Communication created successfully:', communication);
 
       res.json(communication);
     } catch (error) {
@@ -1251,13 +1290,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/settings/:institutionId', isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
-      const userRole = req.user.role;
+      const requestingUser = req.user;
 
-      if (!['admin', 'superadmin'].includes(userRole)) {
-        return res.status(403).json({ message: 'Access denied' });
+      // Role-based access control for settings
+      if (!['admin', 'superadmin'].includes(requestingUser.role)) {
+        return res.status(403).json({ message: 'Access denied: insufficient permissions to view settings' });
       }
 
+      // Admins can only access settings for their institution
+      if (requestingUser.role === 'admin' && requestingUser.institutionId !== institutionId) {
+        return res.status(403).json({ message: 'Access denied: can only view settings for your institution' });
+      }
+
+      console.log('SETTINGS_GET: User', requestingUser.email, 'accessing settings for institution', institutionId);
       const settings = await storage.getSettings(institutionId);
+      console.log('SETTINGS_GET: Retrieved', Object.keys(settings || {}).length, 'settings');
       res.json(settings);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -1268,24 +1315,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/settings/:institutionId', isAuthenticated, async (req: any, res) => {
     try {
       const { institutionId } = req.params;
-      const userRole = req.user.role;
+      const requestingUser = req.user;
 
-      if (!['admin', 'superadmin'].includes(userRole)) {
-        return res.status(403).json({ message: 'Access denied' });
+      // Enhanced role-based access control for settings modification
+      if (!['admin', 'superadmin'].includes(requestingUser.role)) {
+        return res.status(403).json({ message: 'Access denied: insufficient permissions to modify settings' });
+      }
+
+      // Admins can only modify settings for their institution
+      if (requestingUser.role === 'admin' && requestingUser.institutionId !== institutionId) {
+        return res.status(403).json({ message: 'Access denied: can only modify settings for your institution' });
       }
 
       const { settings } = req.body;
-      
-      // Update each setting individually
+
+      console.log('SETTINGS_UPDATE: User', requestingUser.email, 'updating settings for institution', institutionId);
+      console.log('SETTINGS_UPDATE: Settings to update:', Object.keys(settings || {}));
+
+      // Update each setting individually with validation
+      const updatedKeys = [];
       for (const [key, value] of Object.entries(settings)) {
+        console.log('SETTINGS_UPDATE: Upserting', key, '=', value);
         await storage.upsertSetting({
           institutionId,
           key,
           value: String(value)
         });
+        updatedKeys.push(key);
       }
 
-      res.json({ success: true });
+      console.log('SETTINGS_UPDATE: Successfully updated', updatedKeys.length, 'settings');
+
+      // Verify settings were saved correctly
+      const verificationSettings = await storage.getSettings(institutionId);
+      console.log('SETTINGS_UPDATE: Verification - retrieved', Object.keys(verificationSettings || {}).length, 'settings from DB');
+
+      res.json({ 
+        success: true,
+        updatedKeys,
+        message: `Successfully updated ${updatedKeys.length} settings` 
+      });
     } catch (error) {
       console.error("Error updating settings:", error);
       res.status(500).json({ message: "Failed to update settings" });

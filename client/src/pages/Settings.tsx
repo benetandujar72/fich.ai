@@ -75,24 +75,38 @@ export default function Settings() {
   const { data: settings = [], isLoading: settingsLoading } = useQuery({
     queryKey: ["/api/settings", institutionId || "null"],
     queryFn: async () => {
-      const response = await fetch(`/api/settings/${institutionId || "null"}`);
+      console.log('SETTINGS_CLIENT: Fetching settings for institution:', institutionId);
+      const response = await fetch(`/api/settings/${institutionId || "null"}`, {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch settings');
       }
       const data = await response.json();
+      console.log('SETTINGS_CLIENT: Received settings data:', data);
       return Array.isArray(data) ? data : [];
     },
   });
 
   // Load existing center settings when data is received
   useEffect(() => {
+    console.log('SETTINGS_CLIENT: Processing settings data:', settings);
     if (settings && Array.isArray(settings) && settings.length > 0) {
       const settingsObj = settings.reduce((acc: any, setting: any) => {
         acc[setting.key] = setting.value;
         return acc;
       }, {});
       
+      console.log('SETTINGS_CLIENT: Processed settings object:', settingsObj);
+      
       setCenterSettings({
+        centerName: settingsObj.centerName || "",
+        academicYear: settingsObj.academicYear || "2025-2026",
+        timezone: settingsObj.timezone || "Europe/Barcelona",
+        defaultLanguage: settingsObj.defaultLanguage || "ca",
+      });
+      
+      console.log('SETTINGS_CLIENT: Set center settings:', {
         centerName: settingsObj.centerName || "",
         academicYear: settingsObj.academicYear || "2025-2026",
         timezone: settingsObj.timezone || "Europe/Barcelona",
@@ -110,14 +124,23 @@ export default function Settings() {
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (settingsData: CenterSettings) => {
-      const promises = Object.entries(settingsData).map(([key, value]) =>
-        apiRequest("PUT", `/api/settings/${institutionId || "null"}/${key}`, { value })
-      );
-      // Also save autoDeleteEnabled
-      promises.push(
-        apiRequest("PUT", `/api/settings/${institutionId || "null"}/autoDeleteEnabled`, { value: autoDeleteEnabled.toString() })
-      );
-      await Promise.all(promises);
+      console.log('SETTINGS_CLIENT: Updating settings:', settingsData);
+      console.log('SETTINGS_CLIENT: Auto delete enabled:', autoDeleteEnabled);
+      
+      // Use the correct endpoint that expects a settings object
+      const allSettings = {
+        ...settingsData,
+        autoDeleteEnabled: autoDeleteEnabled.toString()
+      };
+      
+      console.log('SETTINGS_CLIENT: Sending all settings:', allSettings);
+      
+      const response = await apiRequest("PUT", `/api/settings/${institutionId || "null"}`, { 
+        settings: allSettings 
+      });
+      
+      console.log('SETTINGS_CLIENT: Response:', response);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/settings", institutionId || "null"] });

@@ -1306,11 +1306,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transporter = nodemailer.createTransport({
         host: smtpConfig.host,
         port: smtpConfig.port,
-        secure: smtpConfig.isSecure, // true for 465, false for other ports
+        secure: smtpConfig.port === 465, // true for 465 (SSL), false for 587 (STARTTLS)
+        requireTLS: smtpConfig.port === 587, // force STARTTLS for port 587
         auth: {
           user: smtpConfig.username,
           pass: smtpConfig.password,
         },
+        tls: {
+          // Allow Gmail's self-signed certificates
+          rejectUnauthorized: false
+        }
       });
 
       // Test email content

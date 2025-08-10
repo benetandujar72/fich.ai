@@ -420,7 +420,7 @@ export default function EmailConfigurationPanel() {
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                           <FormLabel>
-                            {language === "ca" ? "Connexió segura (TLS)" : "Conexión segura (TLS)"}
+                            {language === "ca" ? "Connexió segura (recomanat per Gmail)" : "Conexión segura (recomendado para Gmail)"}
                           </FormLabel>
                         </FormItem>
                       )}

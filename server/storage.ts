@@ -1875,68 +1875,6 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
   }
 
   // Communications methods
-  async getCommunications(userId: string, filter?: string) {
-    try {
-      const baseSelect = {
-        id: communications.id,
-        institutionId: communications.institutionId,
-        senderId: communications.senderId,
-        recipientId: communications.recipientId,
-        messageType: communications.messageType,
-        subject: communications.subject,
-        content: communications.content,
-        status: communications.status,
-        priority: communications.priority,
-        emailSent: communications.emailSent,
-        emailSentAt: communications.emailSentAt,
-        readAt: communications.readAt,
-        deliveredAt: communications.deliveredAt,
-        deletedByUserAt: communications.deletedByUserAt,
-        createdAt: communications.createdAt,
-        updatedAt: communications.updatedAt,
-        sender: {
-          firstName: users.firstName,
-          lastName: users.lastName,
-          email: users.email
-        }
-      };
-
-      let whereCondition;
-      
-      if (filter === 'unread') {
-        whereCondition = and(
-          eq(communications.recipientId, userId),
-          eq(communications.status, 'sent'),
-          isNull(communications.readAt),
-          isNull(communications.deletedByUserAt)
-        );
-      } else if (filter === 'sent') {
-        whereCondition = and(
-          eq(communications.senderId, userId),
-          isNull(communications.deletedByUserAt)
-        );
-      } else {
-        whereCondition = and(
-          or(
-            eq(communications.senderId, userId),
-            eq(communications.recipientId, userId)
-          ),
-          isNull(communications.deletedByUserAt)
-        );
-      }
-
-      const results = await db.select(baseSelect)
-        .from(communications)
-        .leftJoin(users, eq(communications.senderId, users.id))
-        .where(whereCondition)
-        .orderBy(desc(communications.createdAt));
-        
-      return results;
-    } catch (error) {
-      console.error('GET_COMMUNICATIONS_ERROR', error);
-      throw error;
-    }
-  }
 
   async createCommunication(communicationData: any) {
     try {
@@ -2040,7 +1978,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         recipientId: communications.recipientId,
         messageType: communications.messageType,
         subject: communications.subject,
-        content: communications.content,
+        message: communications.message,
         status: communications.status,
         priority: communications.priority,
         emailSent: communications.emailSent,
@@ -2127,35 +2065,46 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     try {
       console.log('GET_COMMUNICATIONS: Fetching for user:', userId, 'filter:', filter);
       
-      // Direct SQL query to avoid Drizzle issues
+      let whereClause = sql`(c.sender_id = ${userId} OR c.recipient_id = ${userId}) AND c.deleted_by_user_at IS NULL`;
+      
+      if (filter === 'sent') {
+        whereClause = sql`c.sender_id = ${userId} AND c.deleted_by_user_at IS NULL`;
+      } else if (filter === 'inbox') {
+        whereClause = sql`c.recipient_id = ${userId} AND c.deleted_by_user_at IS NULL`;
+      } else if (filter === 'unread') {
+        whereClause = sql`c.recipient_id = ${userId} AND c.read_at IS NULL AND c.deleted_by_user_at IS NULL`;
+      }
+      
+      // Enhanced SQL query with proper user joins and filtering
       const result = await db.execute(sql`
         SELECT 
-          id,
-          institution_id as "institutionId",
-          sender_id as "senderId", 
-          recipient_id as "recipientId",
-          message_type as "messageType",
-          subject,
-          content,
-          status,
-          priority,
-          email_sent as "emailSent",
-          email_sent_at as "emailSentAt",
-          read_at as "readAt",
-          delivered_at as "deliveredAt",
-          deleted_by_user_at as "deletedByUserAt",
-          created_at as "createdAt",
-          updated_at as "updatedAt",
-          'Sistema' as "senderFirstName",
-          'EduPresència' as "senderLastName", 
-          'sistema@bitacola.edu' as "senderEmail",
-          'Usuari' as "recipientFirstName",
-          'Centre' as "recipientLastName",
-          'usuari@bitacola.edu' as "recipientEmail"
-        FROM communications 
-        WHERE (sender_id = ${userId} OR recipient_id = ${userId})
-          AND deleted_by_user_at IS NULL
-        ORDER BY created_at DESC
+          c.id,
+          c.institution_id as "institutionId",
+          c.sender_id as "senderId", 
+          c.recipient_id as "recipientId",
+          c.message_type as "messageType",
+          c.subject,
+          c.message,
+          c.status,
+          c.priority,
+          c.email_sent as "emailSent",
+          c.email_sent_at as "emailSentAt",
+          c.read_at as "readAt",
+          c.delivered_at as "deliveredAt",
+          c.deleted_by_user_at as "deletedByUserAt",
+          c.created_at as "createdAt",
+          c.updated_at as "updatedAt",
+          COALESCE(s.first_name, 'Sistema') as "senderFirstName",
+          COALESCE(s.last_name, 'EduPresència') as "senderLastName", 
+          COALESCE(s.email, 'sistema@bitacola.edu') as "senderEmail",
+          COALESCE(r.first_name, 'Usuari') as "recipientFirstName",
+          COALESCE(r.last_name, 'Centre') as "recipientLastName",
+          COALESCE(r.email, 'usuari@bitacola.edu') as "recipientEmail"
+        FROM communications c
+        LEFT JOIN users s ON c.sender_id = s.id
+        LEFT JOIN users r ON c.recipient_id = r.id
+        WHERE ${whereClause}
+        ORDER BY c.created_at DESC
       `);
 
       console.log('GET_COMMUNICATIONS: Found', result.rows.length, 'communications');

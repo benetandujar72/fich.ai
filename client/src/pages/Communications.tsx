@@ -39,7 +39,7 @@ interface Communication {
   recipientId: string;
   messageType: 'internal' | 'notification' | 'alert';
   subject: string;
-  content: string;
+  message: string;
   status: 'sent' | 'delivered' | 'read';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   emailSent: boolean;
@@ -49,16 +49,12 @@ interface Communication {
   deletedByUserAt?: string;
   createdAt: string;
   updatedAt: string;
-  sender: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  recipient: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
+  senderFirstName?: string;
+  senderLastName?: string;
+  senderEmail?: string;
+  recipientFirstName?: string;
+  recipientLastName?: string;
+  recipientEmail?: string;
 }
 
 interface User {
@@ -186,7 +182,7 @@ export default function Communications() {
       recipientId: composeRecipient,
       messageType: composeMessageType,
       subject: composeSubject,
-      content: composeContent,
+      message: composeContent,
       priority: composePriority,
       emailSent: composeEmailEnabled,
     });
@@ -205,7 +201,7 @@ export default function Communications() {
   const filteredCommunications = communications.filter((comm: Communication) => {
     const matchesSearch = searchTerm === '' || 
       comm.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      comm.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comm.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${comm.senderFirstName} ${comm.senderLastName}`.toLowerCase().includes(searchTerm.toLowerCase());
 
     switch (selectedFilter) {
@@ -458,7 +454,7 @@ export default function Communications() {
                                 {communication.subject}
                               </p>
                               <p className="text-xs text-muted-foreground truncate mb-2">
-                                {communication.content}
+                                {communication.message}
                               </p>
                               <div className="flex items-center justify-between">
                                 <p className="text-xs text-muted-foreground">
@@ -534,7 +530,7 @@ export default function Communications() {
               <CardContent>
                 <div className="prose prose-sm max-w-none">
                   <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {selectedCommunication.content}
+                    {selectedCommunication.message}
                   </div>
                 </div>
                 

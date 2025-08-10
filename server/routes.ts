@@ -546,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recipientId: req.body.recipientId,
         message_type: req.body.messageType || 'internal',
         subject: req.body.subject,
-        content: req.body.content,
+        content: req.body.message,
         status: 'sent',
         priority: req.body.priority || 'medium',
         email_sent: req.body.emailSent || false,

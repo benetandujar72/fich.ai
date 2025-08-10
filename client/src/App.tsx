@@ -185,11 +185,11 @@ function Router() {
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-background via-background to-blue-50/30 dark:to-blue-900/10">
       <LanguageSwitcher />
       <Sidebar />
       
-      <div className="flex-1 flex flex-col ml-0 md:ml-20 lg:ml-72 transition-all duration-300 min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col ml-0 md:ml-16 lg:ml-60 transition-all duration-300 min-h-0">
         <Switch>
           <Route path="/" component={() => 
             <ProtectedRoute>

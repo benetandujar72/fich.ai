@@ -103,20 +103,20 @@
 @layer components {
   /* Modern navigation styles */
   .nav-link {
-    @apply relative flex items-center px-3 py-2.5 text-sm font-medium rounded-xl 
+    @apply relative flex items-center px-3 py-2.5 mx-1 text-sm font-medium rounded-xl border
     transition-all duration-200 ease-in-out
-    text-muted-foreground hover:text-foreground hover:bg-accent/50 
-    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
+    text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent hover:translate-x-1 hover:shadow-sm
+    border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
   }
 
   .nav-link.active {
-    @apply bg-primary text-primary-foreground shadow-lg 
-    translate-x-1 hover:opacity-90;
+    @apply bg-blue-500 text-white shadow-lg
+    translate-x-2 border-blue-500 hover:opacity-95;
   }
 
   .nav-link.active::before {
     content: '';
-    @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 
+    @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 
     bg-white rounded-r-full shadow-sm;
   }
 

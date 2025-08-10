@@ -260,24 +260,24 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300 flex flex-col",
+        "fixed top-0 left-0 h-full bg-gradient-to-b from-card/95 to-card/98 backdrop-blur-md border-r border-border/50 z-50 transition-all duration-300 flex flex-col shadow-2xl",
         // Desktop behavior
-        !isMobile && (isCollapsed ? "w-20" : "w-72"),
+        !isMobile && (isCollapsed ? "w-16" : "w-60"),
         // Mobile behavior
-        isMobile && (isMobileMenuOpen ? "w-80" : "w-0 -translate-x-full"),
+        isMobile && (isMobileMenuOpen ? "w-72" : "w-0 -translate-x-full"),
         isMobile && isMobileMenuOpen && "translate-x-0 shadow-2xl"
       )}>
         
         {/* Header Section */}
-        <div className="flex-shrink-0 px-6 py-6 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
+        <div className="flex-shrink-0 px-4 py-5 border-b border-border/30 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
           <div className="flex items-center justify-between">
             {(!isCollapsed || isMobile) && (
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  <h2 className="text-xl font-bold text-foreground">
                     EduPresència
                   </h2>
                   <p className="text-xs text-muted-foreground font-medium">Sistema de Presència</p>
@@ -301,9 +301,9 @@ export default function Sidebar() {
         {/* User Profile Section */}
         {(!isCollapsed || isMobile) && user && (
           <div className="flex-shrink-0 p-4 border-b border-border">
-            <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20">
-              <Avatar className="w-12 h-12 ring-2 ring-primary/20">
-                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-semibold">
+            <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700/50">
+              <Avatar className="w-12 h-12 ring-2 ring-blue-200">
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
@@ -324,7 +324,7 @@ export default function Sidebar() {
         )}
 
         {/* Navigation Sections */}
-        <nav className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent overscroll-contain">
+        <nav className="flex-1 p-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent overscroll-contain">
           <div className="space-y-6">
             {navigationSections.map((section, sectionIndex) => (
               <div key={section.title} className="space-y-2">
@@ -346,17 +346,15 @@ export default function Sidebar() {
                       <Link key={item.href} href={item.href}>
                         <div
                           className={cn(
-                            "group flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative cursor-pointer",
-                            isActive 
-                              ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25 translate-x-1" 
-                              : "text-muted-foreground hover:text-foreground hover:bg-accent/50 hover:translate-x-0.5",
+                            "nav-link",
+                            isActive && "active",
                             isCollapsed && !isMobile ? "justify-center px-3" : "justify-start"
                           )}
                           data-testid={`nav-${item.href.replace('/', '').replace('/', '-')}`}
                         >
                           <Icon className={cn(
-                            "flex-shrink-0 transition-transform duration-200",
-                            isActive ? "w-5 h-5" : "w-4 h-4 group-hover:scale-110"
+                            "flex-shrink-0 transition-all duration-200",
+                            isActive ? "w-5 h-5 text-primary-foreground" : "w-4 h-4 group-hover:scale-110 group-hover:text-accent-foreground"
                           )} />
                           
                           {(!isCollapsed || isMobile) && (
@@ -375,7 +373,7 @@ export default function Sidebar() {
                           
                           {/* Active indicator */}
                           {isActive && (
-                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full shadow-sm" />
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full shadow-sm" />
                           )}
                         </div>
                       </Link>

@@ -12,6 +12,7 @@ import {
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { db } from "./db";
+import { startOfWeek, endOfWeek, addDays, format } from "date-fns";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -1239,6 +1240,254 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching weekly schedule:', error);
       res.status(500).json({ message: 'Error obtenint horari setmanal' });
+    }
+  });
+
+  // ============================================
+  // MISSING CONFIGURATION API ROUTES - CRITICAL FIXES
+  // ============================================
+  
+  // General Settings routes
+  app.get('/api/settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const settings = await storage.getSettings(institutionId);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.put('/api/settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { settings } = req.body;
+      
+      // Update each setting individually
+      for (const [key, value] of Object.entries(settings)) {
+        await storage.upsertSetting({
+          institutionId,
+          key,
+          value: String(value)
+        });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  // Automated Alerts Settings routes
+  app.get('/api/automated-alerts-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const alertsSettings = await storage.getAutomatedAlertSettings(institutionId);
+      res.json(alertsSettings || {});
+    } catch (error) {
+      console.error("Error fetching automated alerts settings:", error);
+      res.status(500).json({ message: "Failed to fetch automated alerts settings" });
+    }
+  });
+
+  app.put('/api/automated-alerts-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const updatedSettings = await storage.updateAutomatedAlertSettings(institutionId, JSON.stringify(req.body));
+      res.json({ success: true, settings: JSON.parse(updatedSettings) });
+    } catch (error) {
+      console.error("Error updating automated alerts settings:", error);
+      res.status(500).json({ message: "Failed to update automated alerts settings" });
+    }
+  });
+
+  // Email Settings routes
+  app.get('/api/email-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const emailSettings = await storage.getEmailSettings(institutionId === 'null' ? null : institutionId);
+      res.json(emailSettings || {});
+    } catch (error) {
+      console.error("Error fetching email settings:", error);
+      res.status(500).json({ message: "Failed to fetch email settings" });
+    }
+  });
+
+  app.put('/api/email-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const settings = { 
+        ...req.body, 
+        institutionId: institutionId === 'null' ? null : institutionId 
+      };
+      const updatedSettings = await storage.upsertEmailSettings(settings);
+      res.json(updatedSettings);
+    } catch (error) {
+      console.error("Error updating email settings:", error);
+      res.status(500).json({ message: "Failed to update email settings" });
+    }
+  });
+
+  // Attendance Network Settings routes
+  app.get('/api/attendance-network-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const networkSettings = await storage.getAttendanceNetworkSettings(institutionId === 'null' ? null : institutionId);
+      res.json(networkSettings || {});
+    } catch (error) {
+      console.error("Error fetching attendance network settings:", error);
+      res.status(500).json({ message: "Failed to fetch attendance network settings" });
+    }
+  });
+
+  app.put('/api/attendance-network-settings/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const settings = { 
+        ...req.body, 
+        institutionId: institutionId === 'null' ? null : institutionId 
+      };
+      const updatedSettings = await storage.upsertAttendanceNetworkSettings(settings);
+      res.json(updatedSettings);
+    } catch (error) {
+      console.error("Error updating attendance network settings:", error);
+      res.status(500).json({ message: "Failed to update attendance network settings" });
+    }
+  });
+
+  // Admin users routes - MISSING
+  app.get('/api/users/admins/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const admins = await db.execute(sql`
+        SELECT 
+          id, email, first_name as "firstName", last_name as "lastName",
+          role, created_at as "createdAt", updated_at as "updatedAt"
+        FROM users 
+        WHERE institution_id = ${institutionId} 
+          AND role IN ('admin', 'superadmin')
+        ORDER BY first_name, last_name
+      `);
+
+      res.json(admins.rows);
+    } catch (error) {
+      console.error("Error fetching admin users:", error);
+      res.status(500).json({ message: "Failed to fetch admin users" });
+    }
+  });
+
+  app.post('/api/users/admins', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { email, firstName, lastName, role, institutionId } = req.body;
+      
+      // Create new admin user
+      const [newAdmin] = await db.execute(sql`
+        INSERT INTO users (institution_id, email, first_name, last_name, role, password_hash)
+        VALUES (${institutionId}, ${email}, ${firstName}, ${lastName}, ${role}, '$2b$10$defaulthash')
+        RETURNING id, email, first_name as "firstName", last_name as "lastName", role, created_at as "createdAt"
+      `);
+
+      res.json(newAdmin);
+    } catch (error) {
+      console.error("Error creating admin user:", error);
+      res.status(500).json({ message: "Failed to create admin user" });
+    }
+  });
+
+  // Absence justifications routes - MISSING 
+  app.get('/api/absence-justifications/admin/:institutionId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const absences = await db.execute(sql`
+        SELECT 
+          a.id,
+          a.employee_id as "employeeId",
+          u.first_name || ' ' || COALESCE(u.last_name, '') as "employeeName",
+          a.start_date as "startDate",
+          a.end_date as "endDate",
+          a.reason,
+          a.justification_status as "justificationStatus",
+          a.created_at as "createdAt",
+          a.updated_at as "updatedAt"
+        FROM absences a
+        LEFT JOIN users u ON a.employee_id = u.id
+        WHERE a.institution_id = ${institutionId}
+        ORDER BY a.created_at DESC
+        LIMIT 100
+      `);
+
+      res.json(absences.rows);
+    } catch (error) {
+      console.error("Error fetching absence justifications:", error);
+      res.status(500).json({ message: "Failed to fetch absence justifications" });
     }
   });
 

@@ -913,6 +913,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Resolve alert endpoint
+  app.put('/api/alerts/:alertId/resolve', isAuthenticated, async (req: any, res) => {
+    try {
+      const { alertId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin', 'employee'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      // Delete the alert (mark as resolved)
+      const result = await db.execute(sql`
+        DELETE FROM alert_notifications 
+        WHERE id = ${alertId}
+      `);
+
+      res.json({ success: true, message: "Alert resolved successfully" });
+    } catch (error) {
+      console.error("Error resolving alert:", error);
+      res.status(500).json({ message: "Failed to resolve alert" });
+    }
+  });
+
   // Admin communications endpoint
   app.get('/api/admin/communications/:institutionId', isAuthenticated, async (req: any, res) => {
     try {

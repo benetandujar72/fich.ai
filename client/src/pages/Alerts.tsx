@@ -302,11 +302,47 @@ export default function Alerts() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    {language === "ca" ? "Historial d'alertes es carregarà des de la base de dades" : "Historial de alertas se cargará desde la base de datos"}
-                  </TableCell>
-                </TableRow>
+                {(alerts as any[]).length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      {language === "ca" ? "No hi ha historial d'alertes" : "No hay historial de alertas"}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  (alerts as any[]).map((alert: any) => (
+                    <TableRow key={alert.id}>
+                      <TableCell>
+                        {new Date(alert.createdAt).toLocaleString(language === "ca" ? "ca-ES" : "es-ES")}
+                      </TableCell>
+                      <TableCell>
+                        {alert.employeeName || 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={alert.type === 'late_arrival' ? 'secondary' : 'destructive'}>
+                          {getAlertTitle(alert.type)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={alert.emailSent ? 'default' : 'outline'}>
+                          {alert.emailSent ? 
+                            (language === "ca" ? "Enviat" : "Enviado") : 
+                            (language === "ca" ? "Pendent" : "Pendiente")
+                          }
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => resolveAlertMutation.mutate(alert.id)}
+                          disabled={resolveAlertMutation.isPending}
+                        >
+                          {language === "ca" ? "Resoldre" : "Resolver"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

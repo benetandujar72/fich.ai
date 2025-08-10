@@ -229,9 +229,9 @@ export default function AlertConfigModal({ isOpen, onClose, institutionId, langu
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-950">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-foreground">
             {language === "ca" ? "Configuració d'Alertes Automàtiques" : "Configuración de Alertas Automáticas"}
           </DialogTitle>
         </DialogHeader>

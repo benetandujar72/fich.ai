@@ -47,7 +47,7 @@ export default function QuickAttendanceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white dark:bg-gray-950" data-testid="quick-attendance-modal">
+      <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700" data-testid="quick-attendance-modal">
         <DialogTitle className="sr-only">
           Control d'assistència ràpid
         </DialogTitle>

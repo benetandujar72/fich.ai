@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -175,7 +175,6 @@ function Router() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background">
-        <LanguageSwitcher />
         <Switch>
           <Route path="/register" component={Register} />
           <Route component={Login} />
@@ -186,7 +185,6 @@ function Router() {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-rose-50/40 via-pink-50/30 to-purple-50/40 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <LanguageSwitcher />
       <Sidebar />
       
       <div className="flex-1 flex flex-col ml-0 md:ml-16 lg:ml-60 transition-all duration-300 min-h-0">

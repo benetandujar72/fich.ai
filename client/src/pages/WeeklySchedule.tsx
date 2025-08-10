@@ -106,12 +106,12 @@ export default function WeeklySchedule() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Calendar className="h-8 w-8" />
-              {language === "ca" ? "El meu horari setmanal" : "Mi horario semanal"}
+              {language === "ca" ? "El meu horari personal" : "Mi horario personal"}
             </h1>
             <p className="text-muted-foreground">
               {language === "ca" 
-                ? "Visualitza el teu horari de classes setmanal" 
-                : "Visualiza tu horario de clases semanal"}
+                ? "Visualitza el teu horari de classes personal" 
+                : "Visualiza tu horario de clases personal"}
             </p>
           </div>
           

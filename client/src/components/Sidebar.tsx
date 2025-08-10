@@ -82,7 +82,7 @@ export default function Sidebar() {
       show: permissions.canCreateAcademicYear || permissions.canEditAcademicYear,
     },
     {
-      name: language === "ca" ? "Horari Setmanal" : "Horario Semanal",
+      name: language === "ca" ? "Horari Personal" : "Horario Personal",
       href: "/weekly-schedule",
       icon: CalendarDays,
       show: permissions.canViewOwnAttendance,
@@ -91,7 +91,7 @@ export default function Sidebar() {
       name: language === "ca" ? "Horaris Personal (Admin)" : "Horarios Personal (Admin)",
       href: "/admin/weekly-schedule",
       icon: Calendar,
-      show: user?.role === 'admin' || user?.role === 'superadmin',
+      show: (user?.role === 'admin' || user?.role === 'superadmin'),
     },
     {
       name: language === "ca" ? "Comunicacions" : "Comunicaciones",

@@ -309,7 +309,7 @@ function Router() {
           <Route path="/weekly-schedule" component={() => 
             <ProtectedRoute>
               <Header 
-                title={language === "ca" ? "Horari Setmanal" : "Horario Semanal"}
+                title={language === "ca" ? "Horari Personal" : "Horario Personal"}
               />
               <WeeklySchedule />
             </ProtectedRoute>

@@ -1689,5 +1689,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /admin/weekly-schedule - Get all employees with weekly schedule summary
+  app.get("/api/admin/weekly-schedule", isAuthenticated, async (req: any, res) => {
+    console.log('ADMIN_WEEKLY_SCHEDULE: Request from user:', req.user?.id, 'role:', req.user?.role);
+
+    if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+      console.log('ADMIN_WEEKLY_SCHEDULE: Access denied, insufficient role');
+      return res.status(403).json({ message: 'Access denied: admin role required' });
+    }
+
+    const week = req.query.week as string;
+    if (!week) {
+      return res.status(400).json({ message: 'Week date required (YYYY-MM-DD format)' });
+    }
+
+    try {
+      const result = await db.execute(sql`
+        WITH employee_sessions AS (
+          SELECT 
+            u.id,
+            u.first_name,
+            u.last_name,
+            u.email,
+            u.role,
+            COUNT(us.id) as total_sessions,
+            COALESCE(COUNT(us.id) * 0.9, 0) as weekly_hours
+          FROM users u
+          LEFT JOIN untis_schedule_sessions us ON (
+            us.teacher_code = u.first_name
+            OR us.employee_id = u.id
+          )
+          WHERE u.institution_id = ${req.user.institutionId}
+            AND u.role = 'employee'
+          GROUP BY u.id, u.first_name, u.last_name, u.email, u.role
+        )
+        SELECT 
+          id,
+          first_name as "firstName",
+          last_name as "lastName",
+          email,
+          role,
+          total_sessions as "totalSessions",
+          weekly_hours as "weeklyHours"
+        FROM employee_sessions
+        ORDER BY first_name, last_name
+      `);
+
+      console.log('ADMIN_WEEKLY_SCHEDULE: Found', result.rows.length, 'employees');
+      res.json(result.rows);
+    } catch (error) {
+      console.error('ADMIN_WEEKLY_SCHEDULE: Error:', error);
+      res.status(500).json({ message: 'Failed to fetch weekly schedule' });
+    }
+  });
+
+  // GET /admin/personal-schedule/:employeeId - Get detailed personal schedule for specific employee
+  app.get("/api/admin/personal-schedule/:employeeId", isAuthenticated, async (req: any, res) => {
+    const { employeeId } = req.params;
+    const week = req.query.week as string;
+
+    console.log('ADMIN_PERSONAL_SCHEDULE: Request for employee:', employeeId, 'week:', week);
+
+    if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+      console.log('ADMIN_PERSONAL_SCHEDULE: Access denied, insufficient role');
+      return res.status(403).json({ message: 'Access denied: admin role required' });
+    }
+
+    if (!week) {
+      return res.status(400).json({ message: 'Week date required (YYYY-MM-DD format)' });
+    }
+
+    try {
+      // Verify employee belongs to same institution
+      const employee = await db.execute(sql`
+        SELECT u.id, u.first_name, u.institution_id
+        FROM users u
+        WHERE u.id = ${employeeId}
+      `);
+
+      if (employee.rows.length === 0) {
+        return res.status(404).json({ message: 'Employee not found' });
+      }
+
+      if (employee.rows[0].institution_id !== req.user.institutionId) {
+        return res.status(403).json({ message: 'Access denied: employee not in your institution' });
+      }
+
+      // Get personal schedule sessions
+      const result = await db.execute(sql`
+        SELECT 
+          us.day_of_week as "dayOfWeek",
+          us.hour_period as "hourPeriod",
+          CASE 
+            WHEN us.hour_period = 1 THEN '08:00:00'
+            WHEN us.hour_period = 2 THEN '09:00:00'
+            WHEN us.hour_period = 3 THEN '10:00:00'
+            WHEN us.hour_period = 4 THEN '11:00:00'
+            WHEN us.hour_period = 5 THEN '12:00:00'
+            WHEN us.hour_period = 6 THEN '13:00:00'
+            WHEN us.hour_period = 7 THEN '14:00:00'
+            WHEN us.hour_period = 8 THEN '15:00:00'
+            ELSE '09:00:00'
+          END as "startTime",
+          CASE 
+            WHEN us.hour_period = 1 THEN '08:55:00'
+            WHEN us.hour_period = 2 THEN '09:55:00'
+            WHEN us.hour_period = 3 THEN '10:55:00'
+            WHEN us.hour_period = 4 THEN '11:55:00'
+            WHEN us.hour_period = 5 THEN '12:55:00'
+            WHEN us.hour_period = 6 THEN '13:55:00'
+            WHEN us.hour_period = 7 THEN '14:55:00'
+            WHEN us.hour_period = 8 THEN '15:55:00'
+            ELSE '09:55:00'
+          END as "endTime",
+          us.subject_code as "subjectCode",
+          us.group_code as "groupCode",
+          us.classroom_code as "classroomCode"
+        FROM untis_schedule_sessions us
+        WHERE (
+          us.teacher_code = (SELECT first_name FROM users WHERE id = ${employeeId})
+          OR us.employee_id = ${employeeId}
+        )
+        ORDER BY us.day_of_week, us.hour_period
+      `);
+
+      console.log('ADMIN_PERSONAL_SCHEDULE: Found', result.rows.length, 'sessions');
+      res.json(result.rows);
+    } catch (error) {
+      console.error('ADMIN_PERSONAL_SCHEDULE: Error:', error);
+      res.status(500).json({ message: 'Failed to fetch personal schedule' });
+    }
+  });
+
   return httpServer;
 }

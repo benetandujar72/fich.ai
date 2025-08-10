@@ -88,6 +88,12 @@ export default function Sidebar() {
       show: permissions.canViewOwnAttendance,
     },
     {
+      name: language === "ca" ? "Horaris Personal (Admin)" : "Horarios Personal (Admin)",
+      href: "/admin/weekly-schedule",
+      icon: Calendar,
+      show: user?.role === 'admin' || user?.role === 'superadmin',
+    },
+    {
       name: language === "ca" ? "Comunicacions" : "Comunicaciones",
       href: "/communications",
       icon: MessageSquare,

@@ -23,6 +23,7 @@ import AdminManagement from "@/pages/AdminManagement";
 import InstitutionManagement from "@/pages/InstitutionManagement";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import WeeklySchedule from "@/pages/WeeklySchedule";
+import WeeklyScheduleAdmin from "@/pages/WeeklyScheduleAdmin";
 import Communications from "@/pages/Communications";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -311,6 +312,16 @@ function Router() {
                 title={language === "ca" ? "Horari Setmanal" : "Horario Semanal"}
               />
               <WeeklySchedule />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/weekly-schedule" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title="Horaris Personal - Administració"
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <WeeklyScheduleAdmin />
             </ProtectedRoute>
           } />
 

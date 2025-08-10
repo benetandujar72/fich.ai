@@ -51,7 +51,8 @@ The application uses a monorepo architecture, separating client and server code:
 - **Risk Assessment Dashboard**: Teacher risk monitoring with color-coded levels and empathetic notification templates.
 - **Email Configuration Panel**: SMTP setup, email template management, and testing capabilities.
 - **Enhanced Administrative Features**: CSV/Excel import for employees, advanced filtering, bulk operations, custom alerts, advanced report generation, weekly schedule view with real data, absence justification workflow, and automated legal alerts.
-- **Accessibility**: Improved dialog accessibility.
+- **Accessibility**: Improved dialog accessibility and comprehensive modal contrast improvements.
+- **UI/UX Enhancements**: Complete modal dialog contrast improvements across all components (Dialog, AlertDialog, Sheet, Drawer, Popover, Tooltip, HoverCard, Select, ContextMenu, DropdownMenu), enhanced mobile menu visibility with solid backgrounds, and improved overlay opacity for better visual hierarchy.
 
 ## External Dependencies
 

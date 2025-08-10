@@ -1,0 +1,24 @@
+[vite] connecting...
+[vite] connected.
+Warning: Invalid prop &#x60;data-replit-metadata&#x60; supplied to &#x60;React.Fragment&#x60;. React.Fragment can only have &#x60;key&#x60; and &#x60;children&#x60; props.
+    at WeeklySchedule (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/pages/WeeklySchedule.tsx:30:20)
+    at ProtectedRoute (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/components/ProtectedRoute.tsx:23:3)
+    at component
+    at Route (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=0433e37c:323:16)
+    at Switch (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=0433e37c:379:17)
+    at div
+    at div
+    at Router (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/src/App.tsx?v=hjGrYFUJTG6yTeTbHA3OK:54:48)
+    at Provider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=0433e37c:38:15)
+    at TooltipProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=0433e37c:63:5)
+    at QueryClientProvider (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=0433e37c:2805:3)
+    at App
+📅 Setting initial dates: 2025-06-30 to 2025-08-10
+🚀 Generating initial report for: 2025-06-30 to 2025-08-10
+❌ Error generating initial report: 
+SyntaxError {message: "Failed to execute 'json' on 'Response': Unexpected token '<', "<!DOCTYPE "... is not valid JSON"}
+
+at t.value (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

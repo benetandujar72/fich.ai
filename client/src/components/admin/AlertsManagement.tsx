@@ -200,10 +200,10 @@ export function AlertsManagement() {
                 Nova Alerta
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-gray-950">
+            <DialogContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
               <DialogHeader>
-                <DialogTitle>Enviar Nova Alerta</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-foreground">Enviar Nova Alerta</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
                   Envia una alerta manual als usuaris seleccionats
                 </DialogDescription>
               </DialogHeader>

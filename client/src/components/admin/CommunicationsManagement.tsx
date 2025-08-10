@@ -183,7 +183,7 @@ export function CommunicationsManagement() {
                 Nova Comunicació
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl bg-white dark:bg-gray-950">
               <DialogHeader>
                 <DialogTitle>Enviar Nova Comunicació</DialogTitle>
                 <DialogDescription>

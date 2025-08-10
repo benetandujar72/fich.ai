@@ -200,7 +200,7 @@ export function AlertsManagement() {
                 Nova Alerta
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white dark:bg-gray-950">
               <DialogHeader>
                 <DialogTitle>Enviar Nova Alerta</DialogTitle>
                 <DialogDescription>

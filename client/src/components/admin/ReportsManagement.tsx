@@ -311,7 +311,7 @@ export function ReportsManagement() {
 
       {/* Weekly Detailed Report Modal */}
       <Dialog open={showWeeklyDetailModal} onOpenChange={setShowWeeklyDetailModal}>
-        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-950">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />

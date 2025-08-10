@@ -372,7 +372,7 @@ export function PrivacyManagement() {
       {/* Response Dialog */}
       {selectedRequest && (
         <Dialog open={responseDialogOpen} onOpenChange={setResponseDialogOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl bg-white dark:bg-gray-950">
             <DialogHeader>
               <DialogTitle>Respondre Sol·licitud de Privacitat</DialogTitle>
               <DialogDescription>

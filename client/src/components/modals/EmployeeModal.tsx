@@ -234,7 +234,7 @@ export default function EmployeeModal({ isOpen, onClose, employee, institutionId
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="employee-modal">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-950" data-testid="employee-modal">
         <DialogHeader>
           <DialogTitle>
             {employee 

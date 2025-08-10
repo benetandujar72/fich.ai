@@ -264,7 +264,7 @@ export default function Communications() {
               Nou Missatge
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl bg-white dark:bg-gray-950">
             <DialogHeader>
               <DialogTitle>Redactar Missatge</DialogTitle>
             </DialogHeader>

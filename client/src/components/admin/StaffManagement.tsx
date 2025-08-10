@@ -174,7 +174,7 @@ export function StaffManagement() {
                 Importar Personal
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white dark:bg-gray-950">
               <DialogHeader>
                 <DialogTitle>Importar Personal</DialogTitle>
                 <DialogDescription>

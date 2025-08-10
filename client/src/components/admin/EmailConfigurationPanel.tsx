@@ -301,10 +301,22 @@ export default function EmailConfigurationPanel() {
                 <Mail className="h-5 w-5" />
                 {language === "ca" ? "Configuració del Servidor SMTP" : "Configuración del Servidor SMTP"}
               </CardTitle>
-              <CardDescription>
-                {language === "ca" 
-                  ? "Configura el servidor d'email per enviar notificacions automàtiques" 
-                  : "Configura el servidor de email para enviar notificaciones automáticas"}
+              <CardDescription className="space-y-2">
+                <p>
+                  {language === "ca" 
+                    ? "Configura el servidor d'email per enviar notificacions automàtiques" 
+                    : "Configura el servidor de email para enviar notificaciones automáticas"}
+                </p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                    📧 {language === "ca" ? "Per Gmail:" : "Para Gmail:"}
+                  </p>
+                  <ul className="text-xs text-blue-700 dark:text-blue-300 mt-1 space-y-1">
+                    <li>• {language === "ca" ? "Activa l'autenticació de dos factors al teu compte Gmail" : "Activa la autenticación de dos factores en tu cuenta Gmail"}</li>
+                    <li>• {language === "ca" ? "Genera una contrasenya d'aplicació a " : "Genera una contraseña de aplicación en "}<a href="https://myaccount.google.com/apppasswords" target="_blank" className="underline">myaccount.google.com/apppasswords</a></li>
+                    <li>• {language === "ca" ? "Utilitza aquesta contrasenya d'aplicació, no la contrasenya normal" : "Utiliza esta contraseña de aplicación, no la contraseña normal"}</li>
+                  </ul>
+                </div>
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -371,7 +383,11 @@ export default function EmailConfigurationPanel() {
                           <FormControl>
                             <Input 
                               type="password" 
-                              placeholder={smtpConfig ? "Deixa buit per mantenir l'actual" : "Contrasenya SMTP"} 
+                              placeholder={
+                                smtpConfig 
+                                  ? (language === "ca" ? "Deixa buit per mantenir l'actual" : "Dejar vacío para mantener actual")
+                                  : (language === "ca" ? "Per Gmail: Contrasenya d'aplicació" : "Para Gmail: Contraseña de aplicación")
+                              } 
                               {...field} 
                             />
                           </FormControl>

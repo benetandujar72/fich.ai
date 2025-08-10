@@ -22,6 +22,17 @@ interface EmailSettings {
   senderName: string;
 }
 
+interface SmtpConfig {
+  id?: string;
+  host: string;
+  port: number;
+  username: string;
+  isSecure: boolean;
+  fromEmail: string;
+  fromName: string;
+  isActive: boolean;
+}
+
 export default function EmailSettingsForm({ institutionId, language }: EmailSettingsFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -37,14 +48,14 @@ export default function EmailSettingsForm({ institutionId, language }: EmailSett
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const { data: settings, isLoading } = useQuery<EmailSettings>({
+  const { data: settings, isLoading } = useQuery<EmailSettings | null>({
     queryKey: ["/api/admin/smtp-config", institutionId || "null"],
     queryFn: async () => {
       const response = await fetch(`/api/admin/smtp-config/${institutionId || "null"}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch SMTP settings');
+        return null;
       }
-      const data = await response.json();
+      const data: SmtpConfig | null = await response.json();
       if (!data) return null;
       
       // Transform the SMTP response to EmailSettings format

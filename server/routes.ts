@@ -750,7 +750,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           GROUP BY DATE(timestamp)
         ),
         user_info AS (
-          SELECT u.first_name, u.email
+          SELECT u.first_name, u.last_name, u.email
           FROM users u 
           WHERE u.id = ${employeeId}
         ),
@@ -779,11 +779,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               WHEN us.hour_period = 7 THEN '14:55:00'::time
               WHEN us.hour_period = 8 THEN '15:55:00'::time
               ELSE '09:55:00'::time
-            END as end_time,
-            us.is_lective_hour
+            END as end_time
           FROM untis_schedule_sessions us
           CROSS JOIN user_info ui
-          WHERE us.teacher_code = ui.first_name
+          WHERE (
+            -- Coincidència exacta amb el nom
+            us.teacher_code = ui.first_name
+            -- Vinculació directa per employee_id si existeix
+            OR us.employee_id = ${employeeId}
+            -- Patró A.COGNOM per noms que comencen amb inicial
+            OR (ui.first_name LIKE '%.%' AND us.teacher_code = UPPER(ui.first_name))
+          )
         ),
         daily_schedule AS (
           SELECT 

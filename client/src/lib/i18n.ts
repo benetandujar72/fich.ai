@@ -19,6 +19,7 @@ export const translations = {
     
     // Employee management
     "employee_management": "Gestió de personal",
+    "manager_employees": "Gestió de personal",
     "add_employee": "Afegir empleat",
     "search": "Buscar",
     "department": "Departament",
@@ -139,6 +140,7 @@ export const translations = {
     
     // Employee management
     "employee_management": "Gestión de personal",
+    "manager_employees": "Gestión de personal",
     "add_employee": "Añadir empleado",
     "search": "Buscar",
     "department": "Departamento",

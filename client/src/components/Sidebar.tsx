@@ -260,7 +260,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed top-0 left-0 h-full bg-gradient-to-b from-card/95 to-card/98 backdrop-blur-md border-r border-border/50 z-50 transition-all duration-300 flex flex-col shadow-2xl",
+        "fixed top-0 left-0 h-full bg-gradient-to-b from-rose-50/95 via-pink-50/95 to-purple-50/98 dark:from-slate-900/95 dark:via-slate-800/95 dark:to-slate-700/98 backdrop-blur-md border-r border-rose-100 dark:border-slate-600 z-50 transition-all duration-300 flex flex-col shadow-2xl",
         // Desktop behavior
         !isMobile && (isCollapsed ? "w-16" : "w-60"),
         // Mobile behavior
@@ -269,11 +269,11 @@ export default function Sidebar() {
       )}>
         
         {/* Header Section */}
-        <div className="flex-shrink-0 px-4 py-5 border-b border-border/30 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+        <div className="flex-shrink-0 px-4 py-5 border-b border-rose-100 dark:border-slate-600 bg-gradient-to-r from-rose-100/80 to-pink-100/80 dark:from-slate-800/50 dark:to-slate-700/50">
           <div className="flex items-center justify-between">
             {(!isCollapsed || isMobile) && (
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-br from-rose-400 via-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -301,9 +301,9 @@ export default function Sidebar() {
         {/* User Profile Section */}
         {(!isCollapsed || isMobile) && user && (
           <div className="flex-shrink-0 p-4 border-b border-border">
-            <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700/50">
-              <Avatar className="w-12 h-12 ring-2 ring-blue-200">
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
+            <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-rose-50/70 to-pink-50/70 dark:from-slate-700/50 dark:to-slate-600/50 border border-rose-200 dark:border-slate-500/50">
+              <Avatar className="w-12 h-12 ring-2 ring-rose-200 dark:ring-slate-500">
+                <AvatarFallback className="bg-gradient-to-br from-rose-400 via-pink-400 to-purple-500 text-white font-semibold">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
@@ -373,7 +373,7 @@ export default function Sidebar() {
                           
                           {/* Active indicator */}
                           {isActive && (
-                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full shadow-sm" />
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full shadow-sm opacity-80" />
                           )}
                         </div>
                       </Link>

@@ -185,7 +185,7 @@ function Router() {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-background via-background to-blue-50/30 dark:to-blue-900/10">
+    <div className="flex h-screen bg-gradient-to-br from-rose-50/40 via-pink-50/30 to-purple-50/40 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <LanguageSwitcher />
       <Sidebar />
       

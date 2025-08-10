@@ -7,10 +7,11 @@ import {
   insertAttendanceRecordSchema,
   insertAbsenceSchema,
   insertSettingSchema,
-  insertCommunicationSchema 
+  insertCommunicationSchema,
+  smtpConfigurations
 } from "@shared/schema";
 import { z } from "zod";
-import { sql } from "drizzle-orm";
+import { sql, and, eq } from "drizzle-orm";
 import { db } from "./db";
 import { startOfWeek, endOfWeek, addDays, format } from "date-fns";
 
@@ -1141,17 +1142,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
 
-      const result = await db.execute(sql`
-        SELECT 
-          id, host, port, username, is_secure as "isSecure",
-          from_email as "fromEmail", from_name as "fromName", 
-          is_active as "isActive"
-        FROM smtp_configurations 
-        WHERE institution_id = ${institutionId} AND is_active = true
-        LIMIT 1
-      `);
+      const result = await db
+        .select({
+          id: smtpConfigurations.id,
+          host: smtpConfigurations.host,
+          port: smtpConfigurations.port,
+          username: smtpConfigurations.username,
+          isSecure: smtpConfigurations.isSecure,
+          fromEmail: smtpConfigurations.fromEmail,
+          fromName: smtpConfigurations.fromName,
+          isActive: smtpConfigurations.isActive,
+        })
+        .from(smtpConfigurations)
+        .where(
+          and(
+            eq(smtpConfigurations.institutionId, institutionId),
+            eq(smtpConfigurations.isActive, true)
+          )
+        )
+        .limit(1);
 
-      res.json(result.rows[0] || null);
+      res.json(result[0] || null);
     } catch (error) {
       console.error("Error fetching SMTP config:", error);
       res.status(500).json({ message: "Failed to fetch SMTP configuration" });
@@ -1167,23 +1178,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
 
-      // Deactivate existing configs
-      await db.execute(sql`
-        UPDATE smtp_configurations 
-        SET is_active = false 
-        WHERE institution_id = ${req.user.institutionId}
-      `);
+      // Deactivate existing configs for this institution
+      await db
+        .update(smtpConfigurations)
+        .set({ isActive: false })
+        .where(eq(smtpConfigurations.institutionId, req.user.institutionId));
 
-      // Insert new config
-      await db.execute(sql`
-        INSERT INTO smtp_configurations (
-          institution_id, host, port, username, password, 
-          is_secure, from_email, from_name, is_active
-        ) VALUES (
-          ${req.user.institutionId}, ${host}, ${port}, ${username}, ${password},
-          ${isSecure}, ${fromEmail}, ${fromName}, ${isActive}
-        )
-      `);
+      // Insert new SMTP configuration
+      await db.insert(smtpConfigurations).values({
+        institutionId: req.user.institutionId,
+        host,
+        port,
+        username,
+        password, // In production, this should be encrypted
+        isSecure,
+        fromEmail,
+        fromName,
+        isActive: isActive ?? true,
+      });
 
       res.json({ success: true });
     } catch (error) {

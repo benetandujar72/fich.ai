@@ -38,13 +38,24 @@ export default function EmailSettingsForm({ institutionId, language }: EmailSett
   const [showPassword, setShowPassword] = useState(false);
 
   const { data: settings, isLoading } = useQuery<EmailSettings>({
-    queryKey: ["/api/email-settings", institutionId || "null"],
+    queryKey: ["/api/admin/smtp-config", institutionId || "null"],
     queryFn: async () => {
-      const response = await fetch(`/api/email-settings/${institutionId || "null"}`);
+      const response = await fetch(`/api/admin/smtp-config/${institutionId || "null"}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch email settings');
+        throw new Error('Failed to fetch SMTP settings');
       }
-      return response.json();
+      const data = await response.json();
+      if (!data) return null;
+      
+      // Transform the SMTP response to EmailSettings format
+      return {
+        smtpHost: data.host || "",
+        smtpPort: data.port || 587,
+        smtpUser: data.username || "",
+        smtpPassword: "", // Don't return password for security
+        senderEmail: data.fromEmail || "",
+        senderName: data.fromName || "",
+      };
     },
   });
 
@@ -63,14 +74,25 @@ export default function EmailSettingsForm({ institutionId, language }: EmailSett
 
   const updateMutation = useMutation({
     mutationFn: async (data: EmailSettings) => {
-      return await apiRequest("PUT", `/api/email-settings/${institutionId || "null"}`, data);
+      // Transform EmailSettings to SMTP format
+      const smtpData = {
+        host: data.smtpHost,
+        port: data.smtpPort,
+        username: data.smtpUser,
+        password: data.smtpPassword,
+        isSecure: true, // Default to secure connection
+        fromEmail: data.senderEmail,
+        fromName: data.senderName,
+        isActive: true
+      };
+      return await apiRequest("POST", "/api/admin/smtp-config", smtpData);
     },
     onSuccess: () => {
       toast({
         title: language === "ca" ? "Èxit" : "Éxito",
-        description: language === "ca" ? "Configuració d'email guardada" : "Configuración de email guardada",
+        description: language === "ca" ? "Configuració SMTP guardada" : "Configuración SMTP guardada",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/email-settings", institutionId || "null"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/smtp-config", institutionId || "null"] });
     },
     onError: (error: any) => {
       toast({

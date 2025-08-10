@@ -203,10 +203,10 @@ export default function WeeklyScheduleAdmin() {
 
       {/* Personal Schedule Dialog */}
       <Dialog open={isPersonalScheduleOpen} onOpenChange={setIsPersonalScheduleOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <User className="h-5 w-5" />
+            <DialogTitle className="flex items-center space-x-2 text-foreground">
+              <User className="h-5 w-5 text-rose-600 dark:text-rose-400" />
               <span>
                 Horari Personal - {selectedEmployee?.firstName} {selectedEmployee?.lastName}
               </span>
@@ -215,11 +215,11 @@ export default function WeeklyScheduleAdmin() {
           
           <div className="mt-4">
             <div className="grid grid-cols-6 gap-2 mb-4">
-              <div className="p-3 text-sm font-medium text-center bg-muted rounded">
+              <div className="p-3 text-sm font-medium text-center bg-rose-100 dark:bg-slate-800 text-rose-800 dark:text-rose-200 rounded border border-rose-200 dark:border-slate-600">
                 Hora
               </div>
               {weekDays.map(day => (
-                <div key={day} className="p-3 text-sm font-medium text-center bg-muted rounded">
+                <div key={day} className="p-3 text-sm font-medium text-center bg-rose-100 dark:bg-slate-800 text-rose-800 dark:text-rose-200 rounded border border-rose-200 dark:border-slate-600">
                   {day}
                 </div>
               ))}
@@ -228,7 +228,7 @@ export default function WeeklyScheduleAdmin() {
             <div className="grid grid-cols-6 gap-2">
               {timeSlots.map(slot => (
                 <div key={slot.period} className="contents">
-                  <div className="p-2 text-xs text-center bg-muted/50 rounded text-muted-foreground">
+                  <div className="p-2 text-xs text-center bg-rose-50 dark:bg-slate-800/50 rounded text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-slate-600">
                     {slot.label}
                   </div>
                   {[1, 2, 3, 4, 5].map(dayOfWeek => {
@@ -236,21 +236,21 @@ export default function WeeklyScheduleAdmin() {
                     const session = daySchedule.find(s => s.hourPeriod === slot.period);
                     
                     return (
-                      <div key={`${dayOfWeek}-${slot.period}`} className="min-h-[60px] border rounded">
+                      <div key={`${dayOfWeek}-${slot.period}`} className="min-h-[60px] border border-rose-200 dark:border-slate-600 rounded bg-white dark:bg-slate-900">
                         {session ? (
-                          <div className="p-2 h-full bg-primary/10 border-l-4 border-primary rounded">
-                            <div className="text-xs font-medium text-primary">
+                          <div className="p-2 h-full bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 dark:border-rose-400 rounded">
+                            <div className="text-xs font-medium text-rose-700 dark:text-rose-300">
                               {session.subjectCode}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-rose-600 dark:text-rose-400">
                               {session.groupCode}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-rose-500 dark:text-rose-500">
                               {session.classroomCode}
                             </div>
                           </div>
                         ) : (
-                          <div className="p-2 h-full flex items-center justify-center text-muted-foreground">
+                          <div className="p-2 h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
                             <span className="text-xs">-</span>
                           </div>
                         )}

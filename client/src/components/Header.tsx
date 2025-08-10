@@ -95,7 +95,7 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
                 onClick={() => setLanguage("ca")}
                 className={cn("cursor-pointer hover:bg-rose-100 dark:hover:bg-slate-700", language === "ca" && "bg-rose-100 dark:bg-slate-700")}
               >
-                🇪🇸 Català
+                🇨🇦 Català
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setLanguage("es")}

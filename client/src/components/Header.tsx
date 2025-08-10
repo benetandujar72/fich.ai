@@ -26,7 +26,8 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
   return (
     <header className={cn(
       "sticky top-0 z-40 bg-rose-50/95 dark:bg-slate-800/95 backdrop-blur supports-[backdrop-filter]:bg-rose-50/60 dark:supports-[backdrop-filter]:bg-slate-800/60",
-      "border-b border-rose-100 dark:border-slate-600 shadow-sm"
+      "border-b border-rose-100 dark:border-slate-600 shadow-sm",
+      "hidden md:block" // Ocultar en mòbil
     )}>
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         

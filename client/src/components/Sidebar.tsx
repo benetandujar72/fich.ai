@@ -137,7 +137,14 @@ export default function Sidebar() {
           href: "/alerts",
           icon: AlertTriangle,
           show: permissions.canViewAlerts,
-          badge: Array.isArray(alerts) && alerts.length > 0 ? alerts.length.toString() : null,
+          badge: Array.isArray(alerts) && alerts.filter((alert: any) => alert.status === 'active').length > 0 ? alerts.filter((alert: any) => alert.status === 'active').length.toString() : null,
+        },
+        {
+          name: language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas",
+          href: "/alert-config",
+          icon: Settings,
+          show: permissions.canManageSystem,
+          badge: null,
         },
         {
           name: t("reports", language),

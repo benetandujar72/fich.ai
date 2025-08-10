@@ -14,6 +14,7 @@ import Dashboard from "@/pages/Dashboard";
 import Employees from "@/pages/Employees";
 import Attendance from "@/pages/Attendance";
 import Alerts from "@/pages/Alerts";
+import AlertConfig from "@/pages/AlertConfig";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import ScheduleImport from "@/pages/ScheduleImport";
@@ -236,6 +237,16 @@ function Router() {
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <Alerts />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/alert-config" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title={language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas"}
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <AlertConfig />
             </ProtectedRoute>
           } />
           

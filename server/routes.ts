@@ -1891,5 +1891,199 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Alert Rules Management Routes
+  app.get("/api/admin/alert-rules/:institutionId", async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+
+      const alertRules = await db.execute(sql`
+        SELECT * FROM alert_rules 
+        WHERE institution_id = ${institutionId}
+        ORDER BY created_at DESC
+      `);
+
+      res.json(alertRules.rows.map(rule => ({
+        id: rule.id,
+        name: rule.name,
+        type: rule.type,
+        enabled: rule.enabled,
+        condition: {
+          threshold: rule.condition_threshold,
+          unit: rule.condition_unit,
+          comparison: rule.condition_comparison
+        },
+        notification: {
+          email: rule.notification_email,
+          internal: rule.notification_internal,
+          emailTemplate: rule.notification_email_template,
+          recipients: rule.notification_recipients || []
+        },
+        schedule: {
+          immediate: rule.schedule_immediate,
+          delay: rule.schedule_delay,
+          repeat: rule.schedule_repeat,
+          repeatInterval: rule.schedule_repeat_interval
+        },
+        createdAt: rule.created_at,
+        updatedAt: rule.updated_at
+      })));
+    } catch (error) {
+      console.error('Error fetching alert rules:', error);
+      res.status(500).json({ message: 'Error fetching alert rules' });
+    }
+  });
+
+  app.post("/api/admin/alert-rules", async (req, res) => {
+    try {
+      const {
+        institutionId,
+        name,
+        type,
+        enabled,
+        condition,
+        notification,
+        schedule
+      } = req.body;
+
+      const result = await db.execute(sql`
+        INSERT INTO alert_rules (
+          institution_id, name, type, enabled,
+          condition_threshold, condition_unit, condition_comparison,
+          notification_email, notification_internal, notification_email_template, notification_recipients,
+          schedule_immediate, schedule_delay, schedule_repeat, schedule_repeat_interval
+        ) VALUES (
+          ${institutionId}, ${name}, ${type}, ${enabled},
+          ${condition.threshold}, ${condition.unit}, ${condition.comparison},
+          ${notification.email}, ${notification.internal}, ${notification.emailTemplate || ''}, ${notification.recipients ? sql`${JSON.stringify(notification.recipients)}::text[]` : sql`'{}'::text[]`},
+          ${schedule.immediate}, ${schedule.delay || 0}, ${schedule.repeat || false}, ${schedule.repeatInterval || 60}
+        )
+        RETURNING *
+      `);
+
+      if (result.rows.length > 0) {
+        const rule = result.rows[0];
+        res.status(201).json({
+          id: rule.id,
+          name: rule.name,
+          type: rule.type,
+          enabled: rule.enabled,
+          condition: {
+            threshold: rule.condition_threshold,
+            unit: rule.condition_unit,
+            comparison: rule.condition_comparison
+          },
+          notification: {
+            email: rule.notification_email,
+            internal: rule.notification_internal,
+            emailTemplate: rule.notification_email_template,
+            recipients: rule.notification_recipients || []
+          },
+          schedule: {
+            immediate: rule.schedule_immediate,
+            delay: rule.schedule_delay,
+            repeat: rule.schedule_repeat,
+            repeatInterval: rule.schedule_repeat_interval
+          },
+          createdAt: rule.created_at,
+          updatedAt: rule.updated_at
+        });
+      } else {
+        res.status(400).json({ message: 'Failed to create alert rule' });
+      }
+    } catch (error) {
+      console.error('Error creating alert rule:', error);
+      res.status(500).json({ message: 'Error creating alert rule' });
+    }
+  });
+
+  app.put("/api/admin/alert-rules/:ruleId", async (req, res) => {
+    try {
+      const { ruleId } = req.params;
+      const {
+        name,
+        type,
+        enabled,
+        condition,
+        notification,
+        schedule
+      } = req.body;
+
+      const result = await db.execute(sql`
+        UPDATE alert_rules SET
+          name = ${name},
+          type = ${type},
+          enabled = ${enabled},
+          condition_threshold = ${condition.threshold},
+          condition_unit = ${condition.unit},
+          condition_comparison = ${condition.comparison},
+          notification_email = ${notification.email},
+          notification_internal = ${notification.internal},
+          notification_email_template = ${notification.emailTemplate || ''},
+          notification_recipients = ${notification.recipients ? sql`${JSON.stringify(notification.recipients)}::text[]` : sql`'{}'::text[]`},
+          schedule_immediate = ${schedule.immediate},
+          schedule_delay = ${schedule.delay || 0},
+          schedule_repeat = ${schedule.repeat || false},
+          schedule_repeat_interval = ${schedule.repeatInterval || 60},
+          updated_at = NOW()
+        WHERE id = ${ruleId}
+        RETURNING *
+      `);
+
+      if (result.rows.length > 0) {
+        const rule = result.rows[0];
+        res.json({
+          id: rule.id,
+          name: rule.name,
+          type: rule.type,
+          enabled: rule.enabled,
+          condition: {
+            threshold: rule.condition_threshold,
+            unit: rule.condition_unit,
+            comparison: rule.condition_comparison
+          },
+          notification: {
+            email: rule.notification_email,
+            internal: rule.notification_internal,
+            emailTemplate: rule.notification_email_template,
+            recipients: rule.notification_recipients || []
+          },
+          schedule: {
+            immediate: rule.schedule_immediate,
+            delay: rule.schedule_delay,
+            repeat: rule.schedule_repeat,
+            repeatInterval: rule.schedule_repeat_interval
+          },
+          createdAt: rule.created_at,
+          updatedAt: rule.updated_at
+        });
+      } else {
+        res.status(404).json({ message: 'Alert rule not found' });
+      }
+    } catch (error) {
+      console.error('Error updating alert rule:', error);
+      res.status(500).json({ message: 'Error updating alert rule' });
+    }
+  });
+
+  app.delete("/api/admin/alert-rules/:ruleId", async (req, res) => {
+    try {
+      const { ruleId } = req.params;
+
+      const result = await db.execute(sql`
+        DELETE FROM alert_rules WHERE id = ${ruleId}
+        RETURNING id
+      `);
+
+      if (result.rows.length > 0) {
+        res.json({ message: 'Alert rule deleted successfully' });
+      } else {
+        res.status(404).json({ message: 'Alert rule not found' });
+      }
+    } catch (error) {
+      console.error('Error deleting alert rule:', error);
+      res.status(500).json({ message: 'Error deleting alert rule' });
+    }
+  });
+
   return httpServer;
 }

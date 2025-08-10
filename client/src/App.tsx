@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import MobileHeader from "@/components/MobileHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -42,6 +43,7 @@ function Router() {
   const queryClient = useQueryClient();
   const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Update time every second - TEMPORALMENTE DESACTIVADO PARA EVITAR RE-RENDERS
   // useEffect(() => {
@@ -186,9 +188,31 @@ function Router() {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-rose-50/40 via-pink-50/30 to-purple-50/40 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <Sidebar />
+      <Sidebar isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
       
-      <div className="flex-1 flex flex-col ml-0 md:ml-16 lg:ml-60 transition-all duration-300 min-h-0">
+      {/* Mobile Header */}
+      <MobileHeader 
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        onLogout={async () => {
+          try {
+            const response = await fetch('/api/logout', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+              window.location.href = '/';
+            } else {
+              window.location.href = '/api/logout';
+            }
+          } catch (error) {
+            window.location.href = '/api/logout';
+          }
+        }}
+      />
+      
+      <div className="flex-1 flex flex-col ml-0 md:ml-16 lg:ml-60 transition-all duration-300 min-h-0 pt-16 md:pt-0">
         <Switch>
           <Route path="/" component={() => 
             <ProtectedRoute>

@@ -37,14 +37,24 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
-export default function Sidebar() {
+interface SidebarProps {
+  isMobileMenuOpen?: boolean;
+  setIsMobileMenuOpen?: (open: boolean) => void;
+}
+
+export default function Sidebar(props: SidebarProps = {}) {
+  const { isMobileMenuOpen, setIsMobileMenuOpen } = props;
   const [location] = useLocation();
   const { user } = useAuth();
   const permissions = usePermissions();
   const { language } = useLanguage();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [internalMobileMenuOpen, setInternalMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Use props if provided, otherwise use internal state
+  const mobileMenuOpen = isMobileMenuOpen !== undefined ? isMobileMenuOpen : internalMobileMenuOpen;
+  const setMobileMenuOpen = setIsMobileMenuOpen ?? setInternalMobileMenuOpen;
 
   // Get alert count for badge
   const { data: alerts = [] } = useQuery({
@@ -60,7 +70,7 @@ export default function Sidebar() {
       setIsMobile(mobile);
       if (mobile) {
         setIsCollapsed(true);
-        setIsMobileMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     };
 
@@ -72,7 +82,7 @@ export default function Sidebar() {
   // Close mobile menu on route change
   useEffect(() => {
     if (isMobile) {
-      setIsMobileMenuOpen(false);
+      setMobileMenuOpen(false);
     }
   }, [location, isMobile]);
 
@@ -247,7 +257,7 @@ export default function Sidebar() {
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'U';
@@ -255,25 +265,14 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Overlay */}
-      {isMobile && isMobileMenuOpen && (
+      {isMobile && mobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/80 z-40 md:hidden pointer-events-auto" 
-          onClick={() => setIsMobileMenuOpen(false)}
+          onClick={() => setMobileMenuOpen(false)}
         />
       )}
       
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleMobileMenu}
-          className="fixed top-4 left-4 z-50 md:hidden bg-white dark:bg-gray-900 shadow-lg border border-border/50"
-          data-testid="mobile-menu-button"
-        >
-          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </Button>
-      )}
+
 
       {/* Sidebar */}
       <div className={cn(
@@ -281,8 +280,8 @@ export default function Sidebar() {
         // Desktop behavior
         !isMobile && (isCollapsed ? "w-16" : "w-60"),
         // Mobile behavior
-        isMobile && (isMobileMenuOpen ? "w-72" : "w-0 -translate-x-full"),
-        isMobile && isMobileMenuOpen && "translate-x-0 shadow-2xl"
+        isMobile && (mobileMenuOpen ? "w-72" : "w-0 -translate-x-full"),
+        isMobile && mobileMenuOpen && "translate-x-0 shadow-2xl"
       )}>
         
         {/* Header Section */}
@@ -369,7 +368,7 @@ export default function Sidebar() {
                             isMobile && "pointer-events-auto"
                           )}
                           data-testid={`nav-${item.href.replace('/', '').replace('/', '-')}`}
-                          onClick={isMobile ? () => setIsMobileMenuOpen(false) : undefined}
+                          onClick={isMobile ? () => setMobileMenuOpen(false) : undefined}
                         >
                           <Icon className={cn(
                             "flex-shrink-0 transition-all duration-200",
@@ -413,7 +412,7 @@ export default function Sidebar() {
               isCollapsed && !isMobile ? "justify-center px-3" : "justify-start"
             )}
             onClick={() => {
-              if (isMobile) setIsMobileMenuOpen(false);
+              if (isMobile) setMobileMenuOpen(false);
               handleLogout();
             }}
             data-testid="logout-button"

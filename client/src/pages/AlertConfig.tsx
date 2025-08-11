@@ -62,6 +62,12 @@ export default function AlertConfig() {
   // Fetch alert rules
   const { data: alertRules = [], isLoading } = useQuery({
     queryKey: ["/api/admin/alert-rules", user?.institutionId],
+    queryFn: async () => {
+      if (!user?.institutionId) return [];
+      const response = await fetch(`/api/admin/alert-rules/${user.institutionId}`);
+      if (!response.ok) throw new Error('Failed to fetch alert rules');
+      return response.json();
+    },
     enabled: !!user?.institutionId,
   });
 
@@ -73,10 +79,7 @@ export default function AlertConfig() {
         : `/api/admin/alert-rules`;
       const method = rule.id ? 'PUT' : 'POST';
       
-      return apiRequest(url, {
-        method,
-        body: { ...rule, institutionId: user?.institutionId }
-      });
+      return apiRequest(method, url, { ...rule, institutionId: user?.institutionId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/alert-rules"] });
@@ -103,9 +106,7 @@ export default function AlertConfig() {
   // Delete alert rule
   const deleteRuleMutation = useMutation({
     mutationFn: async (ruleId: string) => {
-      return apiRequest(`/api/admin/alert-rules/${ruleId}`, {
-        method: 'DELETE'
-      });
+      return apiRequest('DELETE', `/api/admin/alert-rules/${ruleId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/alert-rules"] });

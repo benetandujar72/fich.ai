@@ -80,7 +80,7 @@ export function CommunicationsManagement() {
   });
 
   // Filter communications
-  const filteredCommunications = communications.filter((comm: Communication) => {
+  const filteredCommunications = (communications as Communication[]).filter((comm: Communication) => {
     const matchesSearch = 
       comm.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comm.senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -208,7 +208,7 @@ export function CommunicationsManagement() {
                           <SelectValue placeholder="Selecciona un usuari" />
                         </SelectTrigger>
                         <SelectContent className="select-content-solid">
-                          {employees.map((employee: any) => (
+                          {(employees as any[]).map((employee: any) => (
                             <SelectItem key={employee.id} value={employee.id}>
                               {employee.firstName} {employee.lastName}
                             </SelectItem>

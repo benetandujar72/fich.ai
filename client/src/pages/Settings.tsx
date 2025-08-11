@@ -99,37 +99,39 @@ export default function Settings() {
 
   // Load existing center settings when data is received  
   useEffect(() => {
-    console.log('SETTINGS_CLIENT: Processing settings data (useEffect triggered):', settings);
+    console.log('SETTINGS_CLIENT: Processing settings data (useEffect triggered), length:', settings?.length);
     if (settings && Array.isArray(settings) && settings.length > 0) {
       const settingsObj = settings.reduce((acc: any, setting: any) => {
         acc[setting.key] = setting.value;
         return acc;
       }, {});
       
-      console.log('SETTINGS_CLIENT: Processed settings object:', settingsObj);
+      console.log('SETTINGS_CLIENT: Processed settings object keys:', Object.keys(settingsObj));
       
-      setCenterSettings({
+      const newCenterSettings = {
         centerName: settingsObj.centerName || "",
         academicYear: settingsObj.academicYear || "2025-2026",
         timezone: settingsObj.timezone || "Europe/Barcelona",
         defaultLanguage: settingsObj.defaultLanguage || "ca",
-      });
+      };
       
-      console.log('SETTINGS_CLIENT: Set center settings:', {
-        centerName: settingsObj.centerName || "",
-        academicYear: settingsObj.academicYear || "2025-2026",
-        timezone: settingsObj.timezone || "Europe/Barcelona",
-        defaultLanguage: settingsObj.defaultLanguage || "ca",
-      });
+      // Only update if different to prevent loops
+      if (JSON.stringify(newCenterSettings) !== JSON.stringify(centerSettings)) {
+        setCenterSettings(newCenterSettings);
+        console.log('SETTINGS_CLIENT: Updated center settings');
+      }
       
       // Handle both string and boolean values, default to true for compliance
-      setAutoDeleteEnabled(
-        settingsObj.autoDeleteEnabled === true || 
+      const newAutoDeleteEnabled = settingsObj.autoDeleteEnabled === true || 
         settingsObj.autoDeleteEnabled === "true" || 
-        (settingsObj.autoDeleteEnabled === undefined || settingsObj.autoDeleteEnabled === null)
-      );
+        (settingsObj.autoDeleteEnabled === undefined || settingsObj.autoDeleteEnabled === null);
+      
+      if (newAutoDeleteEnabled !== autoDeleteEnabled) {
+        setAutoDeleteEnabled(newAutoDeleteEnabled);
+        console.log('SETTINGS_CLIENT: Updated autoDeleteEnabled:', newAutoDeleteEnabled);
+      }
     }
-  }, [settings]);
+  }, [settings.length]); // Use settings.length instead of settings array to prevent infinite loops
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (settingsData: CenterSettings) => {

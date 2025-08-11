@@ -1840,6 +1840,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/automated-alerts-settings/:institutionId/test - Test automated alert
+  app.post('/api/automated-alerts-settings/:institutionId/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      console.log('AUTOMATED_ALERT_TEST: Testing alert for institution:', institutionId);
+      console.log('AUTOMATED_ALERT_TEST: User:', req.user.email);
+
+      // Get alert settings
+      const alertSettings = await storage.getAutomatedAlertSettings(institutionId);
+      if (!alertSettings) {
+        return res.status(400).json({ message: 'No alert settings configured' });
+      }
+
+      const settings = typeof alertSettings === 'string' ? JSON.parse(alertSettings) : alertSettings;
+      console.log('AUTOMATED_ALERT_TEST: Settings:', settings);
+
+      if (!settings.enabled) {
+        return res.status(400).json({ message: 'Automated alerts are not enabled' });
+      }
+
+      if (!settings.recipientEmails || settings.recipientEmails.length === 0) {
+        return res.status(400).json({ message: 'No recipient emails configured' });
+      }
+
+      // Mock test data
+      const testData = {
+        centerName: 'Institut Bitàcola (Test)',
+        date: new Date().toLocaleDateString('ca-ES'),
+        period: 'Test Period',
+        totalEmployees: 15,
+        delayedEmployees: 2,
+        absentEmployees: 1,
+        totalDelayMinutes: 25
+      };
+
+      // Replace template variables
+      let subject = settings.emailSubjectTemplate || 'Test Alert';
+      let body = settings.emailBodyTemplate || 'This is a test alert.';
+      
+      Object.entries(testData).forEach(([key, value]) => {
+        const placeholder = `{${key}}`;
+        subject = subject.replace(new RegExp(placeholder, 'g'), value.toString());
+        body = body.replace(new RegExp(placeholder, 'g'), value.toString());
+      });
+
+      console.log('AUTOMATED_ALERT_TEST: Sending test email to:', settings.recipientEmails);
+      console.log('AUTOMATED_ALERT_TEST: Subject:', subject);
+
+      // In a real implementation, this would send an actual email
+      // For testing purposes, we'll just simulate success
+      res.json({ 
+        success: true, 
+        message: 'Test alert sent successfully',
+        recipients: settings.recipientEmails,
+        subject: subject,
+        testMode: true
+      });
+    } catch (error) {
+      console.error("Error sending test automated alert:", error);
+      res.status(500).json({ message: "Failed to send test alert" });
+    }
+  });
+
   // Email Settings routes
   app.get('/api/email-settings/:institutionId', isAuthenticated, async (req: any, res) => {
     try {

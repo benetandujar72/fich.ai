@@ -575,11 +575,33 @@ export default function Settings() {
 
       {/* Automated Alerts Configuration - Only for Admins */}
       {permissions.canManageUsers && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800">
-            Component d'alertes automàtiques temporalment desactivat per debugging
-          </p>
-        </div>
+        <Card data-testid="automated-alerts-card">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <AlertTriangle className="mr-2 h-5 w-5" />
+              {language === "ca" ? "Alertes Automàtiques" : "Alertas Automáticas"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <Info className="text-blue-600 mr-3 h-5 w-5 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-blue-800 mb-1">
+                    {language === "ca" ? "Compliment Legal" : "Cumplimiento Legal"}
+                  </p>
+                  <p className="text-sm text-blue-700">
+                    {language === "ca" 
+                      ? "Configura notificacions automàtiques per garantir el compliment de la normativa laboral sobre control horari."
+                      : "Configura notificaciones automáticas para garantizar el cumplimiento de la normativa laboral sobre control horario."}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <AutomatedAlertsConfig institutionId={institutionId} language={language} />
+          </CardContent>
+        </Card>
       )}
 
       {/* User Management */}

@@ -2038,6 +2038,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update existing admin user
+  app.put('/api/users/admins/:userId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { email, firstName, lastName, role, institutionId } = req.body;
+      
+      console.log('UPDATE_ADMIN_USER: Updating user ID:', userId);
+      console.log('UPDATE_ADMIN_USER: New data:', { email, firstName, lastName, role });
+      
+      // Update admin user
+      const result = await db.execute(sql`
+        UPDATE users 
+        SET 
+          email = ${email},
+          first_name = ${firstName},
+          last_name = ${lastName},
+          role = ${role},
+          updated_at = NOW()
+        WHERE id = ${userId} AND institution_id = ${institutionId}
+        RETURNING id, email, first_name as "firstName", last_name as "lastName", role, updated_at as "updatedAt"
+      `);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'User not found or access denied' });
+      }
+
+      console.log('UPDATE_ADMIN_USER: Successfully updated user');
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Error updating admin user:", error);
+      res.status(500).json({ message: "Failed to update admin user" });
+    }
+  });
+
   // Absence justifications routes - MISSING 
   app.get('/api/absence-justifications/admin/:institutionId', isAuthenticated, async (req: any, res) => {
     try {

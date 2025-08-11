@@ -66,6 +66,8 @@ export default function Settings() {
 
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true); // Default enabled for regulatory compliance
   const [showAddAdminForm, setShowAddAdminForm] = useState(false);
+  const [showEditAdminForm, setShowEditAdminForm] = useState(false);
+  const [editingAdmin, setEditingAdmin] = useState<any>(null);
   const [passwordChangeUser, setPasswordChangeUser] = useState<{ id: string; email: string } | null>(null);
   const [showAlertConfigModal, setShowAlertConfigModal] = useState(false);
   const [newAdminData, setNewAdminData] = useState({
@@ -74,6 +76,13 @@ export default function Settings() {
     lastName: "",
     role: "admin",
     password: "prof123"
+  });
+  const [editAdminData, setEditAdminData] = useState({
+    id: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    role: "admin"
   });
 
   const { data: settings = [], isLoading: settingsLoading, error: settingsError } = useQuery({
@@ -196,6 +205,53 @@ export default function Settings() {
       });
     },
   });
+
+  const updateAdminMutation = useMutation({
+    mutationFn: async (adminData: typeof editAdminData) => {
+      return await apiRequest("PUT", `/api/users/admins/${adminData.id}`, {
+        email: adminData.email,
+        firstName: adminData.firstName,
+        lastName: adminData.lastName,
+        role: adminData.role,
+        institutionId
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users/admins", institutionId] });
+      toast({
+        title: t("success", language),
+        description: language === "ca" ? "Administrador actualitzat correctament" : "Administrador actualizado correctamente",
+      });
+      setShowEditAdminForm(false);
+      setEditingAdmin(null);
+      setEditAdminData({
+        id: "",
+        email: "",
+        firstName: "",
+        lastName: "",
+        role: "admin"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t("error", language),
+        description: error.message || (language === "ca" ? "Error actualitzant l'administrador" : "Error actualizando el administrador"),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditAdmin = (admin: any) => {
+    setEditingAdmin(admin);
+    setEditAdminData({
+      id: admin.id,
+      email: admin.email,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      role: admin.role
+    });
+    setShowEditAdminForm(true);
+  };
 
   const getRoleBadge = (role: string) => {
     const roleMap = {
@@ -693,7 +749,9 @@ export default function Settings() {
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            onClick={() => handleEditAdmin(admin)}
                             data-testid={`edit-admin-${admin.id}`}
+                            title={language === "ca" ? "Editar administrador" : "Editar administrador"}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -841,6 +899,127 @@ export default function Settings() {
                   language === "ca" ? "Creant..." : "Creando..."
                 ) : (
                   language === "ca" ? "Crear" : "Crear"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Admin Dialog */}
+      {showEditAdminForm && editingAdmin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">
+                {language === "ca" ? "Editar administrador" : "Editar administrador"}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowEditAdminForm(false);
+                  setEditingAdmin(null);
+                  setEditAdminData({
+                    id: "",
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    role: "admin"
+                  });
+                }}
+                data-testid="close-edit-admin-form"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-admin-email">Email</Label>
+                <Input
+                  id="edit-admin-email"
+                  type="email"
+                  value={editAdminData.email}
+                  onChange={(e) => setEditAdminData({...editAdminData, email: e.target.value})}
+                  data-testid="edit-admin-email-input"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-admin-firstname">
+                  {language === "ca" ? "Nom" : "Nombre"}
+                </Label>
+                <Input
+                  id="edit-admin-firstname"
+                  value={editAdminData.firstName}
+                  onChange={(e) => setEditAdminData({...editAdminData, firstName: e.target.value})}
+                  data-testid="edit-admin-firstname-input"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-admin-lastname">
+                  {language === "ca" ? "Cognoms" : "Apellidos"}
+                </Label>
+                <Input
+                  id="edit-admin-lastname"
+                  value={editAdminData.lastName}
+                  onChange={(e) => setEditAdminData({...editAdminData, lastName: e.target.value})}
+                  data-testid="edit-admin-lastname-input"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-admin-role">
+                  {language === "ca" ? "Rol" : "Rol"}
+                </Label>
+                <Select 
+                  value={editAdminData.role}
+                  onValueChange={(value) => setEditAdminData({...editAdminData, role: value})}
+                >
+                  <SelectTrigger id="edit-admin-role" data-testid="edit-admin-role-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">
+                      {language === "ca" ? "Administrador" : "Administrador"}
+                    </SelectItem>
+                    <SelectItem value="superadmin">
+                      {language === "ca" ? "Superadministrador" : "Superadministrador"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowEditAdminForm(false);
+                  setEditingAdmin(null);
+                  setEditAdminData({
+                    id: "",
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    role: "admin"
+                  });
+                }}
+                data-testid="cancel-edit-admin-button"
+              >
+                {language === "ca" ? "Cancel·lar" : "Cancelar"}
+              </Button>
+              <Button
+                onClick={() => updateAdminMutation.mutate(editAdminData)}
+                disabled={updateAdminMutation.isPending || !editAdminData.email || !editAdminData.firstName}
+                data-testid="save-edit-admin-button"
+              >
+                {updateAdminMutation.isPending ? (
+                  language === "ca" ? "Guardant..." : "Guardando..."
+                ) : (
+                  language === "ca" ? "Guardar" : "Guardar"
                 )}
               </Button>
             </div>

@@ -6,7 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AppModal,
+  AppModalContent,
+  AppModalTrigger,
+  AppModalField,
+  AppModalActions,
+  AppModalInput,
+  AppModalTextarea,
+  AppModalButton
+} from "@/components/ui/AppModal";
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -257,26 +266,21 @@ export default function Communications() {
             Gestiona la comunicació interna del centre educatiu
           </p>
         </div>
-        <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-          <DialogTrigger asChild>
+        <AppModal open={isComposeOpen} onOpenChange={setIsComposeOpen}>
+          <AppModalTrigger asChild>
             <Button data-testid="button-compose-message">
               <Send className="mr-2 h-4 w-4" />
               Nou Missatge
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
-            <DialogHeader className="pb-4 bg-rose-50 dark:bg-slate-700 p-4 rounded-lg mb-4">
-              <DialogTitle className="text-black dark:text-white font-bold text-xl" style={{ color: '#000000' }}>
-                Redactar Missatge
-              </DialogTitle>
-              <DialogDescription className="text-black dark:text-white font-semibold text-base mt-2" style={{ color: '#1f2937' }}>
-                Crea una nova comunicació per enviar als usuaris
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-6 p-6" style={{ backgroundColor: '#f8fafc' }}>
+          </AppModalTrigger>
+          <AppModalContent 
+            maxWidth="2xl"
+            title="Redactar Missatge"
+            description="Crea una nova comunicació per enviar als usuaris"
+          >
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="recipient" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Destinatari *</Label>
+                <AppModalField label="Destinatari" required>
                   <Select value={composeRecipient} onValueChange={setComposeRecipient}>
                     <SelectTrigger data-testid="select-recipient" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                       <SelectValue placeholder="Selecciona un destinatari" />
@@ -289,9 +293,8 @@ export default function Communications() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div>
-                  <Label htmlFor="messageType" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Tipus de Missatge</Label>
+                </AppModalField>
+                <AppModalField label="Tipus de Missatge">
                   <Select value={composeMessageType} onValueChange={(value: 'internal' | 'notification' | 'alert') => setComposeMessageType(value)}>
                     <SelectTrigger data-testid="select-message-type" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                       <SelectValue />
@@ -302,12 +305,11 @@ export default function Communications() {
                       <SelectItem value="alert" style={{ color: '#000000' }}>Alerta</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </AppModalField>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="priority" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Prioritat</Label>
+                <AppModalField label="Prioritat">
                   <Select value={composePriority} onValueChange={(value: 'low' | 'medium' | 'high' | 'urgent') => setComposePriority(value)}>
                     <SelectTrigger data-testid="select-priority" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                       <SelectValue />
@@ -319,7 +321,7 @@ export default function Communications() {
                       <SelectItem value="urgent" style={{ color: '#000000' }}>Urgent</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </AppModalField>
                 <div className="flex items-center space-x-2 pt-6">
                   <input
                     type="checkbox"
@@ -328,51 +330,47 @@ export default function Communications() {
                     onChange={(e) => setComposeEmailEnabled(e.target.checked)}
                     data-testid="checkbox-email-enabled"
                   />
-                  <Label htmlFor="emailEnabled" className="text-sm font-bold" style={{ color: '#000000' }}>Enviar per email</Label>
+                  <label htmlFor="emailEnabled" className="text-sm font-bold" style={{ color: '#000000' }}>Enviar per email</label>
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="subject" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Assumpte *</Label>
-                <Input
+              <AppModalField label="Assumpte" required>
+                <AppModalInput
                   id="subject"
                   value={composeSubject}
                   onChange={(e) => setComposeSubject(e.target.value)}
                   placeholder="Introdueix l'assumpte del missatge"
                   data-testid="input-subject"
-                  style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}
                 />
-              </div>
+              </AppModalField>
 
-              <div>
-                <Label htmlFor="content" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Contingut *</Label>
-                <Textarea
+              <AppModalField label="Contingut" required>
+                <AppModalTextarea
                   id="content"
                   value={composeContent}
                   onChange={(e) => setComposeContent(e.target.value)}
                   placeholder="Escriu el contingut del missatge..."
                   rows={6}
                   data-testid="textarea-content"
-                  style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}
                 />
-              </div>
+              </AppModalField>
 
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button variant="outline" onClick={() => setIsComposeOpen(false)} style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
+              <AppModalActions>
+                <AppModalButton variant="outline" onClick={() => setIsComposeOpen(false)}>
                   Cancel·lar
-                </Button>
-                <Button 
+                </AppModalButton>
+                <AppModalButton 
                   onClick={handleComposeSubmit}
                   disabled={createCommunicationMutation.isPending}
                   data-testid="button-send-message"
-                  style={{ backgroundColor: '#e11d48', color: '#ffffff', border: 'none' }}
+                  variant="primary"
                 >
                   {createCommunicationMutation.isPending ? 'Enviant...' : 'Enviar'}
-                </Button>
-              </div>
+                </AppModalButton>
+              </AppModalActions>
             </div>
-          </DialogContent>
-        </Dialog>
+          </AppModalContent>
+        </AppModal>
       </div>
 
       {/* Filters and Search */}

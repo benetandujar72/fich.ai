@@ -1041,9 +1041,11 @@ export class DatabaseStorage implements IStorage {
       const [created] = await db
         .insert(settings)
         .values({
-          institutionId,
+          id: sql`gen_random_uuid()`,
+          institutionId: institutionId as string,
           key: 'automated_alerts',
           value: alertSettings,
+          updatedAt: new Date(),
         })
         .returning();
       return created.value;
@@ -1110,11 +1112,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     console.log(`Subject: ${subject}`);
     console.log(`Body preview: ${body.substring(0, 100)}...`);
     
-    return { 
-      message: 'Test alert sent successfully',
-      recipients: recipientEmails,
-      subject 
-    };
+    console.log('Test alert sent successfully to:', recipientEmails);
+    // Return void as expected by the function signature
     
     // In production, integrate with actual email service like SendGrid, SES, or SMTP
     // Example pseudo-code:

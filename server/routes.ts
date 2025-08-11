@@ -11,9 +11,8 @@ import {
   smtpConfigurations
 } from "@shared/schema";
 import nodemailer from "nodemailer";
-import { eq, and } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { sql, and, eq } from "drizzle-orm";
 import { db } from "./db";
 import { startOfWeek, endOfWeek, addDays, format } from "date-fns";
 
@@ -1594,9 +1593,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Determine status for each day
       Object.values(weeklySchedule).forEach((dayData: any) => {
-        const checkIns = dayData.records.filter(r => r.type === 'check_in').length;
-        const checkOuts = dayData.records.filter(r => r.type === 'check_out').length;
-        const hasDelays = dayData.records.some(r => r.is_late);
+        const checkIns = dayData.records.filter((r: any) => r.type === 'check_in').length;
+        const checkOuts = dayData.records.filter((r: any) => r.type === 'check_out').length;
+        const hasDelays = dayData.records.some((r: any) => r.is_late);
         
         if (checkIns > 0 && checkOuts > 0 && !hasDelays) {
           dayData.status = 'complete';

@@ -1,0 +1,149 @@
+_app-29682acb77ecdd83.js:13 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-29682acb77ecdd83.js:13 [LaunchDarkly] LaunchDarkly client initialized
+_app-29682acb77ecdd83.js:13 Adding extension: CSS Shadow Generator Object
+_app-29682acb77ecdd83.js:13 Adding extension: Icon Generator Object
+sw_iframe.html?origin=https%3A%2F%2Freplit.com:7 Uncaught SyntaxError: Identifier 't' has already been declared (at sw_iframe.html?origin=https%3A%2F%2Freplit.com:7:11)
+4891-e33da237590e5740.js:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://replit.com/public/fonts/replit-icons.woff
+FitxaControl:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+classifier.js:1 [Report Only] Refused to compile or instantiate WebAssembly module because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self'".
+
+ [Report Only] Refused to compile or instantiate WebAssembly module because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self'".
+
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'battery'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-9d3251a6078e5ccb.js:1
+framework-9d3251a6078e5ccb.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-9d3251a6078e5ccb.js:1
+o1151714.ingest.sentry.io/api/6318792/envelope/?sentry_key=8aa91189a4274b5a8c9b7b01d46ea360&sentry_version=7&sentry_client=sentry.javascript.browser%2F7.112.0:1  Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSTNKZmt4QVlTQmdqN3MrVEVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09O59Zdf8fb1hI_-5OCDNYhxWvN4MM3rYh-Io5E8mxYiCCQ8f-3i_7WIfJ_8gL6hbZwj2-2P6i4xaXxksahMT6Cg.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1
+r.stripe.com/b:1  Failed to load resource: net::ERR_CONNECTION_ABORTED
+r.stripe.com/b:1  Failed to load resource: net::ERR_CONNECTION_ABORTED
+api.sorryapp.com/v1/pages/27c7b5fc:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+/data/repls/f4605a06-f590-4b1d-a27e-b06cffa3a556/get_connection_metadata:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+api.sorryapp.com/v1/pages/27c7b5fc:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Afetch%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A675522db&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=a06202a6-6497-4d2c-8311-540629c9c9bd:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Axhr%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A675522db&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=ceeb45b3-06d3-4271-8883-9dbab9a30cb2:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSTNKZmt4QVlTQmdqN3MrVEVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09O59Zdf8fb1hI_-5OCDNYhxWvN4MM3rYh-Io5E8mxYiCCQ8f-3i_7WIfJ_8gL6hbZwj2-2P6i4xaXxksahMT6Cg.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1
+_app-29682acb77ecdd83.js:40 WebSocket connection to 'wss://replit.com/graphql_subscriptions' failed: 
+(anónimo) @ _app-29682acb77ecdd83.js:40
+/data/repls/f4605a06-f590-4b1d-a27e-b06cffa3a556/get_connection_metadata:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+/graphql:1  Failed to load resource: net::ERR_CONNECTION_CLOSED
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSTNQZmx4QVlTQmdqN2srYkVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09vHRCEZxMYKWCLj1ChLIBi561DNGopBheeu7VWHDDwaVLUX0iWiVyMGkvnZyNRzbdazxVb3S7UhCfokaI3Um6DA.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1
+_app-29682acb77ecdd83.js:13 task queue exceeded allotted deadline by 136ms
+(anónimo) @ _app-29682acb77ecdd83.js:13
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSTNQZmx4QVlTQmdqN2srYkVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09vHRCEZxMYKWCLj1ChLIBi561DNGopBheeu7VWHDDwaVLUX0iWiVyMGkvnZyNRzbdazxVb3S7UhCfokaI3Um6DA.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED
+_app-29682acb77ecdd83.js:40 WebSocket connection to 'wss://replit.com/graphql_subscriptions' failed: 
+(anónimo) @ _app-29682acb77ecdd83.js:40
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSTNQZmx4QVlTQmdqN2srYkVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09vHRCEZxMYKWCLj1ChLIBi561DNGopBheeu7VWHDDwaVLUX0iWiVyMGkvnZyNRzbdazxVb3S7UhCfokaI3Um6DA.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSTNQZmx4QVlTQmdqN2srYkVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09vHRCEZxMYKWCLj1ChLIBi561DNGopBheeu7VWHDDwaVLUX0iWiVyMGkvnZyNRzbdazxVb3S7UhCfokaI3Um6DA.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1
+attached_assets/image_1754891453730.png:1  Failed to load resource: the server responded with a status of 404 ()
+attached_assets/image_1754892717787.png:1  Failed to load resource: the server responded with a status of 404 ()
+attached_assets/image_1754891711216.png:1  Failed to load resource: the server responded with a status of 404 ()
+attached_assets/image_1754893364385.png:1  Failed to load resource: the server responded with a status of 404 ()
+attached_assets/image_1754893517367.png:1  Failed to load resource: the server responded with a status of 404 ()
+analytics.google.com/g/collect?v=2&tid=G-MPJY3F1YEL&gtm=45je5861v9135634466za200&_p=1754860523854&gcd=13l3l3l3l2l1&npa=0&dma=0&tag_exp=101509157~103116026~103200004~103233427~104527907~104528501~104684208~104684211~104948813~105033763~105033765~105103161~105103163~105113531~105135708~105135710&ul=es-es&sr=1536x960&cid=1090488596.1754318246&ecid=1144028815&ir=1&uaa=x86&uab=64&uafvl=Not)A%253BBrand%3B8.0.0.0%7CChromium%3B138.0.7204.184%7CGoogle%2520Chrome%3B138.0.7204.184&uamb=0&uam=&uap=Windows&uapv=19.0.0&uaw=0&are=1&frm=0&pscdl=noapi&_eu=EBAIAAQ&_s=149&dl=https%3A%2F%2Freplit.com%2F%40benetandujar%2FFitxaControl&dp=%2F%40benetandujar%2FFitxaControl&dt=replEnvironmentDesktop&sid=1754889196&sct=15&seg=1&_tu=wAQ&en=Workspace%20Port%20Opened&_ee=1&ep.event_category=All&ep.value=0&_et=9760&tfd=36078213:1  Failed to load resource: net::ERR_CONNECTION_CLOSED
+/graphql:1  Failed to load resource: net::ERR_CONNECTION_CLOSED
+3635-0abc29a912057312.js:1 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSWhaem14QVlTQmdpa3VPYkVCaUlHY0dsallYSmtNQUE2N3dFS0pHWTBOakExWVRBMkxXWTFPVEF0TkdJeFpDMWhNamRsTFdJd05tTm1abUV6WVRVMU5oSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpREVacGRIaGhRMjl1ZEhKdmJDb01ZbVZ1WlhSaGJtUjFhbUZ5UWxRS0dYSmxjR3hwZEMxeVpYQnNMV0pzYjJOcmN5MXdhV05oY21RU0YzSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNHbGpZWEprR2g1eVpYQnNhWFF0YldGeVoyRnlhVzVsTFdKc2IyTnJjeTF3YVdOaGNtUktCd2lKOWNzUkVBRlFBRm9aYjI1aWIyRnlaR2x1WjE5bGVIQmxjbWxsYm1ObFgyeHZkMW9PYVc1MFpXNTBYM04wZFdSbGJuUjRBRklqQ0FFUWdJQ0FnQ0FaQUFBQUFBQUFFRUFoQUFBQUFBQUFFRUFvZ0lDQWdNZ0JNQUpnQUdvVENJbjF5eEVTREdKbGJtVjBZVzVrZFdwaGNvSUJBaW9BbWdFS0NnZ3dMakF1TVRVNU9hQUJBUT09nc5qBPTI9z3j4ptKOF0bGL3krwOWOZFQXrMvCuMWw2jEPB1lpeCN4No88k6e64DnEp4MsErK9pzWsWtni46XCQ.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 3635-0abc29a912057312.js:1

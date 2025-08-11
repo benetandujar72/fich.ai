@@ -87,11 +87,20 @@ export default function AlertConfigModal({ isOpen, onClose, institutionId, langu
   const { data: alertRules = [], isLoading } = useQuery({
     queryKey: ['/api/admin/alert-rules', institutionId],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/alert-rules/${institutionId}`);
-      if (!response.ok) throw new Error('Failed to fetch alert rules');
+      if (!institutionId) {
+        throw new Error('No institution ID provided');
+      }
+      const response = await fetch(`/api/admin/alert-rules/${institutionId}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch alert rules: ${response.status}`);
+      }
       return response.json();
     },
-    enabled: isOpen && !!institutionId
+    enabled: isOpen && !!institutionId,
+    retry: 2,
+    retryDelay: 1000
   });
 
   const createRuleMutation = useMutation({
@@ -229,7 +238,7 @@ export default function AlertConfigModal({ isOpen, onClose, institutionId, langu
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto modal-content-solid">
         <DialogHeader>
           <DialogTitle className="text-foreground">
             {language === "ca" ? "Configuració d'Alertes Automàtiques" : "Configuración de Alertas Automáticas"}

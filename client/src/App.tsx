@@ -18,6 +18,8 @@ import Alerts from "@/pages/Alerts";
 import AlertConfig from "@/pages/AlertConfig";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
+import SettingsSimple from "@/pages/SettingsSimple";
+import SettingsTest from "@/pages/SettingsTest";
 import ScheduleImport from "@/pages/ScheduleImport";
 import Privacy from "@/pages/Privacy";
 import DataSubjectRights from "@/pages/DataSubjectRights";
@@ -299,7 +301,16 @@ function Router() {
               <Header 
                 title={t("settings", language)}
               />
-              <Settings />
+              <SettingsSimple />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/settings-test" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title="Test de Configuración"
+              />
+              <SettingsTest />
             </ProtectedRoute>
           } />
 

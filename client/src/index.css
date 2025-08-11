@@ -280,6 +280,39 @@
     background: rgba(0, 0, 0, 0.90) !important;
     backdrop-filter: none !important;
   }
+  
+  /* ADDITIONAL TRANSPARENCY ELIMINATION RULES */
+  .modal-content-solid,
+  .select-content-solid {
+    background: rgb(248 250 252) !important;
+    border: 2px solid rgb(226 232 240) !important;
+    backdrop-filter: none !important;
+    z-index: 9999 !important;
+  }
+  
+  .dark .modal-content-solid,
+  .dark .select-content-solid {
+    background: rgb(15 23 42) !important;
+    border: 2px solid rgb(51 65 85) !important;
+  }
+  
+  /* Force all shadcn UI components to solid backgrounds */
+  [data-state="open"][role="dialog"],
+  [data-state="open"][role="menu"],
+  [data-state="open"][role="listbox"],
+  [data-state="open"][role="combobox"] {
+    background: rgb(248 250 252) !important;
+    border: 2px solid rgb(226 232 240) !important;
+    backdrop-filter: none !important;
+  }
+  
+  .dark [data-state="open"][role="dialog"],
+  .dark [data-state="open"][role="menu"],
+  .dark [data-state="open"][role="listbox"],
+  .dark [data-state="open"][role="combobox"] {
+    background: rgb(15 23 42) !important;
+    border: 2px solid rgb(51 65 85) !important;
+  }
 
   [role="dialog"] {
     @apply bg-background border shadow-2xl !important;

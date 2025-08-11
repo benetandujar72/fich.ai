@@ -1038,12 +1038,7 @@ export default function Settings() {
         </div>
       )}
       
-      <AlertConfigModal
-        isOpen={showAlertConfigModal}
-        onClose={() => setShowAlertConfigModal(false)}
-        institutionId={institutionId}
-        language={language}
-      />
+
     </main>
   );
 }

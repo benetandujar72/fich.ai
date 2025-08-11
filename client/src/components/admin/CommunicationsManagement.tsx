@@ -101,12 +101,9 @@ export function CommunicationsManagement() {
       message: string;
       priority: string;
     }) => {
-      return apiRequest('/api/admin/communications/send', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...data,
-          institutionId: user?.institutionId,
-        }),
+      return await apiRequest('POST', '/api/admin/communications/send', {
+        ...data,
+        institutionId: user?.institutionId,
       });
     },
     onSuccess: () => {

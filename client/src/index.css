@@ -246,17 +246,39 @@
     hover:shadow-md hover:bg-rose-50/70 dark:hover:bg-slate-700/70 transition-all duration-200;
   }
 
-  /* Modal and Dialog fixes - overlay removed */
+  /* Modal and Dialog fixes - COMPLETE TRANSPARENCY ELIMINATION */
   
-  [data-radix-dialog-content] {
-    @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg !important;
+  /* FORCE SOLID BACKGROUNDS FOR ALL RADIX COMPONENTS */
+  [data-radix-dialog-content],
+  [data-radix-dropdown-menu-content],
+  [data-radix-context-menu-content],
+  [data-radix-popover-content],
+  [data-radix-hover-card-content],
+  [data-radix-select-content],
+  [data-radix-alert-dialog-content],
+  .vaul-drawer-wrapper {
     background: rgb(248 250 252) !important;
-    border: 1px solid rgb(226 232 240) !important;
+    border: 2px solid rgb(226 232 240) !important;
+    backdrop-filter: none !important;
   }
 
-  .dark [data-radix-dialog-content] {
+  .dark [data-radix-dialog-content],
+  .dark [data-radix-dropdown-menu-content], 
+  .dark [data-radix-context-menu-content],
+  .dark [data-radix-popover-content],
+  .dark [data-radix-hover-card-content],
+  .dark [data-radix-select-content],
+  .dark [data-radix-alert-dialog-content],
+  .dark .vaul-drawer-wrapper {
     background: rgb(15 23 42) !important;
-    border: 1px solid rgb(51 65 85) !important;
+    border: 2px solid rgb(51 65 85) !important;
+  }
+  
+  /* FORCE SOLID OVERLAYS */
+  [data-radix-dialog-overlay],
+  [data-radix-alert-dialog-overlay] {
+    background: rgba(0, 0, 0, 0.90) !important;
+    backdrop-filter: none !important;
   }
 
   [role="dialog"] {

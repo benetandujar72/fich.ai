@@ -243,7 +243,7 @@ export default function EmailConfigurationPanel() {
               {language === "ca" ? "Provar Email" : "Probar Email"}
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-white dark:bg-gray-950">
+          <DialogContent className="modal-content-solid">
             <DialogHeader>
               <DialogTitle>
                 {language === "ca" ? "Enviar Email de Prova" : "Enviar Email de Prueba"}

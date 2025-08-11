@@ -39,6 +39,7 @@ import { PasswordChangeModal } from "@/components/PasswordChangeModal";
 import AbsenceJustificationReview from "@/components/AbsenceJustificationReview";
 import AutomatedAlertsConfig from "@/components/AutomatedAlertsConfig";
 import AlertConfigModal from "@/components/modals/AlertConfigModal";
+import AdminPasswordChangeForm from "@/components/AdminPasswordChangeForm";
 
 interface CenterSettings {
   centerName: string;
@@ -1027,7 +1028,41 @@ export default function Settings() {
         </div>
       )}
 
-      {/* Password Change Modal - handled by PasswordChangeModal component itself */}
+      {/* Admin Password Change Modal */}
+      {passwordChangeUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">
+                {language === "ca" ? "Canviar contrasenya" : "Cambiar contraseña"}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPasswordChangeUser(null)}
+                data-testid="close-password-change-form"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">
+                {language === "ca" 
+                  ? `Canviant la contrasenya per a: ${passwordChangeUser.email}`
+                  : `Cambiando la contraseña para: ${passwordChangeUser.email}`}
+              </p>
+            </div>
+            
+            <AdminPasswordChangeForm 
+              userId={passwordChangeUser.id} 
+              userEmail={passwordChangeUser.email}
+              onSuccess={() => setPasswordChangeUser(null)}
+              language={language}
+            />
+          </div>
+        </div>
+      )}
       
       <AlertConfigModal
         isOpen={showAlertConfigModal}

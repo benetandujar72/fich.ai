@@ -2078,6 +2078,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change password for another user (admin functionality)
+  app.put('/api/users/admins/:userId/password', isAuthenticated, async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { newPassword } = req.body;
+      
+      console.log('CHANGE_USER_PASSWORD: Admin changing password for user ID:', userId);
+      
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update user password
+      const result = await db.execute(sql`
+        UPDATE users 
+        SET 
+          password_hash = ${hashedPassword},
+          updated_at = NOW()
+        WHERE id = ${userId} AND institution_id = ${req.user.institutionId}
+        RETURNING id, email
+      `);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'User not found or access denied' });
+      }
+
+      console.log('CHANGE_USER_PASSWORD: Successfully updated password');
+      res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error("Error changing user password:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
   // Absence justifications routes - MISSING 
   app.get('/api/absence-justifications/admin/:institutionId', isAuthenticated, async (req: any, res) => {
     try {

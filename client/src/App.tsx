@@ -15,6 +15,7 @@ import Dashboard from "@/pages/Dashboard";
 import Employees from "@/pages/Employees";
 import Attendance from "@/pages/Attendance";
 import Alerts from "@/pages/Alerts";
+import AlertsAdmin from "@/pages/AlertsAdmin";
 import AlertConfig from "@/pages/AlertConfig";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
@@ -262,7 +263,7 @@ function Router() {
                 title={t("alerts", language)}
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
-              <Alerts />
+              <AlertsAdmin />
             </ProtectedRoute>
           } />
 

@@ -144,7 +144,7 @@ export default function Sidebar(props: SidebarProps = {}) {
       title: language === "ca" ? "Monitoratge" : "Monitoreo",
       items: [
         {
-          name: t("alerts", language),
+          name: language === "ca" ? "Gestió d'Alertes" : "Gestión de Alertas",
           href: "/alerts",
           icon: AlertTriangle,
           show: permissions.canViewAlerts,

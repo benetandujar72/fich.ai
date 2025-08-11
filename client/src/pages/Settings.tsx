@@ -31,14 +31,13 @@ import {
   Users,
   Mail,
   AlertTriangle,
+  Settings as SettingsIcon,
   FileText
 } from "lucide-react";
 import NetworkSettingsForm from "@/components/NetworkSettingsForm";
 import EmailSettingsForm from "@/components/EmailSettingsForm";
 import { PasswordChangeModal } from "@/components/PasswordChangeModal";
-import AbsenceJustificationReview from "@/components/AbsenceJustificationReview";
-import AutomatedAlertsConfig from "@/components/AutomatedAlertsConfig";
-import AlertConfigModal from "@/components/modals/AlertConfigModal";
+
 import AdminPasswordChangeForm from "@/components/AdminPasswordChangeForm";
 
 interface CenterSettings {
@@ -70,7 +69,7 @@ export default function Settings() {
   const [showEditAdminForm, setShowEditAdminForm] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<any>(null);
   const [passwordChangeUser, setPasswordChangeUser] = useState<{ id: string; email: string } | null>(null);
-  const [showAlertConfigModal, setShowAlertConfigModal] = useState(false);
+
   const [newAdminData, setNewAdminData] = useState({
     email: "",
     firstName: "",
@@ -571,92 +570,67 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Absence Justification Review - Only for Admins */}
-      {permissions.canManageUsers && (
-        <Card data-testid="absence-justification-card">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileText className="mr-2 h-5 w-5" />
-              {language === "ca" ? "Revisió de Justificacions d'Absències" : "Revisión de Justificaciones de Ausencias"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-              <div className="flex items-start">
-                <Info className="text-amber-600 mr-3 h-5 w-5 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-amber-800 mb-1">
-                    {language === "ca" ? "Gestió d'absències" : "Gestión de ausencias"}
-                  </p>
-                  <p className="text-sm text-amber-700">
-                    {language === "ca" 
-                      ? "Revisa i aprova/rebutja les justificacions d'absències presentades pels empleats."
-                      : "Revisa y aprueba/rechaza las justificaciones de ausencias presentadas por los empleados."}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <AbsenceJustificationReview institutionId={institutionId} language={language} />
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Quick Access to Alert Configuration */}
+
+      {/* Unified Alert Management Access */}
       {permissions.canManageUsers && (
-        <Card data-testid="alert-config-card">
+        <Card data-testid="alert-management-card">
           <CardHeader>
             <CardTitle className="flex items-center">
               <AlertTriangle className="mr-2 h-5 w-5" />
-              {language === "ca" ? "Configuració d'Alertes Automàtiques" : "Configuración de Alertas Automáticas"}
+              {language === "ca" ? "Gestió d'Alertes" : "Gestión de Alertas"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
               {language === "ca" 
-                ? "Gestiona les regles d'alertes automàtiques per detectar retards, absències i altres incidents."
-                : "Gestiona las reglas de alertas automáticas para detectar retrasos, ausencias y otros incidentes."
+                ? "Accés centralitzat a la gestió completa d'alertes: configuració automàtica, justificacions d'absències i administració del sistema."
+                : "Acceso centralizado a la gestión completa de alertas: configuración automática, justificaciones de ausencias y administración del sistema."
               }
             </p>
-            <Button 
-              onClick={() => setShowAlertConfigModal(true)}
-              className="w-full"
-              data-testid="configure-alerts-button"
-            >
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Configurar Alertes" : "Configurar Alertas"}
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Automated Alerts Configuration - Only for Admins */}
-      {permissions.canManageUsers && (
-        <Card data-testid="automated-alerts-card">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <AlertTriangle className="mr-2 h-5 w-5" />
-              {language === "ca" ? "Alertes Automàtiques" : "Alertas Automáticas"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-start">
-                <Info className="text-blue-600 mr-3 h-5 w-5 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-800 mb-1">
-                    {language === "ca" ? "Compliment Legal" : "Cumplimiento Legal"}
-                  </p>
-                  <p className="text-sm text-blue-700">
-                    {language === "ca" 
-                      ? "Configura notificacions automàtiques per garantir el compliment de la normativa laboral sobre control horari."
-                      : "Configura notificaciones automáticas para garantizar el cumplimiento de la normativa laboral sobre control horario."}
-                  </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Settings className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-medium">
+                    {language === "ca" ? "Configuració" : "Configuración"}
+                  </span>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  {language === "ca" ? "Alertes automàtiques i regles" : "Alertas automáticas y reglas"}
+                </p>
+              </div>
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm font-medium">
+                    {language === "ca" ? "Justificacions" : "Justificaciones"}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {language === "ca" ? "Revisió d'absències" : "Revisión de ausencias"}
+                </p>
+              </div>
+              <div className="p-3 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium">
+                    {language === "ca" ? "Administració" : "Administración"}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {language === "ca" ? "Historial i gestió" : "Historial y gestión"}
+                </p>
               </div>
             </div>
-            
-            <AutomatedAlertsConfig institutionId={institutionId} language={language} />
+            <Button 
+              onClick={() => window.location.href = '/alerts'}
+              className="w-full"
+              data-testid="access-alert-management-button"
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              {language === "ca" ? "Accedir a la Gestió d'Alertes" : "Acceder a la Gestión de Alertas"}
+            </Button>
           </CardContent>
         </Card>
       )}

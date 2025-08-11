@@ -193,9 +193,12 @@ export default function Settings() {
       }
       const data = await response.json();
       console.log('SETTINGS_CLIENT: Received admin users data:', data);
+      console.log('SETTINGS_CLIENT: Users query completed, should set usersLoading to false now');
       return Array.isArray(data) ? data : [];
     },
     enabled: !!institutionId,
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnWindowFocus: false, // Prevent refetching on focus
   });
 
   const createAdminMutation = useMutation({
@@ -206,7 +209,7 @@ export default function Settings() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/users/admins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/admins", institutionId] });
       toast({
         title: t("success", language),
         description: language === "ca" ? "Administrador creat correctament" : "Administrador creado correctamente",

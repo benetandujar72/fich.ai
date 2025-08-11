@@ -452,7 +452,7 @@ export default function Login() {
 
       {/* Attendance Result Modal */}
       <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
+        <DialogContent className="sm:max-w-md modal-content-solid">
           <DialogHeader>
             <DialogTitle className="text-center">
               {language === "ca" ? "Marcatge Registrat" : "Marcaje Registrado"}

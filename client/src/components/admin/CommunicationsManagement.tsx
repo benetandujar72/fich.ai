@@ -183,7 +183,7 @@ export function CommunicationsManagement() {
                 Nova Comunicació
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl bg-white dark:bg-gray-950">
+            <DialogContent className="max-w-2xl modal-content-solid">
               <DialogHeader>
                 <DialogTitle>Enviar Nova Comunicació</DialogTitle>
                 <DialogDescription>
@@ -209,7 +209,7 @@ export function CommunicationsManagement() {
                         <SelectTrigger>
                           <SelectValue placeholder="Selecciona un usuari" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="select-content-solid">
                           {employees.map((employee: any) => (
                             <SelectItem key={employee.id} value={employee.id}>
                               {employee.firstName} {employee.lastName}
@@ -225,7 +225,7 @@ export function CommunicationsManagement() {
                         <SelectTrigger>
                           <SelectValue placeholder="Tipus de missatge" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="select-content-solid">
                           <SelectItem value="communication">Comunicació</SelectItem>
                           <SelectItem value="notification">Notificació</SelectItem>
                           <SelectItem value="announcement">Comunicat</SelectItem>
@@ -246,7 +246,7 @@ export function CommunicationsManagement() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="select-content-solid">
                         <SelectItem value="low">Baixa</SelectItem>
                         <SelectItem value="normal">Normal</SelectItem>
                         <SelectItem value="high">Alta</SelectItem>
@@ -299,7 +299,7 @@ export function CommunicationsManagement() {
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filtrar per tipus" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="select-content-solid">
                 <SelectItem value="all">Tots els tipus</SelectItem>
                 <SelectItem value="communication">Comunicacions</SelectItem>
                 <SelectItem value="notification">Notificacions</SelectItem>
@@ -313,7 +313,7 @@ export function CommunicationsManagement() {
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filtrar per estat" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="select-content-solid">
                 <SelectItem value="all">Tots els estats</SelectItem>
                 <SelectItem value="draft">Esborranys</SelectItem>
                 <SelectItem value="sent">Enviats</SelectItem>

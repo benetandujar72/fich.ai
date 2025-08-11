@@ -198,7 +198,7 @@ export function AlertsManagement() {
           </Button>
           
           <Dialog open={newAlertDialogOpen} onOpenChange={setNewAlertDialogOpen}>
-            <DialogContent className="max-w-2xl bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600">
+            <DialogContent className="max-w-2xl modal-content-solid">
               <DialogHeader>
                 <DialogTitle>Enviar Nova Alerta</DialogTitle>
                 <DialogDescription>Envia una alerta manual als usuaris seleccionats</DialogDescription>
@@ -217,12 +217,12 @@ export function AlertsManagement() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Destinatari *</label>
                     <Select name="recipient" required>
-                      <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600">
+                      <SelectTrigger className="select-content-solid">
                         <SelectValue placeholder="Selecciona un empleat" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
+                      <SelectContent className="select-content-solid">
                         {(employees as Employee[]).map((employee: Employee) => (
-                          <SelectItem key={employee.id} value={employee.id} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">
+                          <SelectItem key={employee.id} value={employee.id}>
                             {employee.firstName} {employee.lastName} - {employee.email}
                           </SelectItem>
                         ))}
@@ -236,7 +236,7 @@ export function AlertsManagement() {
                       name="subject"
                       placeholder="Introdueix l'assumpte de l'alerta..."
                       required 
-                      className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
+                      className="select-content-solid"
                     />
                   </div>
                   
@@ -247,7 +247,7 @@ export function AlertsManagement() {
                       placeholder="Escriu el missatge de l'alerta..."
                       required 
                       rows={4}
-                      className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
+                      className="select-content-solid"
                     />
                   </div>
                   

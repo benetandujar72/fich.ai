@@ -162,7 +162,7 @@ export default function EmployeeDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto modal-content-solid">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">

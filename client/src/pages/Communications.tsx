@@ -272,7 +272,7 @@ export default function Communications() {
         </Button>
         
         <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-          <DialogContent className="max-w-2xl bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600">
+          <DialogContent className="max-w-2xl modal-content-solid">
             <DialogHeader>
               <DialogTitle>Redactar Missatge</DialogTitle>
               <DialogDescription>Crea una nova comunicació per enviar als usuaris</DialogDescription>
@@ -282,12 +282,12 @@ export default function Communications() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Destinatari *</label>
                   <Select value={composeRecipient} onValueChange={setComposeRecipient}>
-                    <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600" data-testid="select-recipient">
+                    <SelectTrigger className="select-content-solid" data-testid="select-recipient">
                       <SelectValue placeholder="Selecciona un destinatari" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
+                    <SelectContent className="select-content-solid">
                       {institutionUsers.map((user: User) => (
-                        <SelectItem key={user.id} value={user.id} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">
+                        <SelectItem key={user.id} value={user.id}>
                           {user.firstName} {user.lastName} ({user.email})
                         </SelectItem>
                       ))}
@@ -297,13 +297,13 @@ export default function Communications() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Tipus de Missatge</label>
                   <Select value={composeMessageType} onValueChange={(value: string) => setComposeMessageType(value as 'internal' | 'notification' | 'alert')}>
-                    <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600" data-testid="select-message-type">
+                    <SelectTrigger className="select-content-solid" data-testid="select-message-type">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
-                      <SelectItem value="internal" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Intern</SelectItem>
-                      <SelectItem value="notification" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Notificació</SelectItem>
-                      <SelectItem value="alert" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Alerta</SelectItem>
+                    <SelectContent className="select-content-solid">
+                      <SelectItem value="internal">Intern</SelectItem>
+                      <SelectItem value="notification">Notificació</SelectItem>
+                      <SelectItem value="alert">Alerta</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -313,14 +313,14 @@ export default function Communications() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Prioritat</label>
                   <Select value={composePriority} onValueChange={(value: string) => setComposePriority(value as 'low' | 'medium' | 'high' | 'urgent')}>
-                    <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600" data-testid="select-priority">
+                    <SelectTrigger className="select-content-solid" data-testid="select-priority">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
-                      <SelectItem value="low" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Baixa</SelectItem>
-                      <SelectItem value="medium" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Mitjana</SelectItem>
-                      <SelectItem value="high" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Alta</SelectItem>
-                      <SelectItem value="urgent" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Urgent</SelectItem>
+                    <SelectContent className="select-content-solid">
+                      <SelectItem value="low">Baixa</SelectItem>
+                      <SelectItem value="medium">Mitjana</SelectItem>
+                      <SelectItem value="high">Alta</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -343,7 +343,7 @@ export default function Communications() {
                   value={composeSubject}
                   onChange={(e) => setComposeSubject(e.target.value)}
                   placeholder="Introdueix l'assumpte del missatge"
-                  className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
+                  className="select-content-solid"
                   data-testid="input-subject"
                 />
               </div>
@@ -356,7 +356,7 @@ export default function Communications() {
                   onChange={(e) => setComposeContent(e.target.value)}
                   placeholder="Escriu el contingut del missatge..."
                   rows={6}
-                  className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
+                  className="select-content-solid"
                   data-testid="textarea-content"
                 />
               </div>

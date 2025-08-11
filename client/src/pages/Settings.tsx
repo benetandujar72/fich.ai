@@ -131,7 +131,7 @@ export default function Settings() {
         console.log('SETTINGS_CLIENT: Updated autoDeleteEnabled:', newAutoDeleteEnabled);
       }
     }
-  }, [settings.length]); // Use settings.length instead of settings array to prevent infinite loops
+  }, [settings.length, JSON.stringify(settings)]); // TRACKING: Use stable keys to prevent loops but still react to changes
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (settingsData: CenterSettings) => {
@@ -290,12 +290,17 @@ export default function Settings() {
 
   // FASE 3: DEBUG LOADING STATES
   console.log('🔍 FASE 3: Loading states checking');
+  console.log('🔍 FASE 3: isLoading values - settingsLoading:', settingsLoading, 'usersLoading:', usersLoading);
+  console.log('🔍 FASE 3: Data lengths - settings:', settings?.length, 'users:', adminUsers?.length);
+  
   if (settingsLoading) {
-    console.log('⏳ FASE 3: Settings still loading, showing loading screen');
+    console.log('⏳ FASE 3: Settings still loading despite having data, showing loading screen');
+    console.log('⏳ FASE 3: This indicates a TanStack Query issue - isLoading not updating correctly');
     return (
       <main className="p-6 space-y-6">
         <div className="text-center">
           <p>⏳ FASE 3: Carregant configuració dels settings...</p>
+          <small>Debug: {settings?.length || 0} settings loaded but isLoading={settingsLoading.toString()}</small>
         </div>
       </main>
     );

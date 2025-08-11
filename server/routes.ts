@@ -987,6 +987,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send new communication endpoint for admin
+  app.post('/api/admin/communications/send', isAuthenticated, async (req: any, res) => {
+    try {
+      const userRole = req.user.role;
+      const senderId = req.user.id;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { recipientId, messageType, subject, message, priority, institutionId } = req.body;
+
+      console.log('SEND_COMM: Creating new communication from admin panel');
+      console.log('SEND_COMM: Data:', { recipientId, messageType, subject, priority, institutionId });
+
+      if (!recipientId || !messageType || !subject || !message || !institutionId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      // Create communication record
+      const communicationId = globalThis.crypto.randomUUID();
+      await db.execute(sql`
+        INSERT INTO communications (
+          id, institution_id, sender_id, recipient_id, message_type,
+          subject, message, status, priority, email_sent, created_at, updated_at
+        ) VALUES (
+          ${communicationId}, ${institutionId}, ${senderId}, ${recipientId},
+          ${messageType}, ${subject}, ${message}, 'sent', ${priority || 'normal'},
+          false, NOW(), NOW()
+        )
+      `);
+
+      console.log('SEND_COMM: Communication created successfully with ID:', communicationId);
+
+      res.json({ 
+        success: true, 
+        id: communicationId,
+        message: 'Comunicació enviada correctament' 
+      });
+    } catch (error) {
+      console.error("Error sending communication:", error);
+      res.status(500).json({ message: "Error enviant comunicació" });
+    }
+  });
+
   // Risk Assessment endpoints (CONFIG-009)
   // Weekly attendance report for all employees
   app.get('/api/admin/weekly-attendance/:institutionId', isAuthenticated, async (req: any, res) => {

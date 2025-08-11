@@ -94,9 +94,9 @@ export default function Settings() {
     enabled: !!institutionId, // Only run when institutionId exists
   });
 
-  // Load existing center settings when data is received
+  // Load existing center settings when data is received  
   useEffect(() => {
-    console.log('SETTINGS_CLIENT: Processing settings data:', settings);
+    console.log('SETTINGS_CLIENT: Processing settings data (useEffect triggered):', settings);
     if (settings && Array.isArray(settings) && settings.length > 0) {
       const settingsObj = settings.reduce((acc: any, setting: any) => {
         acc[setting.key] = setting.value;
@@ -252,6 +252,8 @@ export default function Settings() {
   // Debug error states
   console.log('SETTINGS_CLIENT: Component render - settingsLoading:', settingsLoading, 'usersLoading:', usersLoading);
   console.log('SETTINGS_CLIENT: Settings data length:', settings?.length, 'Admin users length:', adminUsers?.length);
+  console.log('SETTINGS_CLIENT: institutionId:', institutionId);
+  console.log('SETTINGS_CLIENT: user:', user?.email);
   
   if (settingsError) {
     console.error('SETTINGS_CLIENT: Settings error:', settingsError);
@@ -274,19 +276,30 @@ export default function Settings() {
     );
   }
 
-  // Early return for loading states  
-  if (settingsLoading || usersLoading) {
-    console.log('SETTINGS_CLIENT: Still loading...');
+  // Early return for loading states - but be more specific  
+  if (settingsLoading) {
+    console.log('SETTINGS_CLIENT: Settings still loading...');
     return (
       <main className="p-6 space-y-6">
         <div className="text-center">
-          <p>Carregant configuració...</p>
+          <p>Carregant configuració dels settings...</p>
+        </div>
+      </main>
+    );
+  }
+  
+  if (usersLoading) {
+    console.log('SETTINGS_CLIENT: Users still loading...');
+    return (
+      <main className="p-6 space-y-6">
+        <div className="text-center">
+          <p>Carregant usuaris administradors...</p>
         </div>
       </main>
     );
   }
 
-  console.log('SETTINGS_CLIENT: Rendering main content');
+  console.log('SETTINGS_CLIENT: Rendering main content with', settings?.length, 'settings and', adminUsers?.length, 'users');
 
   return (
     <main className="p-6 space-y-6">

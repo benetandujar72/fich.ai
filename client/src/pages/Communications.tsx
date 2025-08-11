@@ -273,17 +273,17 @@ export default function Communications() {
                 Crea una nova comunicació per enviar als usuaris
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+            <div className="space-y-6 p-6" style={{ backgroundColor: '#f8fafc' }}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="recipient" className="text-sm font-bold text-black dark:text-white mb-3 block">Destinatari *</Label>
+                  <Label htmlFor="recipient" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Destinatari *</Label>
                   <Select value={composeRecipient} onValueChange={setComposeRecipient}>
-                    <SelectTrigger data-testid="select-recipient" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600">
+                    <SelectTrigger data-testid="select-recipient" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                       <SelectValue placeholder="Selecciona un destinatari" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
+                    <SelectContent style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }}>
                       {institutionUsers.map((user: User) => (
-                        <SelectItem key={user.id} value={user.id} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">
+                        <SelectItem key={user.id} value={user.id} style={{ color: '#000000' }}>
                           {user.firstName} {user.lastName} ({user.email})
                         </SelectItem>
                       ))}
@@ -291,15 +291,15 @@ export default function Communications() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="messageType" className="text-sm font-bold text-black dark:text-white mb-3 block">Tipus de Missatge</Label>
+                  <Label htmlFor="messageType" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Tipus de Missatge</Label>
                   <Select value={composeMessageType} onValueChange={(value: 'internal' | 'notification' | 'alert') => setComposeMessageType(value)}>
-                    <SelectTrigger data-testid="select-message-type" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600">
+                    <SelectTrigger data-testid="select-message-type" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
-                      <SelectItem value="internal" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Intern</SelectItem>
-                      <SelectItem value="notification" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Notificació</SelectItem>
-                      <SelectItem value="alert" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Alerta</SelectItem>
+                    <SelectContent style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }}>
+                      <SelectItem value="internal" style={{ color: '#000000' }}>Intern</SelectItem>
+                      <SelectItem value="notification" style={{ color: '#000000' }}>Notificació</SelectItem>
+                      <SelectItem value="alert" style={{ color: '#000000' }}>Alerta</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -307,16 +307,16 @@ export default function Communications() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="priority" className="text-sm font-bold text-black dark:text-white mb-3 block">Prioritat</Label>
+                  <Label htmlFor="priority" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Prioritat</Label>
                   <Select value={composePriority} onValueChange={(value: 'low' | 'medium' | 'high' | 'urgent') => setComposePriority(value)}>
-                    <SelectTrigger data-testid="select-priority" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600">
+                    <SelectTrigger data-testid="select-priority" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
-                      <SelectItem value="low" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Baixa</SelectItem>
-                      <SelectItem value="medium" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Mitjana</SelectItem>
-                      <SelectItem value="high" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Alta</SelectItem>
-                      <SelectItem value="urgent" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Urgent</SelectItem>
+                    <SelectContent style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }}>
+                      <SelectItem value="low" style={{ color: '#000000' }}>Baixa</SelectItem>
+                      <SelectItem value="medium" style={{ color: '#000000' }}>Mitjana</SelectItem>
+                      <SelectItem value="high" style={{ color: '#000000' }}>Alta</SelectItem>
+                      <SelectItem value="urgent" style={{ color: '#000000' }}>Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -328,24 +328,24 @@ export default function Communications() {
                     onChange={(e) => setComposeEmailEnabled(e.target.checked)}
                     data-testid="checkbox-email-enabled"
                   />
-                  <Label htmlFor="emailEnabled" className="text-sm font-bold text-black dark:text-white">Enviar per email</Label>
+                  <Label htmlFor="emailEnabled" className="text-sm font-bold" style={{ color: '#000000' }}>Enviar per email</Label>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="subject" className="text-sm font-bold text-black dark:text-white mb-3 block">Assumpte *</Label>
+                <Label htmlFor="subject" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Assumpte *</Label>
                 <Input
                   id="subject"
                   value={composeSubject}
                   onChange={(e) => setComposeSubject(e.target.value)}
                   placeholder="Introdueix l'assumpte del missatge"
                   data-testid="input-subject"
-                  className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600 placeholder:text-gray-400"
+                  style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}
                 />
               </div>
 
               <div>
-                <Label htmlFor="content" className="text-sm font-bold text-black dark:text-white mb-3 block">Contingut *</Label>
+                <Label htmlFor="content" className="text-sm font-bold mb-3 block" style={{ color: '#000000' }}>Contingut *</Label>
                 <Textarea
                   id="content"
                   value={composeContent}
@@ -353,19 +353,19 @@ export default function Communications() {
                   placeholder="Escriu el contingut del missatge..."
                   rows={6}
                   data-testid="textarea-content"
-                  className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600 placeholder:text-gray-400"
+                  style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}
                 />
               </div>
 
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsComposeOpen(false)} className="border-gray-300 text-gray-700 hover:bg-gray-100">
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsComposeOpen(false)} style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
                   Cancel·lar
                 </Button>
                 <Button 
                   onClick={handleComposeSubmit}
                   disabled={createCommunicationMutation.isPending}
                   data-testid="button-send-message"
-                  className="bg-rose-600 hover:bg-rose-700 text-white"
+                  style={{ backgroundColor: '#e11d48', color: '#ffffff', border: 'none' }}
                 >
                   {createCommunicationMutation.isPending ? 'Enviant...' : 'Enviar'}
                 </Button>

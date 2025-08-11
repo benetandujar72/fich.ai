@@ -182,11 +182,7 @@
     hover:shadow-md hover:bg-rose-50/70 dark:hover:bg-slate-700/70 transition-all duration-200;
   }
 
-  /* Modal and Dialog fixes */
-  [data-radix-dialog-overlay] {
-    @apply fixed inset-0 z-40 bg-black/30 !important;
-    backdrop-filter: blur(2px) !important;
-  }
+  /* Modal and Dialog fixes - overlay removed */
   
   [data-radix-dialog-content] {
     @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg !important;

@@ -133,7 +133,7 @@ export default function InstitutionManagement() {
               {language === "ca" ? "Nova Institució" : "Nueva Institución"}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
             <DialogHeader>
               <DialogTitle>
                 {language === "ca" ? "Crear Nova Institució" : "Crear Nueva Institución"}

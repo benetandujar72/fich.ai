@@ -45,8 +45,46 @@ export function ReportsManagement() {
   const [showWeeklyDetailModal, setShowWeeklyDetailModal] = useState(false);
   const [selectedUserForDetail, setSelectedUserForDetail] = useState<string | null>(null);
 
+  // Define interfaces for type safety
+  interface Employee {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }
+
+  interface WeeklyEmployeeData {
+    id: string;
+    name: string;
+    email: string;
+    complianceRate?: number;
+    weeklyDetails?: Array<{
+      status: 'present' | 'late' | 'absent' | 'unknown';
+      actualHours?: number;
+      scheduledHours?: number;
+    }>;
+  }
+
+  interface ReportGenerationResponse {
+    success: boolean;
+    reportData: Array<{
+      id: string;
+      name: string;
+      email: string;
+      total_records: number;
+      avg_hours: number;
+      total_delays: number;
+      days_present: number;
+      missing_exits: number;
+    }>;
+    reportType: string;
+    dateRange: { start: string; end: string };
+    employeeCount: number;
+    generatedAt: string;
+  }
+
   // Fetch weekly attendance data for all employees
-  const { data: weeklyData = [], isLoading: weeklyLoading } = useQuery({
+  const { data: weeklyData = [], isLoading: weeklyLoading } = useQuery<WeeklyEmployeeData[]>({
     queryKey: ['/api/admin/weekly-attendance', user?.institutionId],
     enabled: !!user?.institutionId && showWeeklyDetailModal,
     retry: 1,
@@ -54,17 +92,10 @@ export function ReportsManagement() {
   });
 
   // Fetch employees for selection
-  const { data: employees = [] } = useQuery({
+  const { data: employees = [] } = useQuery<Employee[]>({
     queryKey: ['/api/admin/employees', user?.institutionId],
     enabled: !!user?.institutionId,
   });
-
-  interface Employee {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  }
 
   const handleEmployeeSelection = (employeeId: string, checked: boolean) => {
     if (checked) {
@@ -74,18 +105,94 @@ export function ReportsManagement() {
     }
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEmployees(['all']);
+    } else {
+      setSelectedEmployees([]);
+    }
+  };
+
+  const isAllSelected = selectedEmployees.includes('all');
+  const isIndeterminate = selectedEmployees.length > 0 && !isAllSelected;
+
+  // Generate and download report
   const generateReport = () => {
+    if (!user?.institutionId) {
+      toast({
+        title: "Error",
+        description: "No s'ha pogut identificar la institució",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (selectedEmployees.length === 0) {
+      toast({
+        title: "Error", 
+        description: "Selecciona almenys un empleat per generar l'informe",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const employeeParam = selectedEmployees.includes('all') ? 'all' : selectedEmployees.join(',');
+    
     const params = new URLSearchParams({
-      institutionId: user?.institutionId || '',
-      employees: selectedEmployees.join(','),
+      institutionId: user.institutionId,
+      employees: employeeParam,
       startDate: dateRange.start,
       endDate: dateRange.end,
       type: reportType
     });
 
-    // Download report
-    window.open(`/api/admin/reports/generate?${params}`, '_blank');
+    // Open download in new window
+    const downloadUrl = `/api/admin/reports/generate?${params}`;
+    window.open(downloadUrl, '_blank');
+
+    toast({
+      title: "Informe generat",
+      description: "L'informe s'està descarregant...",
+    });
   };
+
+  // Generate custom report data (for preview/analysis)
+  const generateCustomReportMutation = useMutation({
+    mutationFn: async (): Promise<ReportGenerationResponse> => {
+      const response = await fetch('/api/admin/reports/generate-custom', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selectedEmployees,
+          reportType,
+          dateRange,
+          institutionId: user?.institutionId
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error generant informe');
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Informe generat",
+        description: `S'han processat ${data.employeeCount} empleats correctament`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error generant informe",
+        variant: "destructive"
+      });
+    }
+  });
 
   const presetReports = [
     {
@@ -232,46 +339,65 @@ export function ReportsManagement() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <label className="text-sm font-medium">
-                Seleccionar Empleats ({selectedEmployees.length} seleccionats)
+                Seleccionar Empleats ({isAllSelected ? 'Tots' : selectedEmployees.length} seleccionats)
               </label>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedEmployees((employees as Employee[]).map((e: Employee) => e.id))}
-                  data-testid="button-select-all-employees"
-                >
-                  Tots ({(employees as Employee[]).length})
-                </Button>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="select-all"
+                    checked={isAllSelected}
+                    onCheckedChange={handleSelectAll}
+                    data-testid="checkbox-select-all"
+                  />
+                  <label htmlFor="select-all" className="text-sm cursor-pointer">
+                    Seleccionar tots els empleats
+                  </label>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedEmployees([])}
+                  disabled={selectedEmployees.length === 0}
+                  data-testid="button-clear-selection"
                 >
-                  Deseleccionar Tots
+                  Esborrar selecció
                 </Button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto border rounded p-4">
-              {(employees as Employee[]).map((employee: Employee) => (
-                <div key={employee.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={employee.id}
-                    checked={selectedEmployees.includes(employee.id)}
-                    onCheckedChange={(checked) => 
-                      handleEmployeeSelection(employee.id, checked as boolean)
-                    }
-                  />
-                  <label
-                    htmlFor={employee.id}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    {employee.firstName} {employee.lastName}
-                  </label>
-                </div>
-              ))}
-            </div>
+            {!isAllSelected && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto border rounded p-4">
+                {(employees as Employee[]).map((employee: Employee) => (
+                  <div key={employee.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={employee.id}
+                      checked={selectedEmployees.includes(employee.id)}
+                      onCheckedChange={(checked) => 
+                        handleEmployeeSelection(employee.id, checked as boolean)
+                      }
+                      data-testid={`checkbox-employee-${employee.id}`}
+                    />
+                    <label
+                      htmlFor={employee.id}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {employee.firstName} {employee.lastName}
+                      <span className="text-muted-foreground block text-xs font-normal">
+                        {employee.email}
+                      </span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {isAllSelected && (
+              <div className="border rounded p-4 bg-muted/20">
+                <p className="text-sm text-muted-foreground text-center">
+                  S'han seleccionat tots els empleats ({(employees as Employee[]).length} empleats)
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Generate Button */}
@@ -283,7 +409,7 @@ export function ReportsManagement() {
               data-testid="button-generate-report"
             >
               <Download className="h-4 w-4 mr-2" />
-              Generar Informe ({selectedEmployees.length} seleccionats)
+              Generar Informe ({isAllSelected ? 'Tots els empleats' : `${selectedEmployees.length} seleccionats`})
             </Button>
           </div>
         </CardContent>

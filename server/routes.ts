@@ -1477,11 +1477,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Enhanced Reports - Multi-user selection with "all" option
+  // GET endpoint for report generation (for downloads)
+  app.get('/api/admin/reports/generate', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId, employees, startDate, endDate, type } = req.query;
+      
+      if (!institutionId || !employees || !startDate || !endDate || !type) {
+        return res.status(400).json({ message: 'Falten paràmetres requerits' });
+      }
+
+      let employeeIds: string[] = [];
+      
+      // Parse employees parameter
+      if (employees === 'all') {
+        const allEmployees = await db.execute(sql`
+          SELECT id FROM users 
+          WHERE institution_id = ${institutionId as string} AND role = 'employee'
+        `);
+        employeeIds = allEmployees.rows.map((emp: any) => emp.id);
+      } else {
+        employeeIds = (employees as string).split(',').filter(id => id.trim());
+      }
+
+      if (employeeIds.length === 0) {
+        return res.status(400).json({ message: 'No s\'han seleccionat empleats vàlids' });
+      }
+
+      // Generate report data with proper JSON serialization
+      const reportData = await db.execute(sql`
+        SELECT 
+          u.id,
+          u.first_name || ' ' || COALESCE(u.last_name, '') as name,
+          u.email,
+          COALESCE(COUNT(ar.id), 0)::int as total_records,
+          COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (ar.exit_time - ar.entry_time))/3600)::numeric, 2), 0) as avg_hours,
+          COALESCE(SUM(CASE WHEN ar.is_late THEN 1 ELSE 0 END), 0)::int as total_delays,
+          COALESCE(COUNT(CASE WHEN ar.entry_time IS NOT NULL THEN 1 END), 0)::int as days_present,
+          COALESCE(COUNT(CASE WHEN ar.exit_time IS NULL AND ar.entry_time IS NOT NULL THEN 1 END), 0)::int as missing_exits
+        FROM users u
+        LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+          AND ar.entry_time >= ${startDate as string}::timestamp
+          AND ar.entry_time <= ${endDate as string}::timestamp + interval '1 day'
+        WHERE u.id = ANY(${employeeIds}) 
+        GROUP BY u.id, u.first_name, u.last_name, u.email
+        ORDER BY u.first_name
+      `);
+
+      // Prepare clean data for CSV/Excel export
+      const reportRows = reportData.rows.map((row: any) => ({
+        id: row.id,
+        name: row.name || '',
+        email: row.email || '',
+        total_records: parseInt(row.total_records) || 0,
+        avg_hours: parseFloat(row.avg_hours) || 0,
+        total_delays: parseInt(row.total_delays) || 0,
+        days_present: parseInt(row.days_present) || 0,
+        missing_exits: parseInt(row.missing_exits) || 0
+      }));
+
+      // Generate CSV content
+      let csvContent = 'Nom,Email,Total Registres,Hores Promig,Total Retards,Dies Presents,Sortides Pendents\n';
+      reportRows.forEach(row => {
+        csvContent += `"${row.name}","${row.email}",${row.total_records},${row.avg_hours},${row.total_delays},${row.days_present},${row.missing_exits}\n`;
+      });
+
+      // Set headers for file download
+      const filename = `informe_${type}_${startDate}_${endDate}.csv`;
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      // Add BOM for Excel compatibility
+      res.write('\ufeff');
+      res.write(csvContent);
+      res.end();
+
+    } catch (error) {
+      console.error('Error generating report download:', error);
+      res.status(500).json({ 
+        message: 'Error generant informe per descàrrega',
+        error: error instanceof Error ? error.message : 'Error desconegut'
+      });
+    }
+  });
+
+  // Enhanced Reports - Multi-user selection with "all" option (POST for internal use)
   app.post('/api/admin/reports/generate-custom', isAuthenticated, async (req, res) => {
     try {
       const { selectedEmployees, reportType, dateRange, institutionId } = req.body;
       
+      if (!selectedEmployees || !reportType || !dateRange || !institutionId) {
+        return res.status(400).json({ message: 'Falten paràmetres requerits' });
+      }
+
       let employeeIds = selectedEmployees;
       
       // If "all" selected, get all employee IDs for the institution
@@ -1493,26 +1581,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeIds = allEmployees.rows.map((emp: any) => emp.id);
       }
 
-      // Generate report data based on selected employees
+      if (employeeIds.length === 0) {
+        return res.status(400).json({ message: 'No s\'han seleccionat empleats vàlids' });
+      }
+
+      // Generate report data with proper type casting for JSON serialization
       const reportData = await db.execute(sql`
         SELECT 
           u.id,
           u.first_name || ' ' || COALESCE(u.last_name, '') as name,
           u.email,
-          COUNT(ar.id) as total_records,
-          AVG(EXTRACT(EPOCH FROM (ar.exit_time - ar.entry_time))/3600) as avg_hours,
-          SUM(CASE WHEN ar.is_late THEN 1 ELSE 0 END) as total_delays
+          COALESCE(COUNT(ar.id), 0)::int as total_records,
+          COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (ar.exit_time - ar.entry_time))/3600)::numeric, 2), 0) as avg_hours,
+          COALESCE(SUM(CASE WHEN ar.is_late THEN 1 ELSE 0 END), 0)::int as total_delays,
+          COALESCE(COUNT(CASE WHEN ar.entry_time IS NOT NULL THEN 1 END), 0)::int as days_present,
+          COALESCE(COUNT(CASE WHEN ar.exit_time IS NULL AND ar.entry_time IS NOT NULL THEN 1 END), 0)::int as missing_exits
         FROM users u
         LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
-          AND ar.entry_time >= ${dateRange.start}
-          AND ar.entry_time <= ${dateRange.end}
+          AND ar.entry_time >= ${dateRange.start}::timestamp
+          AND ar.entry_time <= ${dateRange.end}::timestamp + interval '1 day'
         WHERE u.id = ANY(${employeeIds}) 
         GROUP BY u.id, u.first_name, u.last_name, u.email
         ORDER BY u.first_name
       `);
 
+      // Process data to ensure JSON serialization compatibility
+      const processedData = reportData.rows.map((row: any) => ({
+        id: row.id,
+        name: row.name || '',
+        email: row.email || '',
+        total_records: parseInt(row.total_records) || 0,
+        avg_hours: parseFloat(row.avg_hours) || 0,
+        total_delays: parseInt(row.total_delays) || 0,
+        days_present: parseInt(row.days_present) || 0,
+        missing_exits: parseInt(row.missing_exits) || 0
+      }));
+
       res.json({
-        reportData: reportData.rows,
+        success: true,
+        reportData: processedData,
         reportType,
         dateRange,
         employeeCount: employeeIds.length,
@@ -1520,7 +1627,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error generating custom report:', error);
-      res.status(500).json({ message: 'Error generant informe personalitzat' });
+      res.status(500).json({ 
+        message: 'Error generant informe personalitzat',
+        error: error instanceof Error ? error.message : 'Error desconegut'
+      });
     }
   });
 

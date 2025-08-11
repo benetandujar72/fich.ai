@@ -591,7 +591,7 @@ export default function Settings() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="p-3 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <Settings className="h-4 w-4 text-blue-600" />
+                  <SettingsIcon className="h-4 w-4 text-blue-600" />
                   <span className="text-sm font-medium">
                     {language === "ca" ? "Configuració" : "Configuración"}
                   </span>

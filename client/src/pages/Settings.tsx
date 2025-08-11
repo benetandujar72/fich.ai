@@ -250,15 +250,33 @@ export default function Settings() {
   };
 
   // Debug error states
+  console.log('SETTINGS_CLIENT: Component render - settingsLoading:', settingsLoading, 'usersLoading:', usersLoading);
+  console.log('SETTINGS_CLIENT: Settings data length:', settings?.length, 'Admin users length:', adminUsers?.length);
+  
   if (settingsError) {
     console.error('SETTINGS_CLIENT: Settings error:', settingsError);
+    return (
+      <main className="p-6 space-y-6">
+        <div className="text-center text-red-600">
+          <p>Error carregant configuració: {String(settingsError)}</p>
+        </div>
+      </main>
+    );
   }
   if (usersError) {
     console.error('SETTINGS_CLIENT: Users error:', usersError);
+    return (
+      <main className="p-6 space-y-6">
+        <div className="text-center text-red-600">
+          <p>Error carregant usuaris: {String(usersError)}</p>
+        </div>
+      </main>
+    );
   }
 
   // Early return for loading states  
   if (settingsLoading || usersLoading) {
+    console.log('SETTINGS_CLIENT: Still loading...');
     return (
       <main className="p-6 space-y-6">
         <div className="text-center">
@@ -267,6 +285,8 @@ export default function Settings() {
       </main>
     );
   }
+
+  console.log('SETTINGS_CLIENT: Rendering main content');
 
   return (
     <main className="p-6 space-y-6">
@@ -511,16 +531,21 @@ export default function Settings() {
             </div>
           </div>
           
-          <NetworkSettingsForm institutionId={institutionId} language={language} />
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p className="text-sm text-yellow-800">
+              Component de configuració de xarxa temporalment desactivat per debugging
+            </p>
+          </div>
         </CardContent>
       </Card>
 
       {/* Absence Justification Review - Only for Admins */}
       {permissions.canManageUsers && (
-        <AbsenceJustificationReview 
-          institutionId={institutionId || null} 
-          language={language} 
-        />
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            Component d'absències temporalment desactivat per debugging
+          </p>
+        </div>
       )}
 
       {/* Quick Access to Alert Configuration */}
@@ -553,10 +578,11 @@ export default function Settings() {
 
       {/* Automated Alerts Configuration - Only for Admins */}
       {permissions.canManageUsers && (
-        <AutomatedAlertsConfig 
-          institutionId={institutionId || null} 
-          language={language} 
-        />
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            Component d'alertes automàtiques temporalment desactivat per debugging
+          </p>
+        </div>
       )}
 
       {/* User Management */}

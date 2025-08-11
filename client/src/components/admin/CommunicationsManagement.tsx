@@ -101,9 +101,9 @@ export function CommunicationsManagement() {
       message: string;
       priority: string;
     }) => {
-      return await apiRequest('POST', '/api/admin/communications/send', {
+      return await apiRequest('POST', '/api/communications', {
         ...data,
-        institutionId: user?.institutionId,
+        emailSent: true
       });
     },
     onSuccess: () => {
@@ -112,6 +112,7 @@ export function CommunicationsManagement() {
         description: "La comunicació s'ha enviat correctament.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/communications'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/communications'] });
       setNewCommDialogOpen(false);
     },
     onError: (error: any) => {

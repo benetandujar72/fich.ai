@@ -30,7 +30,8 @@ import {
   Save,
   Users,
   Mail,
-  AlertTriangle
+  AlertTriangle,
+  FileText
 } from "lucide-react";
 import NetworkSettingsForm from "@/components/NetworkSettingsForm";
 import EmailSettingsForm from "@/components/EmailSettingsForm";
@@ -515,11 +516,33 @@ export default function Settings() {
 
       {/* Absence Justification Review - Only for Admins */}
       {permissions.canManageUsers && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800">
-            Component d'absències temporalment desactivat per debugging
-          </p>
-        </div>
+        <Card data-testid="absence-justification-card">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <FileText className="mr-2 h-5 w-5" />
+              {language === "ca" ? "Revisió de Justificacions d'Absències" : "Revisión de Justificaciones de Ausencias"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <Info className="text-amber-600 mr-3 h-5 w-5 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 mb-1">
+                    {language === "ca" ? "Gestió d'absències" : "Gestión de ausencias"}
+                  </p>
+                  <p className="text-sm text-amber-700">
+                    {language === "ca" 
+                      ? "Revisa i aprova/rebutja les justificacions d'absències presentades pels empleats."
+                      : "Revisa y aprueba/rechaza las justificaciones de ausencias presentadas por los empleados."}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <AbsenceJustificationReview institutionId={institutionId} language={language} />
+          </CardContent>
+        </Card>
       )}
 
       {/* Quick Access to Alert Configuration */}

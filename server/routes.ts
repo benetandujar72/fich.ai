@@ -2004,6 +2004,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PUT /api/absence-justifications/:id/status - Update absence justification status
+  app.put('/api/absence-justifications/:id/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { status, adminResponse } = req.body;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      if (!['approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status. Must be approved or rejected' });
+      }
+
+      console.log('ABSENCE_JUSTIFICATION: Updating status for ID:', id, 'to:', status);
+      console.log('ABSENCE_JUSTIFICATION: Admin response:', adminResponse);
+      
+      const result = await db.execute(sql`
+        UPDATE absences 
+        SET 
+          status = ${status},
+          admin_response = ${adminResponse || null},
+          reviewed_by = ${req.user.id},
+          reviewed_at = NOW(),
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Absence justification not found' });
+      }
+
+      console.log('ABSENCE_JUSTIFICATION: Successfully updated status');
+      res.json({ 
+        success: true, 
+        message: 'Status updated successfully',
+        absence: result.rows[0]
+      });
+    } catch (error) {
+      console.error("Error updating absence justification status:", error);
+      res.status(500).json({ message: "Failed to update absence justification status" });
+    }
+  });
+
   // GET /admin/weekly-schedule - Get all employees with weekly schedule summary
   app.get("/api/admin/weekly-schedule", isAuthenticated, async (req: any, res) => {
     console.log('ADMIN_WEEKLY_SCHEDULE: Request from user:', req.user?.id, 'role:', req.user?.role);

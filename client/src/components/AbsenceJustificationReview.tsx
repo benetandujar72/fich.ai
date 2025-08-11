@@ -60,8 +60,28 @@ export default function AbsenceJustificationReview({ institutionId, language }: 
 
   // Fetch pending absence justifications
   const { data: justifications = [], isLoading } = useQuery<AbsenceJustification[]>({
-    queryKey: ["/api/absence-justifications/admin", institutionId || "null"],
-    enabled: institutionId !== undefined,
+    queryKey: ["/api/absence-justifications/admin", institutionId],
+    queryFn: async () => {
+      const response = await fetch(`/api/absence-justifications/admin/${institutionId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch absence justifications');
+      }
+      const data = await response.json();
+      // Transform the data to match expected interface
+      return data.map((absence: any) => ({
+        id: absence.id,
+        employeeId: absence.employeeId,
+        employeeName: absence.employeeName,
+        date: absence.startDate, // Map startDate to date
+        reason: absence.reason,
+        status: absence.justificationStatus === 'pending' ? 'pending' : 
+                absence.justificationStatus === 'approved' ? 'approved' : 
+                absence.justificationStatus === 'rejected' ? 'rejected' : 'pending',
+        adminResponse: absence.adminResponse,
+        createdAt: absence.createdAt,
+      }));
+    },
+    enabled: !!institutionId,
   });
 
   // Review justification mutation

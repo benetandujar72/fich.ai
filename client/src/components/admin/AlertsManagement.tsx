@@ -202,8 +202,8 @@ export function AlertsManagement() {
             </DialogTrigger>
             <DialogContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
               <DialogHeader>
-                <DialogTitle className="text-foreground">Enviar Nova Alerta</DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+                <DialogTitle className="text-gray-900 dark:text-white font-semibold">Enviar Nova Alerta</DialogTitle>
+                <DialogDescription className="text-gray-600 dark:text-gray-300">
                   Envia una alerta manual als usuaris seleccionats
                 </DialogDescription>
               </DialogHeader>
@@ -217,16 +217,16 @@ export function AlertsManagement() {
                   type: 'manual_notification',
                 });
               }}>
-                <div className="space-y-4">
+                <div className="space-y-4 p-4">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Destinatari</label>
+                    <label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">Destinatari</label>
                     <Select name="recipient" required>
-                      <SelectTrigger className="bg-background text-foreground border-border">
-                        <SelectValue placeholder="Selecciona un empleat" />
+                      <SelectTrigger className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600">
+                        <SelectValue placeholder="Selecciona un empleat" className="text-gray-500" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
+                      <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
                         {(employees as Employee[]).map((employee: Employee) => (
-                          <SelectItem key={employee.id} value={employee.id} className="text-foreground">
+                          <SelectItem key={employee.id} value={employee.id} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">
                             {employee.firstName} {employee.lastName} - {employee.email}
                           </SelectItem>
                         ))}
@@ -235,16 +235,27 @@ export function AlertsManagement() {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Assumpte</label>
-                    <Input name="subject" required placeholder="Assumpte de l'alerta" className="bg-background text-foreground border-border" />
+                    <label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">Assumpte</label>
+                    <Input 
+                      name="subject" 
+                      required 
+                      placeholder="Assumpte de l'alerta" 
+                      className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600 placeholder:text-gray-400" 
+                    />
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Missatge</label>
-                    <Textarea name="message" required placeholder="Contingut del missatge" rows={4} className="bg-background text-foreground border-border" />
+                    <label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">Missatge</label>
+                    <Textarea 
+                      name="message" 
+                      required 
+                      placeholder="Contingut del missatge" 
+                      rows={4} 
+                      className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600 placeholder:text-gray-400" 
+                    />
                   </div>
                   
-                  <Button type="submit" disabled={sendAlertMutation.isPending} className="bg-rose-600 hover:bg-rose-700 text-white">
+                  <Button type="submit" disabled={sendAlertMutation.isPending} className="bg-rose-600 hover:bg-rose-700 text-white w-full">
                     <Send className="h-4 w-4 mr-2" />
                     {sendAlertMutation.isPending ? "Enviant..." : "Enviar Alerta"}
                   </Button>

@@ -201,9 +201,11 @@ export function AlertsManagement() {
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
-              <DialogHeader className="pb-4">
-                <DialogTitle className="text-black dark:text-white font-bold text-lg">Enviar Nova Alerta</DialogTitle>
-                <DialogDescription className="text-black dark:text-white font-medium">
+              <DialogHeader className="pb-4 bg-rose-50 dark:bg-slate-700 p-4 rounded-lg mb-4">
+                <DialogTitle className="text-black dark:text-white font-bold text-xl" style={{ color: '#000000' }}>
+                  Enviar Nova Alerta
+                </DialogTitle>
+                <DialogDescription className="text-black dark:text-white font-semibold text-base mt-2" style={{ color: '#1f2937' }}>
                   Envia una alerta manual als usuaris seleccionats
                 </DialogDescription>
               </DialogHeader>

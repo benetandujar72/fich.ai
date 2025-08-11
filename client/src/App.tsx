@@ -303,6 +303,26 @@ function Router() {
             </ProtectedRoute>
           } />
 
+          {/* Rutes en català per compatibilitat */}
+          <Route path="/configuracio" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title={t("settings", language)}
+              />
+              <Settings />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/configuracio-alertes" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title={language === "ca" ? "Configuració d'Alertes" : "Configuración de Alertas"}
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <AlertConfig />
+            </ProtectedRoute>
+          } />
+
           <Route path="/privacy" component={() => 
             <ProtectedRoute>
               <Header 

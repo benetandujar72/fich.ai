@@ -1509,15 +1509,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           u.id,
           u.first_name || ' ' || COALESCE(u.last_name, '') as name,
           u.email,
-          COALESCE(COUNT(ar.id), 0)::int as total_records,
-          COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (ar.exit_time - ar.entry_time))/3600)::numeric, 2), 0) as avg_hours,
-          COALESCE(SUM(CASE WHEN ar.is_late THEN 1 ELSE 0 END), 0)::int as total_delays,
-          COALESCE(COUNT(CASE WHEN ar.entry_time IS NOT NULL THEN 1 END), 0)::int as days_present,
-          COALESCE(COUNT(CASE WHEN ar.exit_time IS NULL AND ar.entry_time IS NOT NULL THEN 1 END), 0)::int as missing_exits
+          COALESCE(COUNT(CASE WHEN ar.type = 'check_in' THEN 1 END), 0)::int as total_checkins,
+          COALESCE(COUNT(CASE WHEN ar.type = 'check_out' THEN 1 END), 0)::int as total_checkouts,
+          COALESCE(COUNT(DISTINCT DATE(ar.timestamp)), 0)::int as days_present,
+          COALESCE(COUNT(CASE WHEN ar.type = 'check_in' AND ar.timestamp::time > '08:00:00' THEN 1 END), 0)::int as total_delays,
+          COALESCE(COUNT(ar.id), 0)::int as total_records
         FROM users u
         LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
-          AND ar.entry_time >= ${startDate as string}::timestamp
-          AND ar.entry_time <= ${endDate as string}::timestamp + interval '1 day'
+          AND ar.timestamp >= ${startDate as string}::timestamp
+          AND ar.timestamp <= ${endDate as string}::timestamp + interval '1 day'
         WHERE u.id = ANY(${employeeIds}) 
         GROUP BY u.id, u.first_name, u.last_name, u.email
         ORDER BY u.first_name
@@ -1529,16 +1529,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: row.name || '',
         email: row.email || '',
         total_records: parseInt(row.total_records) || 0,
-        avg_hours: parseFloat(row.avg_hours) || 0,
-        total_delays: parseInt(row.total_delays) || 0,
+        total_checkins: parseInt(row.total_checkins) || 0,
+        total_checkouts: parseInt(row.total_checkouts) || 0,
         days_present: parseInt(row.days_present) || 0,
-        missing_exits: parseInt(row.missing_exits) || 0
+        total_delays: parseInt(row.total_delays) || 0
       }));
 
       // Generate CSV content
-      let csvContent = 'Nom,Email,Total Registres,Hores Promig,Total Retards,Dies Presents,Sortides Pendents\n';
+      let csvContent = 'Nom,Email,Total Registres,Total Entrades,Total Sortides,Dies Presents,Total Retards\n';
       reportRows.forEach(row => {
-        csvContent += `"${row.name}","${row.email}",${row.total_records},${row.avg_hours},${row.total_delays},${row.days_present},${row.missing_exits}\n`;
+        csvContent += `"${row.name}","${row.email}",${row.total_records},${row.total_checkins},${row.total_checkouts},${row.days_present},${row.total_delays}\n`;
       });
 
       // Set headers for file download
@@ -1591,15 +1591,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           u.id,
           u.first_name || ' ' || COALESCE(u.last_name, '') as name,
           u.email,
-          COALESCE(COUNT(ar.id), 0)::int as total_records,
-          COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (ar.exit_time - ar.entry_time))/3600)::numeric, 2), 0) as avg_hours,
-          COALESCE(SUM(CASE WHEN ar.is_late THEN 1 ELSE 0 END), 0)::int as total_delays,
-          COALESCE(COUNT(CASE WHEN ar.entry_time IS NOT NULL THEN 1 END), 0)::int as days_present,
-          COALESCE(COUNT(CASE WHEN ar.exit_time IS NULL AND ar.entry_time IS NOT NULL THEN 1 END), 0)::int as missing_exits
+          COALESCE(COUNT(CASE WHEN ar.type = 'check_in' THEN 1 END), 0)::int as total_checkins,
+          COALESCE(COUNT(CASE WHEN ar.type = 'check_out' THEN 1 END), 0)::int as total_checkouts,
+          COALESCE(COUNT(DISTINCT DATE(ar.timestamp)), 0)::int as days_present,
+          COALESCE(COUNT(CASE WHEN ar.type = 'check_in' AND ar.timestamp::time > '08:00:00' THEN 1 END), 0)::int as total_delays,
+          COALESCE(COUNT(ar.id), 0)::int as total_records
         FROM users u
         LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
-          AND ar.entry_time >= ${dateRange.start}::timestamp
-          AND ar.entry_time <= ${dateRange.end}::timestamp + interval '1 day'
+          AND ar.timestamp >= ${dateRange.start}::timestamp
+          AND ar.timestamp <= ${dateRange.end}::timestamp + interval '1 day'
         WHERE u.id = ANY(${employeeIds}) 
         GROUP BY u.id, u.first_name, u.last_name, u.email
         ORDER BY u.first_name
@@ -1611,10 +1611,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: row.name || '',
         email: row.email || '',
         total_records: parseInt(row.total_records) || 0,
-        avg_hours: parseFloat(row.avg_hours) || 0,
-        total_delays: parseInt(row.total_delays) || 0,
+        total_checkins: parseInt(row.total_checkins) || 0,
+        total_checkouts: parseInt(row.total_checkouts) || 0,
         days_present: parseInt(row.days_present) || 0,
-        missing_exits: parseInt(row.missing_exits) || 0
+        total_delays: parseInt(row.total_delays) || 0
       }));
 
       res.json({

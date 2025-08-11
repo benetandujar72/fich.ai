@@ -14,7 +14,9 @@ import {
   AppModalActions,
   AppModalInput,
   AppModalTextarea,
-  AppModalButton
+  AppModalButton,
+  AppModalSelect,
+  AppModalSelectOption
 } from "@/components/ui/AppModal";
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -281,46 +283,32 @@ export default function Communications() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <AppModalField label="Destinatari" required>
-                  <Select value={composeRecipient} onValueChange={setComposeRecipient}>
-                    <SelectTrigger data-testid="select-recipient" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
-                      <SelectValue placeholder="Selecciona un destinatari" />
-                    </SelectTrigger>
-                    <SelectContent style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }}>
-                      {institutionUsers.map((user: User) => (
-                        <SelectItem key={user.id} value={user.id} style={{ color: '#000000' }}>
-                          {user.firstName} {user.lastName} ({user.email})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <AppModalSelect value={composeRecipient} onValueChange={setComposeRecipient} data-testid="select-recipient">
+                    <AppModalSelectOption value="">Selecciona un destinatari</AppModalSelectOption>
+                    {institutionUsers.map((user: User) => (
+                      <AppModalSelectOption key={user.id} value={user.id}>
+                        {user.firstName} {user.lastName} ({user.email})
+                      </AppModalSelectOption>
+                    ))}
+                  </AppModalSelect>
                 </AppModalField>
                 <AppModalField label="Tipus de Missatge">
-                  <Select value={composeMessageType} onValueChange={(value: 'internal' | 'notification' | 'alert') => setComposeMessageType(value)}>
-                    <SelectTrigger data-testid="select-message-type" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }}>
-                      <SelectItem value="internal" style={{ color: '#000000' }}>Intern</SelectItem>
-                      <SelectItem value="notification" style={{ color: '#000000' }}>Notificació</SelectItem>
-                      <SelectItem value="alert" style={{ color: '#000000' }}>Alerta</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <AppModalSelect value={composeMessageType} onValueChange={(value: string) => setComposeMessageType(value as 'internal' | 'notification' | 'alert')} data-testid="select-message-type">
+                    <AppModalSelectOption value="internal">Intern</AppModalSelectOption>
+                    <AppModalSelectOption value="notification">Notificació</AppModalSelectOption>
+                    <AppModalSelectOption value="alert">Alerta</AppModalSelectOption>
+                  </AppModalSelect>
                 </AppModalField>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <AppModalField label="Prioritat">
-                  <Select value={composePriority} onValueChange={(value: 'low' | 'medium' | 'high' | 'urgent') => setComposePriority(value)}>
-                    <SelectTrigger data-testid="select-priority" style={{ backgroundColor: '#ffffff', color: '#000000', border: '2px solid #e2e8f0' }}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }}>
-                      <SelectItem value="low" style={{ color: '#000000' }}>Baixa</SelectItem>
-                      <SelectItem value="medium" style={{ color: '#000000' }}>Mitjana</SelectItem>
-                      <SelectItem value="high" style={{ color: '#000000' }}>Alta</SelectItem>
-                      <SelectItem value="urgent" style={{ color: '#000000' }}>Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <AppModalSelect value={composePriority} onValueChange={(value: string) => setComposePriority(value as 'low' | 'medium' | 'high' | 'urgent')} data-testid="select-priority">
+                    <AppModalSelectOption value="low">Baixa</AppModalSelectOption>
+                    <AppModalSelectOption value="medium">Mitjana</AppModalSelectOption>
+                    <AppModalSelectOption value="high">Alta</AppModalSelectOption>
+                    <AppModalSelectOption value="urgent">Urgent</AppModalSelectOption>
+                  </AppModalSelect>
                 </AppModalField>
                 <div className="flex items-center space-x-2 pt-6">
                   <input
@@ -375,7 +363,7 @@ export default function Communications() {
 
       {/* Filters and Search */}
       <div className="flex items-center justify-between">
-        <Tabs value={selectedFilter} onValueChange={(value: 'all' | 'inbox' | 'sent' | 'unread') => setSelectedFilter(value)} className="w-auto">
+        <Tabs value={selectedFilter} onValueChange={(value: string) => setSelectedFilter(value as 'all' | 'inbox' | 'sent' | 'unread')} className="w-auto">
           <TabsList>
             <TabsTrigger value="inbox" className="relative" data-testid="tab-inbox">
               <Inbox className="mr-2 h-4 w-4" />

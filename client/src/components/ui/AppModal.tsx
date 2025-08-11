@@ -205,6 +205,47 @@ const AppModalButton = React.forwardRef<HTMLButtonElement, AppModalButtonProps>(
 )
 AppModalButton.displayName = "AppModalButton"
 
+// Pre-styled Select components for consistent styling
+interface AppModalSelectProps extends React.ComponentProps<typeof DialogPrimitive.Root> {
+  value?: string
+  onValueChange?: (value: string) => void
+  children: React.ReactNode
+}
+
+const AppModalSelect: React.FC<AppModalSelectProps> = ({ value, onValueChange, children, ...props }) => {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onValueChange?.(e.target.value)}
+      className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-rose-500"
+      style={{ 
+        backgroundColor: '#ffffff',
+        color: '#000000',
+        border: '2px solid #e2e8f0'
+      }}
+      {...props}
+    >
+      {children}
+    </select>
+  )
+}
+
+interface AppModalSelectOptionProps extends React.OptionHTMLAttributes<HTMLOptionElement> {
+  children: React.ReactNode
+}
+
+const AppModalSelectOption: React.FC<AppModalSelectOptionProps> = ({ children, ...props }) => (
+  <option
+    style={{ 
+      backgroundColor: '#ffffff',
+      color: '#000000'
+    }}
+    {...props}
+  >
+    {children}
+  </option>
+)
+
 export {
   AppModal,
   AppModalTrigger,
@@ -214,5 +255,7 @@ export {
   AppModalActions,
   AppModalInput,
   AppModalTextarea,
-  AppModalButton
+  AppModalButton,
+  AppModalSelect,
+  AppModalSelectOption
 }

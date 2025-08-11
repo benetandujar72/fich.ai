@@ -75,10 +75,10 @@ export default function Settings() {
   });
 
   const { data: settings = [], isLoading: settingsLoading, error: settingsError } = useQuery({
-    queryKey: ["/api/settings", institutionId || "null"],
+    queryKey: ["/api/settings", institutionId],
     queryFn: async () => {
       console.log('SETTINGS_CLIENT: Fetching settings for institution:', institutionId);
-      const response = await fetch(`/api/settings/${institutionId || "null"}`, {
+      const response = await fetch(`/api/settings/${institutionId}`, {
         credentials: 'include'
       });
       if (!response.ok) {
@@ -89,9 +89,12 @@ export default function Settings() {
       }
       const data = await response.json();
       console.log('SETTINGS_CLIENT: Received settings data:', data);
+      console.log('SETTINGS_CLIENT: Query completed, should set isLoading to false now');
       return Array.isArray(data) ? data : [];
     },
-    enabled: !!institutionId, // Only run when institutionId exists
+    enabled: !!institutionId,
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnWindowFocus: false, // Prevent refetching on focus
   });
 
   // Load existing center settings when data is received  
@@ -141,7 +144,7 @@ export default function Settings() {
       
       console.log('SETTINGS_CLIENT: Sending all settings:', allSettings);
       
-      const response = await apiRequest("PUT", `/api/settings/${institutionId || "null"}`, { 
+      const response = await apiRequest("PUT", `/api/settings/${institutionId}`, { 
         settings: allSettings 
       });
       
@@ -149,7 +152,7 @@ export default function Settings() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/settings", institutionId || "null"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/settings", institutionId] });
       toast({
         title: t("success", language),
         description: language === "ca" ? "Configuració guardada correctament" : "Configuración guardada correctamente",

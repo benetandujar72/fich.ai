@@ -257,14 +257,17 @@ export default function Settings() {
     );
   };
 
-  // Debug error states
-  console.log('SETTINGS_CLIENT: Component render - settingsLoading:', settingsLoading, 'usersLoading:', usersLoading);
-  console.log('SETTINGS_CLIENT: Settings data length:', settings?.length, 'Admin users length:', adminUsers?.length);
-  console.log('SETTINGS_CLIENT: institutionId:', institutionId);
-  console.log('SETTINGS_CLIENT: user:', user?.email);
-  
+  // FASE 1: DEBUG INICIAL - Estats bàsics
+  console.log('🔍 FASE 1: Component render');
+  console.log('   - settingsLoading:', settingsLoading, 'usersLoading:', usersLoading);
+  console.log('   - Settings data length:', settings?.length, 'Admin users length:', adminUsers?.length);
+  console.log('   - institutionId:', institutionId);
+  console.log('   - user:', user?.email);
+
+  // FASE 2: DEBUG ERRORS
+  console.log('🔍 FASE 2: Error checking');
   if (settingsError) {
-    console.error('SETTINGS_CLIENT: Settings error:', settingsError);
+    console.error('❌ FASE 2: Settings error detected:', settingsError);
     return (
       <main className="p-6 space-y-6">
         <div className="text-center text-red-600">
@@ -274,7 +277,7 @@ export default function Settings() {
     );
   }
   if (usersError) {
-    console.error('SETTINGS_CLIENT: Users error:', usersError);
+    console.error('❌ FASE 2: Users error detected:', usersError);
     return (
       <main className="p-6 space-y-6">
         <div className="text-center text-red-600">
@@ -283,31 +286,41 @@ export default function Settings() {
       </main>
     );
   }
+  console.log('✅ FASE 2: No errors detected');
 
-  // Early return for loading states - but be more specific  
+  // FASE 3: DEBUG LOADING STATES
+  console.log('🔍 FASE 3: Loading states checking');
   if (settingsLoading) {
-    console.log('SETTINGS_CLIENT: Settings still loading...');
+    console.log('⏳ FASE 3: Settings still loading, showing loading screen');
     return (
       <main className="p-6 space-y-6">
         <div className="text-center">
-          <p>Carregant configuració dels settings...</p>
+          <p>⏳ FASE 3: Carregant configuració dels settings...</p>
         </div>
       </main>
     );
   }
+  console.log('✅ FASE 3: Settings loaded successfully');
   
   if (usersLoading) {
-    console.log('SETTINGS_CLIENT: Users still loading...');
+    console.log('⏳ FASE 3: Users still loading, showing loading screen');
     return (
       <main className="p-6 space-y-6">
         <div className="text-center">
-          <p>Carregant usuaris administradors...</p>
+          <p>⏳ FASE 3: Carregant usuaris administradors...</p>
         </div>
       </main>
     );
   }
+  console.log('✅ FASE 3: Users loaded successfully');
 
-  console.log('SETTINGS_CLIENT: Rendering main content with', settings?.length, 'settings and', adminUsers?.length, 'users');
+  // FASE 4: DEBUG RENDER PREPARATION
+  console.log('🔍 FASE 4: Preparing main content render');
+  console.log('   - About to render main content with', settings?.length, 'settings and', adminUsers?.length, 'users');
+  console.log('✅ FASE 4: All data ready, proceeding to render');
+
+  // FASE 5: DEBUG RENDER START
+  console.log('🔍 FASE 5: Starting JSX render');
 
   return (
     <main className="p-6 space-y-6">

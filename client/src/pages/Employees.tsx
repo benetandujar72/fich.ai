@@ -342,23 +342,29 @@ export default function Employees() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(employee)}
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                             data-testid={`edit-employee-${employee.id}`}
+                            title={language === "ca" ? "Editar empleat" : "Editar empleado"}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => handleViewDetails(employee)}
+                            className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                             data-testid={`schedule-employee-${employee.id}`}
+                            title={language === "ca" ? "Veure detalls" : "Ver detalles"}
                           >
-                            <Clock className="h-4 w-4" />
+                            <User className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDelete(employee)}
-                            className="text-error hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             data-testid={`delete-employee-${employee.id}`}
+                            title={language === "ca" ? "Eliminar empleat" : "Eliminar empleado"}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

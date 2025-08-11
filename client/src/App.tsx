@@ -301,7 +301,7 @@ function Router() {
               <Header 
                 title={t("settings", language)}
               />
-              <SettingsSimple />
+              <Settings />
             </ProtectedRoute>
           } />
           

@@ -29,7 +29,8 @@ import {
   Trash2,
   Save,
   Users,
-  Mail
+  Mail,
+  AlertTriangle
 } from "lucide-react";
 import NetworkSettingsForm from "@/components/NetworkSettingsForm";
 import EmailSettingsForm from "@/components/EmailSettingsForm";
@@ -252,8 +253,8 @@ export default function Settings() {
   }
 
   // Show loading only if both queries are still pending AND we don't have data
-  const reallyLoading = (settingsLoading && (!settings || settings.length === 0)) || 
-                       (usersLoading && (!adminUsers || adminUsers.length === 0));
+  const reallyLoading = (settingsLoading && (!settings || (Array.isArray(settings) && settings.length === 0))) || 
+                       (usersLoading && (!adminUsers || (Array.isArray(adminUsers) && adminUsers.length === 0)));
   
   if (reallyLoading) {
     return (
@@ -530,7 +531,7 @@ export default function Settings() {
         <Card data-testid="alert-config-card">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Settings className="mr-2 h-5 w-5" />
+              <AlertTriangle className="mr-2 h-5 w-5" />
               {language === "ca" ? "Configuració d'Alertes Automàtiques" : "Configuración de Alertas Automáticas"}
             </CardTitle>
           </CardHeader>
@@ -546,7 +547,7 @@ export default function Settings() {
               className="w-full"
               data-testid="configure-alerts-button"
             >
-              <Settings className="mr-2 h-4 w-4" />
+              <AlertTriangle className="mr-2 h-4 w-4" />
               {language === "ca" ? "Configurar Alertes" : "Configurar Alertas"}
             </Button>
           </CardContent>

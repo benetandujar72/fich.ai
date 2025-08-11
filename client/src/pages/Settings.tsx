@@ -74,7 +74,7 @@ export default function Settings() {
     password: "prof123"
   });
 
-  const { data: settings = [], isLoading: settingsLoading } = useQuery({
+  const { data: settings = [], isLoading: settingsLoading, error: settingsError } = useQuery({
     queryKey: ["/api/settings", institutionId || "null"],
     queryFn: async () => {
       console.log('SETTINGS_CLIENT: Fetching settings for institution:', institutionId);
@@ -82,12 +82,16 @@ export default function Settings() {
         credentials: 'include'
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch settings');
+        console.error('SETTINGS_CLIENT: Response not ok:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('SETTINGS_CLIENT: Error response:', errorText);
+        throw new Error(`Failed to fetch settings: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       console.log('SETTINGS_CLIENT: Received settings data:', data);
       return Array.isArray(data) ? data : [];
     },
+    enabled: !!institutionId, // Only run when institutionId exists
   });
 
   // Load existing center settings when data is received
@@ -169,8 +173,23 @@ export default function Settings() {
   };
 
   // Fetch real admin users from database
-  const { data: adminUsers = [], isLoading: usersLoading } = useQuery({
+  const { data: adminUsers = [], isLoading: usersLoading, error: usersError } = useQuery({
     queryKey: ["/api/users/admins", institutionId],
+    queryFn: async () => {
+      console.log('SETTINGS_CLIENT: Fetching admin users for institution:', institutionId);
+      const response = await fetch(`/api/users/admins/${institutionId}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        console.error('SETTINGS_CLIENT: Admin users response not ok:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('SETTINGS_CLIENT: Admin users error response:', errorText);
+        throw new Error(`Failed to fetch admin users: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log('SETTINGS_CLIENT: Received admin users data:', data);
+      return Array.isArray(data) ? data : [];
+    },
     enabled: !!institutionId,
   });
 
@@ -229,6 +248,25 @@ export default function Settings() {
       </Badge>
     );
   };
+
+  // Debug error states
+  if (settingsError) {
+    console.error('SETTINGS_CLIENT: Settings error:', settingsError);
+  }
+  if (usersError) {
+    console.error('SETTINGS_CLIENT: Users error:', usersError);
+  }
+
+  // Early return for loading states  
+  if (settingsLoading || usersLoading) {
+    return (
+      <main className="p-6 space-y-6">
+        <div className="text-center">
+          <p>Carregant configuració...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="p-6 space-y-6">

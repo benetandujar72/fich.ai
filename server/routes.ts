@@ -1083,8 +1083,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 AND DATE(timestamp AT TIME ZONE 'Europe/Madrid') = ${format(currentDay, 'yyyy-MM-dd')}
             `);
 
-            const dayData = dayAttendance.rows[0];
-            const hasAttendance = dayData.check_ins > 0;
+            const dayData = dayAttendance.rows[0] as any;
+            const hasAttendance = (dayData?.check_ins ?? 0) > 0;
             
             weekDays.push({
               date: format(currentDay, 'yyyy-MM-dd'),
@@ -1579,7 +1579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
 
       // Group by day and build schedule
-      const weeklySchedule = {};
+      const weeklySchedule: Record<string, any> = {};
       attendanceData.rows.forEach((record: any) => {
         const day = record.day;
         if (!weeklySchedule[day]) {
@@ -1847,13 +1847,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email, firstName, lastName, role, institutionId } = req.body;
       
       // Create new admin user
-      const [newAdmin] = await db.execute(sql`
+      const result = await db.execute(sql`
         INSERT INTO users (institution_id, email, first_name, last_name, role, password_hash)
         VALUES (${institutionId}, ${email}, ${firstName}, ${lastName}, ${role}, '$2b$10$defaulthash')
         RETURNING id, email, first_name as "firstName", last_name as "lastName", role, created_at as "createdAt"
       `);
 
-      res.json(newAdmin);
+      res.json(result.rows[0]);
     } catch (error) {
       console.error("Error creating admin user:", error);
       res.status(500).json({ message: "Failed to create admin user" });

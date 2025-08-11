@@ -13,13 +13,12 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { 
   Select,
@@ -193,21 +192,16 @@ export function AlertsManagement() {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button size="sm" onClick={() => setNewAlertDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Alerta
+          </Button>
+          
           <Dialog open={newAlertDialogOpen} onOpenChange={setNewAlertDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Alerta
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
-              <DialogHeader className="pb-4 bg-rose-50 dark:bg-slate-700 p-4 rounded-lg mb-4">
-                <DialogTitle className="text-black dark:text-white font-bold text-xl" style={{ color: '#000000' }}>
-                  Enviar Nova Alerta
-                </DialogTitle>
-                <DialogDescription className="text-black dark:text-white font-semibold text-base mt-2" style={{ color: '#1f2937' }}>
-                  Envia una alerta manual als usuaris seleccionats
-                </DialogDescription>
+            <DialogContent className="max-w-2xl bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600">
+              <DialogHeader>
+                <DialogTitle>Enviar Nova Alerta</DialogTitle>
+                <DialogDescription>Envia una alerta manual als usuaris seleccionats</DialogDescription>
               </DialogHeader>
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -219,12 +213,12 @@ export function AlertsManagement() {
                   type: 'manual_notification',
                 });
               }}>
-                <div className="space-y-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+                <div className="space-y-6">
                   <div>
-                    <label className="text-sm font-bold text-black dark:text-white mb-3 block">Destinatari</label>
+                    <label className="text-sm font-medium mb-2 block">Destinatari *</label>
                     <Select name="recipient" required>
-                      <SelectTrigger className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600">
-                        <SelectValue placeholder="Selecciona un empleat" className="text-gray-500" />
+                      <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600">
+                        <SelectValue placeholder="Selecciona un empleat" />
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
                         {(employees as Employee[]).map((employee: Employee) => (
@@ -237,30 +231,35 @@ export function AlertsManagement() {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-bold text-black dark:text-white mb-3 block">Assumpte</label>
+                    <label className="text-sm font-medium mb-2 block">Assumpte *</label>
                     <Input 
-                      name="subject" 
+                      name="subject"
+                      placeholder="Introdueix l'assumpte de l'alerta..."
                       required 
-                      placeholder="Assumpte de l'alerta" 
-                      className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600 placeholder:text-gray-400" 
+                      className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
                     />
                   </div>
                   
                   <div>
-                    <label className="text-sm font-bold text-black dark:text-white mb-3 block">Missatge</label>
+                    <label className="text-sm font-medium mb-2 block">Missatge *</label>
                     <Textarea 
-                      name="message" 
+                      name="message"
+                      placeholder="Escriu el missatge de l'alerta..."
                       required 
-                      placeholder="Contingut del missatge" 
-                      rows={4} 
-                      className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600 placeholder:text-gray-400" 
+                      rows={4}
+                      className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
                     />
                   </div>
                   
-                  <Button type="submit" disabled={sendAlertMutation.isPending} className="bg-rose-600 hover:bg-rose-700 text-white w-full">
-                    <Send className="h-4 w-4 mr-2" />
-                    {sendAlertMutation.isPending ? "Enviant..." : "Enviar Alerta"}
-                  </Button>
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button variant="outline" onClick={() => setNewAlertDialogOpen(false)}>
+                      Cancel·lar
+                    </Button>
+                    <Button type="submit" disabled={sendAlertMutation.isPending}>
+                      <Send className="h-4 w-4 mr-2" />
+                      {sendAlertMutation.isPending ? "Enviant..." : "Enviar Alerta"}
+                    </Button>
+                  </div>
                 </div>
               </form>
             </DialogContent>

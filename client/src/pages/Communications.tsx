@@ -7,17 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  AppModal,
-  AppModalContent,
-  AppModalTrigger,
-  AppModalField,
-  AppModalActions,
-  AppModalInput,
-  AppModalTextarea,
-  AppModalButton,
-  AppModalSelect,
-  AppModalSelectOption
-} from "@/components/ui/AppModal";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -268,48 +263,67 @@ export default function Communications() {
             Gestiona la comunicació interna del centre educatiu
           </p>
         </div>
-        <AppModal open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-          <AppModalTrigger asChild>
-            <Button data-testid="button-compose-message">
-              <Send className="mr-2 h-4 w-4" />
-              Nou Missatge
-            </Button>
-          </AppModalTrigger>
-          <AppModalContent 
-            maxWidth="2xl"
-            title="Redactar Missatge"
-            description="Crea una nova comunicació per enviar als usuaris"
-          >
+        <Button 
+          data-testid="button-compose-message"
+          onClick={() => setIsComposeOpen(true)}
+        >
+          <Send className="mr-2 h-4 w-4" />
+          Nou Missatge
+        </Button>
+        
+        <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
+          <DialogContent className="max-w-2xl bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600">
+            <DialogHeader>
+              <DialogTitle>Redactar Missatge</DialogTitle>
+              <DialogDescription>Crea una nova comunicació per enviar als usuaris</DialogDescription>
+            </DialogHeader>
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <AppModalField label="Destinatari" required>
-                  <AppModalSelect value={composeRecipient} onValueChange={setComposeRecipient} data-testid="select-recipient">
-                    <AppModalSelectOption value="">Selecciona un destinatari</AppModalSelectOption>
-                    {institutionUsers.map((user: User) => (
-                      <AppModalSelectOption key={user.id} value={user.id}>
-                        {user.firstName} {user.lastName} ({user.email})
-                      </AppModalSelectOption>
-                    ))}
-                  </AppModalSelect>
-                </AppModalField>
-                <AppModalField label="Tipus de Missatge">
-                  <AppModalSelect value={composeMessageType} onValueChange={(value: string) => setComposeMessageType(value as 'internal' | 'notification' | 'alert')} data-testid="select-message-type">
-                    <AppModalSelectOption value="internal">Intern</AppModalSelectOption>
-                    <AppModalSelectOption value="notification">Notificació</AppModalSelectOption>
-                    <AppModalSelectOption value="alert">Alerta</AppModalSelectOption>
-                  </AppModalSelect>
-                </AppModalField>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Destinatari *</label>
+                  <Select value={composeRecipient} onValueChange={setComposeRecipient}>
+                    <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600" data-testid="select-recipient">
+                      <SelectValue placeholder="Selecciona un destinatari" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
+                      {institutionUsers.map((user: User) => (
+                        <SelectItem key={user.id} value={user.id} className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">
+                          {user.firstName} {user.lastName} ({user.email})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tipus de Missatge</label>
+                  <Select value={composeMessageType} onValueChange={(value: string) => setComposeMessageType(value as 'internal' | 'notification' | 'alert')}>
+                    <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600" data-testid="select-message-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
+                      <SelectItem value="internal" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Intern</SelectItem>
+                      <SelectItem value="notification" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Notificació</SelectItem>
+                      <SelectItem value="alert" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Alerta</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <AppModalField label="Prioritat">
-                  <AppModalSelect value={composePriority} onValueChange={(value: string) => setComposePriority(value as 'low' | 'medium' | 'high' | 'urgent')} data-testid="select-priority">
-                    <AppModalSelectOption value="low">Baixa</AppModalSelectOption>
-                    <AppModalSelectOption value="medium">Mitjana</AppModalSelectOption>
-                    <AppModalSelectOption value="high">Alta</AppModalSelectOption>
-                    <AppModalSelectOption value="urgent">Urgent</AppModalSelectOption>
-                  </AppModalSelect>
-                </AppModalField>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Prioritat</label>
+                  <Select value={composePriority} onValueChange={(value: string) => setComposePriority(value as 'low' | 'medium' | 'high' | 'urgent')}>
+                    <SelectTrigger className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600" data-testid="select-priority">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600">
+                      <SelectItem value="low" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Baixa</SelectItem>
+                      <SelectItem value="medium" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Mitjana</SelectItem>
+                      <SelectItem value="high" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Alta</SelectItem>
+                      <SelectItem value="urgent" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-700">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="flex items-center space-x-2 pt-6">
                   <input
                     type="checkbox"
@@ -318,47 +332,50 @@ export default function Communications() {
                     onChange={(e) => setComposeEmailEnabled(e.target.checked)}
                     data-testid="checkbox-email-enabled"
                   />
-                  <label htmlFor="emailEnabled" className="text-sm font-bold" style={{ color: '#000000' }}>Enviar per email</label>
+                  <label htmlFor="emailEnabled" className="text-sm font-medium">Enviar per email</label>
                 </div>
               </div>
 
-              <AppModalField label="Assumpte" required>
-                <AppModalInput
+              <div>
+                <label className="text-sm font-medium mb-2 block">Assumpte *</label>
+                <Input
                   id="subject"
                   value={composeSubject}
                   onChange={(e) => setComposeSubject(e.target.value)}
                   placeholder="Introdueix l'assumpte del missatge"
+                  className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
                   data-testid="input-subject"
                 />
-              </AppModalField>
+              </div>
 
-              <AppModalField label="Contingut" required>
-                <AppModalTextarea
+              <div>
+                <label className="text-sm font-medium mb-2 block">Contingut *</label>
+                <Textarea
                   id="content"
                   value={composeContent}
                   onChange={(e) => setComposeContent(e.target.value)}
                   placeholder="Escriu el contingut del missatge..."
                   rows={6}
+                  className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600"
                   data-testid="textarea-content"
                 />
-              </AppModalField>
+              </div>
 
-              <AppModalActions>
-                <AppModalButton variant="outline" onClick={() => setIsComposeOpen(false)}>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsComposeOpen(false)}>
                   Cancel·lar
-                </AppModalButton>
-                <AppModalButton 
+                </Button>
+                <Button 
                   onClick={handleComposeSubmit}
                   disabled={createCommunicationMutation.isPending}
                   data-testid="button-send-message"
-                  variant="primary"
                 >
                   {createCommunicationMutation.isPending ? 'Enviant...' : 'Enviar'}
-                </AppModalButton>
-              </AppModalActions>
+                </Button>
+              </div>
             </div>
-          </AppModalContent>
-        </AppModal>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Filters and Search */}

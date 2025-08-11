@@ -84,7 +84,7 @@ export function PasswordChangeModal({ children }: PasswordChangeModalProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md" data-testid="password-change-modal">
+      <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600" data-testid="password-change-modal">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5" />

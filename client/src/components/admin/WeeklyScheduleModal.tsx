@@ -67,7 +67,7 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white dark:bg-slate-950 border-gray-300 dark:border-slate-600">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />

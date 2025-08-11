@@ -203,7 +203,7 @@ export default function WeeklyScheduleAdmin() {
 
       {/* Personal Schedule Dialog */}
       <Dialog open={isPersonalScheduleOpen} onOpenChange={setIsPersonalScheduleOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto modal-content-solid">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2 text-foreground">
               <User className="h-5 w-5 text-rose-600 dark:text-rose-400" />

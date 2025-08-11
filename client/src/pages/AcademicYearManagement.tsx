@@ -158,7 +158,7 @@ export default function AcademicYearManagement() {
               {language === "ca" ? "Nou Curs Acadèmic" : "Nuevo Curso Académico"}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
+          <DialogContent className="max-w-2xl modal-content-solid">
             <DialogHeader>
               <DialogTitle>
                 {language === "ca" ? "Crear Nou Curs Acadèmic" : "Crear Nuevo Curso Académico"}

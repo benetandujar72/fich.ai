@@ -201,9 +201,9 @@ export function AlertsManagement() {
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
-              <DialogHeader>
-                <DialogTitle className="text-gray-900 dark:text-white font-semibold">Enviar Nova Alerta</DialogTitle>
-                <DialogDescription className="text-gray-600 dark:text-gray-300">
+              <DialogHeader className="pb-4">
+                <DialogTitle className="text-black dark:text-white font-bold text-lg">Enviar Nova Alerta</DialogTitle>
+                <DialogDescription className="text-black dark:text-white font-medium">
                   Envia una alerta manual als usuaris seleccionats
                 </DialogDescription>
               </DialogHeader>
@@ -217,9 +217,9 @@ export function AlertsManagement() {
                   type: 'manual_notification',
                 });
               }}>
-                <div className="space-y-4 p-4">
+                <div className="space-y-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">Destinatari</label>
+                    <label className="text-sm font-bold text-black dark:text-white mb-3 block">Destinatari</label>
                     <Select name="recipient" required>
                       <SelectTrigger className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white border-gray-300 dark:border-slate-600">
                         <SelectValue placeholder="Selecciona un empleat" className="text-gray-500" />
@@ -235,7 +235,7 @@ export function AlertsManagement() {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">Assumpte</label>
+                    <label className="text-sm font-bold text-black dark:text-white mb-3 block">Assumpte</label>
                     <Input 
                       name="subject" 
                       required 
@@ -245,7 +245,7 @@ export function AlertsManagement() {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">Missatge</label>
+                    <label className="text-sm font-bold text-black dark:text-white mb-3 block">Missatge</label>
                     <Textarea 
                       name="message" 
                       required 

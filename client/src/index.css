@@ -184,8 +184,8 @@
 
   /* Modal and Dialog fixes */
   [data-radix-dialog-overlay] {
-    @apply fixed inset-0 z-50 bg-black/80 !important;
-    backdrop-filter: blur(4px) !important;
+    @apply fixed inset-0 z-40 bg-black/30 !important;
+    backdrop-filter: blur(2px) !important;
   }
   
   [data-radix-dialog-content] {

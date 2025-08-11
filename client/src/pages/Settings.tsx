@@ -509,11 +509,7 @@ export default function Settings() {
             </div>
           </div>
           
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-sm text-yellow-800">
-              Component de configuració de xarxa temporalment desactivat per debugging
-            </p>
-          </div>
+          <NetworkSettingsForm institutionId={institutionId} language={language} />
         </CardContent>
       </Card>
 

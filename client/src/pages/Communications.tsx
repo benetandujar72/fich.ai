@@ -268,13 +268,13 @@ export default function Communications() {
           onClick={() => setIsComposeOpen(true)}
         >
           <Send className="mr-2 h-4 w-4" />
-          Nou Missatge
+          Nova Comunicació
         </Button>
         
         <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
           <DialogContent className="max-w-2xl modal-content-solid">
             <DialogHeader>
-              <DialogTitle>Redactar Missatge</DialogTitle>
+              <DialogTitle>Nova Comunicació</DialogTitle>
               <DialogDescription>Crea una nova comunicació per enviar als usuaris</DialogDescription>
             </DialogHeader>
             <div className="space-y-6">

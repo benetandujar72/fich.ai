@@ -219,14 +219,14 @@ export function AlertsManagement() {
               }}>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium">Destinatari</label>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Destinatari</label>
                     <Select name="recipient" required>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-background text-foreground border-border">
                         <SelectValue placeholder="Selecciona un empleat" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-slate-700">
                         {(employees as Employee[]).map((employee: Employee) => (
-                          <SelectItem key={employee.id} value={employee.id}>
+                          <SelectItem key={employee.id} value={employee.id} className="text-foreground">
                             {employee.firstName} {employee.lastName} - {employee.email}
                           </SelectItem>
                         ))}
@@ -235,16 +235,16 @@ export function AlertsManagement() {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium">Assumpte</label>
-                    <Input name="subject" required placeholder="Assumpte de l'alerta" />
+                    <label className="text-sm font-medium text-foreground mb-2 block">Assumpte</label>
+                    <Input name="subject" required placeholder="Assumpte de l'alerta" className="bg-background text-foreground border-border" />
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium">Missatge</label>
-                    <Textarea name="message" required placeholder="Contingut del missatge" rows={4} />
+                    <label className="text-sm font-medium text-foreground mb-2 block">Missatge</label>
+                    <Textarea name="message" required placeholder="Contingut del missatge" rows={4} className="bg-background text-foreground border-border" />
                   </div>
                   
-                  <Button type="submit" disabled={sendAlertMutation.isPending}>
+                  <Button type="submit" disabled={sendAlertMutation.isPending} className="bg-rose-600 hover:bg-rose-700 text-white">
                     <Send className="h-4 w-4 mr-2" />
                     {sendAlertMutation.isPending ? "Enviant..." : "Enviar Alerta"}
                   </Button>

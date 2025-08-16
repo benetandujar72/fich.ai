@@ -48,14 +48,20 @@ export default function PublicQRAttendance() {
       console.log("  Frontend local time:", currentTimestamp.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
       console.log("  QR Data:", qrData.trim());
       
-      return await apiRequest("POST", "/api/attendance/qr-process", {
+      const response = await apiRequest("POST", "/api/attendance/qr-process", {
         qrData: qrData.trim(),
         timestamp: currentTimestamp.toISOString(),
         location: window.location.origin
       });
+      
+      // Parse JSON if it's a Response object
+      const data = response instanceof Response ? await response.json() : response;
+      console.log("✅ QR RESPONSE PARSED:", data);
+      return data;
     },
     onSuccess: (data) => {
       setLastResult(data);
+      console.log("🎉 QR SUCCESS:", data);
       toast({
         title: "Fitxatge registrat",
         description: `${data.type === 'check_in' ? 'Entrada' : 'Sortida'} registrada correctament per ${data.employeeName}`,

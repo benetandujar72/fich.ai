@@ -115,6 +115,13 @@ export default function Sidebar(props: SidebarProps = {}) {
           badge: null,
         },
         {
+          name: language === "ca" ? "El meu QR" : "Mi QR",
+          href: "/my-qr",
+          icon: QrCode,
+          show: true,
+          badge: null,
+        },
+        {
           name: language === "ca" ? "Generador de QR" : "Generador de QR",
           href: "/qr-generator",
           icon: QrCode,

@@ -235,6 +235,13 @@ export class DatabaseStorage implements IStorage {
     return employee;
   }
 
+  async getEmployeeByUserId(userId: string): Promise<Employee | undefined> {
+    const [employee] = await db.select().from(employees).where(eq(employees.userId, userId));
+    return employee;
+  }
+
+
+
   async searchEmployees(institutionId: string, searchQuery: string): Promise<Employee[]> {
     return await db
       .select()
@@ -942,15 +949,7 @@ export class DatabaseStorage implements IStorage {
     return isValid ? user : null;
   }
 
-  // Get employee by user ID
-  async getEmployeeByUserId(userId: string): Promise<Employee | null> {
-    const [employee] = await db
-      .select()
-      .from(employees)
-      .where(eq(employees.userId, userId));
-    
-    return employee || null;
-  }
+
 
   // Get last attendance record for an employee
   async getLastAttendanceRecord(employeeId: string): Promise<AttendanceRecord | null> {

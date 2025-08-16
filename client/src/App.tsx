@@ -34,6 +34,7 @@ import QRAttendancePage from "@/pages/QRAttendance";
 import AcademicDataMigration from "@/pages/AcademicDataMigration";
 import PublicQRAttendance from "@/pages/PublicQRAttendance";
 import EmployeeQRGenerator from "@/pages/EmployeeQRGenerator";
+import MyQRCode from "@/pages/MyQRCode";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -420,6 +421,16 @@ function Router() {
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <QRAttendancePage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/my-qr" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title={language === "ca" ? "El Meu Codi QR" : "Mi Código QR"}
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <MyQRCode />
             </ProtectedRoute>
           } />
 

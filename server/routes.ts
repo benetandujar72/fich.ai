@@ -15,6 +15,7 @@ import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull, inArray } fro
 import { z } from "zod";
 import { db } from "./db";
 import { startOfWeek, endOfWeek, addDays, format } from "date-fns";
+import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -2610,6 +2611,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting alert rule:', error);
       res.status(500).json({ message: 'Error deleting alert rule' });
+    }
+  });
+
+  // ============================================
+  // QUICK ATTENDANCE ENDPOINTS (for login page)
+  // ============================================
+  
+  // Quick authentication endpoint
+  app.post("/api/quick-auth", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email i password són obligatoris" });
+      }
+
+      // Find user by email
+      const userResult = await db.execute(sql`
+        SELECT id, email, first_name as "firstName", last_name as "lastName", password_hash, role, institution_id
+        FROM users 
+        WHERE email = ${email}
+        LIMIT 1
+      `);
+      
+      if (userResult.rows.length === 0) {
+        return res.status(401).json({ error: "Credencials incorrectes" });
+      }
+      
+      const user = userResult.rows[0];
+      
+      // Verify password
+      if (!user.password_hash) {
+        return res.status(401).json({ error: "L'usuari no té password configurada. Contacta l'administrador." });
+      }
+      
+      const isValid = await bcrypt.compare(password, user.password_hash);
+      if (!isValid) {
+        return res.status(401).json({ error: "Credencials incorrectes" });
+      }
+
+      // Find employee record
+      const employeeResult = await db.execute(sql`
+        SELECT id, user_id, full_name, email, institution_id 
+        FROM employees 
+        WHERE user_id = ${user.id}
+        LIMIT 1
+      `);
+      
+      if (employeeResult.rows.length === 0) {
+        return res.status(404).json({ error: "Registre d'empleat no trobat" });
+      }
+      
+      const employee = employeeResult.rows[0];
+
+      // Determine next action (check-in or check-out) based on today's attendance
+      const today = new Date();
+      const startOfDay = new Date(today);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const todayAttendanceResult = await db.execute(sql`
+        SELECT * FROM attendance_records 
+        WHERE employee_id = ${employee.id}
+        AND timestamp >= ${startOfDay.toISOString()}
+        AND timestamp <= ${endOfDay.toISOString()}
+        ORDER BY timestamp DESC
+        LIMIT 1
+      `);
+      
+      const nextAction = todayAttendanceResult.rows.length > 0 && 
+                        todayAttendanceResult.rows[0].type === "check_in" 
+                        ? "check_out" : "check_in";
+
+      res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role
+        },
+        employee,
+        nextAction
+      });
+    } catch (error) {
+      console.error("Error in quick auth:", error);
+      res.status(500).json({ error: "Error en l'autenticació ràpida" });
+    }
+  });
+
+  // Quick attendance endpoint
+  app.post("/api/quick-attendance", async (req, res) => {
+    try {
+      const { employeeId, type } = req.body;
+      
+      if (!employeeId || !type) {
+        return res.status(400).json({ error: "Employee ID i tipus són obligatoris" });
+      }
+
+      if (!["check_in", "check_out"].includes(type)) {
+        return res.status(400).json({ error: "Tipus ha de ser check_in o check_out" });
+      }
+
+      // Get employee info
+      const employeeResult = await db.execute(sql`
+        SELECT id, user_id, full_name, email, institution_id 
+        FROM employees 
+        WHERE id = ${employeeId}
+        LIMIT 1
+      `);
+      
+      if (employeeResult.rows.length === 0) {
+        return res.status(404).json({ error: "Empleat no trobat" });
+      }
+      
+      const employee = employeeResult.rows[0];
+
+      // Create attendance record
+      const timestamp = new Date();
+      const attendanceResult = await db.execute(sql`
+        INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
+        VALUES (${employee.id}, ${type}, ${timestamp.toISOString()}, 'manual', 'Office', ${`Marcatge ràpid - ${employee.full_name}`})
+        RETURNING *
+      `);
+      
+      const attendance = attendanceResult.rows[0];
+
+      // Return response with proper formatting
+      res.json({
+        ...attendance,
+        employeeName: employee.full_name,
+        message: type === "check_in" ? 
+          `Entrada registrada per ${employee.full_name}` : 
+          `Sortida registrada per ${employee.full_name}`,
+        isLate: false,
+        lateMinutes: 0
+      });
+    } catch (error) {
+      console.error("Error in quick attendance:", error);
+      res.status(500).json({ error: "Error en el marcatge ràpid" });
     }
   });
 

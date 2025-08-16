@@ -265,24 +265,24 @@ export default function AcademicDataMigration() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5" />
-                Configurar Migración
+                {language === "ca" ? "Configurar Migració" : "Configurar Migración"}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Source and Target Year Selection */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="source-year">Curso Académico de Origen</Label>
+                  <Label htmlFor="source-year">{language === "ca" ? "Curs Acadèmic d'Origen" : "Curso Académico de Origen"}</Label>
                   <Select value={sourceYearId} onValueChange={setSourceYearId}>
                     <SelectTrigger id="source-year">
-                      <SelectValue placeholder="Selecciona curso origen" />
+                      <SelectValue placeholder={language === "ca" ? "Selecciona curs origen" : "Selecciona curso origen"} />
                     </SelectTrigger>
                     <SelectContent>
                       {academicYears.map((year) => (
                         <SelectItem key={year.id} value={year.id}>
                           <div className="flex items-center gap-2">
                             {year.name}
-                            {year.isActive && <Badge variant="default" className="text-xs">Activo</Badge>}
+                            {year.isActive && <Badge variant="default" className="text-xs">{language === "ca" ? "Actiu" : "Activo"}</Badge>}
                           </div>
                         </SelectItem>
                       ))}
@@ -291,17 +291,17 @@ export default function AcademicDataMigration() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="target-year">Curso Académico de Destino</Label>
+                  <Label htmlFor="target-year">{language === "ca" ? "Curs Acadèmic de Destí" : "Curso Académico de Destino"}</Label>
                   <Select value={targetYearId} onValueChange={setTargetYearId}>
                     <SelectTrigger id="target-year">
-                      <SelectValue placeholder="Selecciona curso destino" />
+                      <SelectValue placeholder={language === "ca" ? "Selecciona curs destí" : "Selecciona curso destino"} />
                     </SelectTrigger>
                     <SelectContent>
                       {academicYears.map((year) => (
                         <SelectItem key={year.id} value={year.id}>
                           <div className="flex items-center gap-2">
                             {year.name}
-                            {year.isActive && <Badge variant="default" className="text-xs">Activo</Badge>}
+                            {year.isActive && <Badge variant="default" className="text-xs">{language === "ca" ? "Actiu" : "Activo"}</Badge>}
                           </div>
                         </SelectItem>
                       ))}
@@ -318,14 +318,14 @@ export default function AcademicDataMigration() {
                       <div className="font-semibold text-blue-900">
                         {academicYears.find(y => y.id === sourceYearId)?.name}
                       </div>
-                      <div className="text-xs text-blue-600">Origen</div>
+                      <div className="text-xs text-blue-600">{language === "ca" ? "Origen" : "Origen"}</div>
                     </div>
                     <ArrowRight className="h-6 w-6 text-blue-600" />
                     <div className="text-center">
                       <div className="font-semibold text-blue-900">
                         {academicYears.find(y => y.id === targetYearId)?.name}
                       </div>
-                      <div className="text-xs text-blue-600">Destino</div>
+                      <div className="text-xs text-blue-600">{language === "ca" ? "Destí" : "Destino"}</div>
                     </div>
                   </div>
                 </div>
@@ -333,7 +333,7 @@ export default function AcademicDataMigration() {
 
               {/* Migration Type Selection */}
               <div className="space-y-4">
-                <Label>Tipos de Datos a Migrar</Label>
+                <Label>{language === "ca" ? "Tipus de Dades a Migrar" : "Tipos de Datos a Migrar"}</Label>
                 <div className="grid md:grid-cols-2 gap-4">
                   {migrationTypeOptions.map((option) => {
                     const IconComponent = option.icon;
@@ -464,7 +464,7 @@ export default function AcademicDataMigration() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Historial de Migraciones
+                {language === "ca" ? "Historial de Migracions" : "Historial de Migraciones"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -479,7 +479,7 @@ export default function AcademicDataMigration() {
               ) : migrationHistory.length === 0 ? (
                 <div className="text-center py-8">
                   <Database className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500">No hay migraciones registradas</p>
+                  <p className="text-gray-500">{language === "ca" ? "No hi ha migracions registrades" : "No hay migraciones registradas"}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -499,19 +499,19 @@ export default function AcademicDataMigration() {
                                 {sourceYear?.name} → {targetYear?.name}
                               </span>
                               <Badge className={getStatusColor(migration.status)}>
-                                {migration.status === 'completed' && 'Completada'}
-                                {migration.status === 'in_progress' && 'En Progreso'}
-                                {migration.status === 'failed' && 'Fallida'}
-                                {migration.status === 'pending' && 'Pendiente'}
+                                {migration.status === 'completed' && (language === "ca" ? 'Completada' : 'Completada')}
+                                {migration.status === 'in_progress' && (language === "ca" ? 'En Progrés' : 'En Progreso')}
+                                {migration.status === 'failed' && (language === "ca" ? 'Fallida' : 'Fallida')}
+                                {migration.status === 'pending' && (language === "ca" ? 'Pendent' : 'Pendiente')}
                               </Badge>
                             </div>
                             <p className="text-sm text-gray-600">
-                              Tipo: {migrationTypeOptions.find(opt => opt.id === migration.migrationType)?.label || migration.migrationType}
+                              {language === "ca" ? "Tipus: " : "Tipo: "}{migrationTypeOptions.find(opt => opt.id === migration.migrationType)?.label || migration.migrationType}
                             </p>
                             <p className="text-xs text-gray-500">
-                              Iniciada: {new Date(migration.createdAt).toLocaleString('es-ES')}
+                              {language === "ca" ? "Iniciada: " : "Iniciada: "}{new Date(migration.createdAt).toLocaleString('es-ES')}
                               {migration.completedAt && (
-                                <> • Completada: {new Date(migration.completedAt).toLocaleString('es-ES')}</>
+                                <> • {language === "ca" ? "Completada: " : "Completada: "}{new Date(migration.completedAt).toLocaleString('es-ES')}</>
                               )}
                             </p>
                           </div>

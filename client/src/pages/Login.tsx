@@ -105,28 +105,45 @@ export default function Login() {
   };
 
   const onQuickAttendance = async (data: QuickAttendanceData) => {
+    console.log("🚀 INICI onQuickAttendance amb dades:", data);
     setIsQuickAttendanceLoading(true);
     
     try {
       // First authenticate
+      console.log("📡 Enviant petició quick-auth...");
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
+      console.log("✅ Resposta quick-auth:", authResponse);
       
       if ((authResponse as any).user && (authResponse as any).employee) {
+        console.log("👤 Usuari autenticat:", (authResponse as any).user);
+        console.log("💼 Empleat trobat:", (authResponse as any).employee);
+        console.log("🎯 Següent acció:", (authResponse as any).nextAction);
+        
         // Now register attendance
-        const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", {
+        const attendanceData = {
           employeeId: (authResponse as any).employee.id,
           type: (authResponse as any).nextAction // "check-in" or "check-out"
-        });
+        };
+        console.log("📡 Enviant petició quick-attendance amb:", attendanceData);
+        
+        const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", attendanceData);
+        console.log("✅ Resposta quick-attendance:", attendanceResponse);
 
         // Use the response directly from the server which already has all the formatted data
-        console.log("Attendance response:", attendanceResponse);
+        console.log("💾 Guardant attendanceResult:", attendanceResponse);
         setAttendanceResult(attendanceResponse);
+        
+        console.log("🎭 Mostrant modal d'assistència...");
         setShowAttendanceModal(true);
 
         // Clear form
         quickForm.reset();
+        console.log("✨ Formulari netejat i procés completat");
+      } else {
+        console.error("❌ No s'ha trobat user o employee a la resposta");
       }
     } catch (error: any) {
+      console.error("💥 Error en onQuickAttendance:", error);
       toast({
         title: t("error", language),
         description: error.message || (language === "ca" ? "Error en el marcatge" : "Error en el marcaje"),
@@ -134,6 +151,7 @@ export default function Login() {
       });
     } finally {
       setIsQuickAttendanceLoading(false);
+      console.log("🏁 onQuickAttendance finalitzat");
     }
   };
 
@@ -436,7 +454,12 @@ export default function Login() {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {attendanceResult && (
+              {(() => {
+                console.log("🎭 Renderitzant modal amb attendanceResult:", attendanceResult);
+                console.log("🎭 showAttendanceModal estat:", showAttendanceModal);
+                return null;
+              })()}
+              {attendanceResult ? (
                 <>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
@@ -447,6 +470,9 @@ export default function Login() {
                     </div>
                     <div className="text-lg text-muted-foreground">
                       {attendanceResult.employeeName}
+                    </div>
+                    <div className="text-sm text-green-600 mt-2">
+                      {attendanceResult.message}
                     </div>
                   </div>
                   
@@ -472,12 +498,26 @@ export default function Login() {
                   )}
                   
                   <Button
-                    onClick={() => setShowAttendanceModal(false)}
+                    onClick={() => {
+                      console.log("🚪 Tancant modal d'assistència");
+                      setShowAttendanceModal(false);
+                      setAttendanceResult(null);
+                    }}
                     className="w-full"
                   >
                     {language === "ca" ? "Tancar" : "Cerrar"}
                   </Button>
                 </>
+              ) : (
+                <div className="text-center">
+                  <div className="text-muted-foreground">
+                    {language === "ca" ? "No hi ha dades d'assistència" : "No hay datos de asistencia"}
+                  </div>
+                  {(() => {
+                    console.log("❌ Modal mostrat però attendanceResult és null!");
+                    return null;
+                  })()}
+                </div>
               )}
             </div>
           </DialogContent>

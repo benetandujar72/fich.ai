@@ -1561,6 +1561,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reports API endpoints for frontend integration
+  app.get('/api/reports/overview/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const result = await db.execute(sql`
+        SELECT 
+          COUNT(DISTINCT u.id) as total_employees,
+          COUNT(CASE WHEN ar.type = 'check_in' THEN 1 END) as total_checkins,
+          COUNT(CASE WHEN ar.type = 'check_out' THEN 1 END) as total_checkouts,
+          COUNT(DISTINCT DATE(ar.timestamp)) as total_days_with_activity,
+          COUNT(CASE WHEN ar.type = 'check_in' AND ar.timestamp::time > '08:00:00' THEN 1 END) as total_delays
+        FROM users u
+        LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+          AND ar.timestamp >= ${startDate as string}::timestamp
+          AND ar.timestamp <= ${endDate as string}::timestamp + interval '1 day'
+        WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
+      `);
+
+      res.json(result.rows[0] || {
+        total_employees: 0,
+        total_checkins: 0,
+        total_checkouts: 0,
+        total_days_with_activity: 0,
+        total_delays: 0
+      });
+    } catch (error) {
+      console.error('Error fetching overview report:', error);
+      res.status(500).json({ error: 'Error fetching overview data' });
+    }
+  });
+
+  app.get('/api/reports/detailed-attendance/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const result = await db.execute(sql`
+        SELECT 
+          u.id,
+          u.first_name || ' ' || COALESCE(u.last_name, '') as name,
+          u.email,
+          COUNT(CASE WHEN ar.type = 'check_in' THEN 1 END) as checkins,
+          COUNT(CASE WHEN ar.type = 'check_out' THEN 1 END) as checkouts,
+          COUNT(DISTINCT DATE(ar.timestamp)) as days_present,
+          COUNT(CASE WHEN ar.type = 'check_in' AND ar.timestamp::time > '08:00:00' THEN 1 END) as delays
+        FROM users u
+        LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+          AND ar.timestamp >= ${startDate as string}::timestamp
+          AND ar.timestamp <= ${endDate as string}::timestamp + interval '1 day'
+        WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
+        GROUP BY u.id, u.first_name, u.last_name, u.email
+        ORDER BY u.first_name
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error fetching detailed attendance:', error);
+      res.status(500).json({ error: 'Error fetching detailed attendance data' });
+    }
+  });
+
+  app.get('/api/reports/monthly-trends/:institutionId', isAuthenticated, async (req, res) => {
+    try {
+      const { institutionId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT 
+          DATE_TRUNC('month', ar.timestamp) as month,
+          COUNT(CASE WHEN ar.type = 'check_in' THEN 1 END) as checkins,
+          COUNT(CASE WHEN ar.type = 'check_out' THEN 1 END) as checkouts,
+          COUNT(DISTINCT ar.employee_id) as active_employees
+        FROM attendance_records ar
+        JOIN users u ON ar.employee_id = u.id
+        WHERE u.institution_id = ${institutionId}
+          AND ar.timestamp >= NOW() - INTERVAL '6 months'
+        GROUP BY DATE_TRUNC('month', ar.timestamp)
+        ORDER BY month DESC
+        LIMIT 6
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error fetching monthly trends:', error);
+      res.status(500).json({ error: 'Error fetching monthly trends data' });
+    }
+  });
+
   // Enhanced Reports - Multi-user selection with "all" option (POST for internal use)
   app.post('/api/admin/reports/generate-custom', isAuthenticated, async (req, res) => {
     try {

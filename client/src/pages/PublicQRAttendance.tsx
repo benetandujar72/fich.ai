@@ -149,6 +149,24 @@ export default function PublicQRAttendance() {
                 <Label htmlFor="qr-input" className="text-sm font-medium">
                   Introdueix el teu codi QR personal:
                 </Label>
+                <div className="text-xs text-gray-600 mb-2">
+                  Exemples per provar:
+                </div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['user-001', 'user-002', 'user-003', 'user-004', 'user-005'].map((code) => (
+                    <Button
+                      key={code}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => setQrInput(code)}
+                      disabled={processing}
+                    >
+                      {code}
+                    </Button>
+                  ))}
+                </div>
                 <Input
                   id="qr-input"
                   type="text"

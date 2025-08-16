@@ -1,5 +1,5 @@
 ## Overview
-EduPresència is an attendance tracking and presence management system for educational institutions in Catalonia. It ensures compliance with Spanish labor laws and GDPR by providing features for employee management, attendance tracking, absence management, alerts, and detailed reporting, all while maintaining data privacy and security. The system aims to streamline administrative tasks and provide essential tools for managing educational staff attendance efficiently.
+fich.ai is an attendance tracking and presence management system for educational institutions in Catalonia. It ensures compliance with Spanish labor laws and GDPR by providing features for employee management, attendance tracking, absence management, alerts, and detailed reporting, all while maintaining data privacy and security. The system aims to streamline administrative tasks and provide essential tools for managing educational staff attendance efficiently.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

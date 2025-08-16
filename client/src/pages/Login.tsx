@@ -146,10 +146,12 @@ export default function Login() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center">
-            <GraduationCap className="h-12 w-12 text-primary" />
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-xl font-bold text-white">F</span>
+            </div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            EduPresència
+            fich.ai
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             {language === "ca" 

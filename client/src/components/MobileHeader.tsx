@@ -22,12 +22,12 @@ export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, on
       <div className="flex items-center justify-between px-3 py-2.5">
         {/* App Logo and Name */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-rose-400 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
-            <Activity className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
+            <span className="text-sm font-bold text-white">F</span>
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-foreground">EduPresència</h1>
-            <p className="text-xs text-muted-foreground">Sistema de Presència</p>
+            <h1 className="text-sm font-semibold text-foreground">fich.ai</h1>
+            <p className="text-xs text-muted-foreground">Sistema Inteligent de Fitxatge</p>
           </div>
         </div>
 

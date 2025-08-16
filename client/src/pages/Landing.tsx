@@ -35,8 +35,10 @@ export default function Landing() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-blue-600 text-white p-12 flex-col justify-center">
         <div className="max-w-md mx-auto">
           <div className="mb-8">
-            <GraduationCap className="text-6xl mb-4 h-16 w-16" />
-            <h1 className="text-4xl font-bold mb-4">EduPresència</h1>
+            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
+              <span className="text-3xl font-bold text-white">F</span>
+            </div>
+            <h1 className="text-4xl font-bold mb-4">fich.ai</h1>
             <p className="text-xl text-blue-100">
               {language === "ca" 
                 ? "Sistema integral de control de presència per a centres educatius"

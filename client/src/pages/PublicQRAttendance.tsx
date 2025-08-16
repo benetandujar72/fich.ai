@@ -42,9 +42,15 @@ export default function PublicQRAttendance() {
   // QR Processing mutation
   const processQRMutation = useMutation({
     mutationFn: async (qrData: string) => {
+      const currentTimestamp = new Date();
+      console.log("🕐 FRONTEND QR TIMESTAMP DEBUG:");
+      console.log("  Frontend current time:", currentTimestamp.toISOString());
+      console.log("  Frontend local time:", currentTimestamp.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
+      console.log("  QR Data:", qrData.trim());
+      
       return await apiRequest("POST", "/api/attendance/qr-process", {
         qrData: qrData.trim(),
-        timestamp: new Date().toISOString(),
+        timestamp: currentTimestamp.toISOString(),
         location: window.location.origin
       });
     },

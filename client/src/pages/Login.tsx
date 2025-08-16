@@ -105,6 +105,10 @@ export default function Login() {
   };
 
   const onQuickAttendance = async (data: QuickAttendanceData) => {
+    console.log("🕐 FRONTEND QUICK ATTENDANCE DEBUG:");
+    console.log("  Frontend current time:", new Date().toISOString());
+    console.log("  Frontend local time:", new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
+    
     setIsQuickAttendanceLoading(true);
     
     try {

@@ -2789,21 +2789,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Skip academic year check for now - focus on basic QR functionality
 
-      // Get employee's latest attendance record for today
-      const today = new Date(timestamp);
-      const startOfDay = new Date(today);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(today);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      // Get today's attendance records directly via SQL
+      // Get employee's latest attendance record for today (Spanish timezone)
+      console.log("🕐 QR TIMEZONE DEBUG:");
+      console.log("  Received timestamp:", timestamp);
+      console.log("  Employee:", employee.full_name);
+      
       const todayAttendanceResult = await db.execute(sql`
         SELECT * FROM attendance_records 
         WHERE employee_id = ${employee.id}
-        AND timestamp >= ${startOfDay.toISOString()}
-        AND timestamp <= ${endOfDay.toISOString()}
+        AND DATE(timestamp AT TIME ZONE 'Europe/Madrid') = CURRENT_DATE
         ORDER BY timestamp DESC
       `);
+      
+      console.log("  Today's attendance records found:", todayAttendanceResult.rows.length);
       
       const todayAttendance = todayAttendanceResult.rows;
 
@@ -2824,13 +2822,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Skip late checking for now - would need working schedule system
+      
+      console.log("  Attendance type determined:", attendanceType);
 
-      // Create attendance record via direct SQL
+      // Create attendance record with Spanish timezone adjustment
+      const utcTimestamp = new Date(timestamp);
+      const spanishTimestamp = new Date(utcTimestamp.getTime() + (2 * 60 * 60 * 1000)); // Add 2 hours for Spanish time
+      
+      console.log("  UTC Timestamp:", utcTimestamp.toISOString());
+      console.log("  Spanish Timestamp:", spanishTimestamp.toISOString());
+      console.log("  Local time should be:", spanishTimestamp.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
+
       const attendanceResult = await db.execute(sql`
         INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
-        VALUES (${employee.id}, ${attendanceType}, ${new Date(timestamp).toISOString()}, 'qr', ${location}, ${`Fitxatge automàtic per codi QR - ${employee.full_name}`})
+        VALUES (${employee.id}, ${attendanceType}, ${spanishTimestamp.toISOString()}, 'qr', ${location}, ${`Fitxatge automàtic per codi QR - ${employee.full_name}`})
         RETURNING *
       `);
+      
+      console.log("✅ QR RECORD INSERTED:", attendanceResult.rows[0]);
       
       const attendance = attendanceResult.rows[0];
 

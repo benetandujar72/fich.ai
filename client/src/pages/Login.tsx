@@ -43,7 +43,7 @@ export default function Login() {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const quickEmailRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState("login");
+  const [activeTab, setActiveTab] = useState("attendance");
 
   // Update clock every second
   useEffect(() => {
@@ -81,7 +81,18 @@ export default function Login() {
     try {
       const response = await apiRequest("POST", "/api/auth/login", data);
       console.log("Login successful", response);
-      window.location.href = "/";
+      
+      // Show success message
+      toast({
+        title: language === "ca" ? "Sessió iniciada" : "Sesión iniciada",
+        description: language === "ca" ? "Redirigint al sistema..." : "Redirigiendo al sistema...",
+        variant: "default",
+      });
+      
+      // Force reload to ensure proper session handling
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
     } catch (error: any) {
       toast({
         title: t("error", language),
@@ -129,17 +140,17 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        {/* Quick attendance button in top right - only show when on login tab */}
-        {activeTab === "login" && (
+        {/* Login button in top right - only show when on attendance tab */}
+        {activeTab === "attendance" && (
           <div className="absolute top-4 right-4">
             <Button 
-              onClick={() => setActiveTab("attendance")}
+              onClick={() => setActiveTab("login")}
               size="sm"
-              className="bg-gradient-to-r from-rose-400 via-pink-400 to-purple-500 hover:from-rose-500 hover:via-pink-500 hover:to-purple-600 shadow-lg hover:shadow-rose-400/25 text-white"
-              data-testid="quick-attendance-button"
+              className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600 shadow-lg hover:shadow-blue-400/25 text-white"
+              data-testid="login-access-button"
             >
-              <Clock className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
+              <GraduationCap className="mr-2 h-4 w-4" />
+              {language === "ca" ? "Accés Complet" : "Acceso Completo"}
             </Button>
           </div>
         )}
@@ -168,12 +179,32 @@ export default function Login() {
             {activeTab === "attendance" ? (
               <div className="space-y-4">
                 <div className="text-center mb-4">
+                  <Clock className="h-8 w-8 text-primary mx-auto mb-2" />
                   <h3 className="text-lg font-semibold">
                     {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
                   </h3>
                   <p className="text-sm text-muted-foreground">
                     {language === "ca" ? "Fitxa directament amb les teves credencials" : "Ficha directamente con tus credenciales"}
                   </p>
+                  
+                  {/* Digital Clock */}
+                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                    <div className="text-3xl font-mono font-bold text-primary">
+                      {currentTime.toLocaleTimeString("ca-ES", {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {currentTime.toLocaleDateString("ca-ES", {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
                 </div>
                 
                 <Form {...quickForm}>

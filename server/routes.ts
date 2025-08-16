@@ -2646,7 +2646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "L'usuari no té password configurada. Contacta l'administrador." });
       }
       
-      const isValid = await bcrypt.compare(password, user.password_hash);
+      const isValid = await bcrypt.compare(password, String(user.password_hash));
       if (!isValid) {
         return res.status(401).json({ error: "Credencials incorrectes" });
       }
@@ -2810,8 +2810,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (todayAttendance.length > 0) {
         // Sort by timestamp to get the latest
-        const sortedAttendance = todayAttendance.sort((a, b) => 
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        const sortedAttendance = todayAttendance.sort((a: any, b: any) => 
+          new Date(String(b.timestamp)).getTime() - new Date(String(a.timestamp)).getTime()
         );
         const lastRecord = sortedAttendance[0];
         
@@ -2839,8 +2839,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isLate: false,
         lateMinutes: 0,
         message: attendanceType === "check_in" ? 
-          `Entrada registrada per ${employee.fullName}` : 
-          `Sortida registrada per ${employee.fullName}`
+          `Entrada registrada per ${employee.full_name}` : 
+          `Sortida registrada per ${employee.full_name}`
       });
 
     } catch (error) {

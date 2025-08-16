@@ -106,6 +106,13 @@ export default function Sidebar(props: SidebarProps = {}) {
           badge: null,
         },
         {
+          name: "Fichaje QR",
+          href: "/qr-attendance",
+          icon: QrCode,
+          show: permissions.canViewOwnAttendance || permissions.canViewAllAttendance,
+          badge: null,
+        },
+        {
           name: language === "ca" ? "Horari Personal" : "Horario Personal",
           href: "/weekly-schedule",
           icon: CalendarDays,

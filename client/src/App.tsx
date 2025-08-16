@@ -30,6 +30,7 @@ import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import WeeklySchedule from "@/pages/WeeklySchedule";
 import WeeklyScheduleAdmin from "@/pages/WeeklyScheduleAdmin";
 import Communications from "@/pages/Communications";
+import QRAttendancePage from "@/pages/QRAttendance";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -396,6 +397,16 @@ function Router() {
                 title={language === "ca" ? "Comunicacions" : "Comunicaciones"}
               />
               <Communications />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/qr-attendance" component={() => 
+            <ProtectedRoute>
+              <Header 
+                title="Fichaje QR"
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <QRAttendancePage />
             </ProtectedRoute>
           } />
 

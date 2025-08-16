@@ -35,7 +35,7 @@ import { ca, es } from "date-fns/locale";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import QuickAttendanceModal from "@/components/modals/QuickAttendanceModal";
 import WeeklyCalendar from "@/components/WeeklyCalendar";
-import SimpleQRAttendance from "@/components/SimpleQRAttendance";
+import QRAttendance from "@/components/QRAttendance";
 import type { AttendanceRecord } from "@shared/schema";
 import { 
   calculateExpectedTimes, 
@@ -273,15 +273,35 @@ export default function Attendance() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Check-in */}
-        <Card data-testid="quick-checkin-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Timer className="h-5 w-5" />
-              {t("quick_checkin", language)}
-            </CardTitle>
-          </CardHeader>
+      {/* Attendance Methods Tabs */}
+      <div className="mb-6">
+        <Tabs defaultValue="manual" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="manual" className="flex items-center gap-2">
+              <Timer className="h-4 w-4" />
+              Fichaje Manual
+            </TabsTrigger>
+            <TabsTrigger value="qr" className="flex items-center gap-2">
+              <QrCode className="h-4 w-4" />
+              Fichaje QR
+            </TabsTrigger>
+            <TabsTrigger value="nfc" className="flex items-center gap-2" disabled>
+              <CreditCard className="h-4 w-4" />
+              NFC (Próximamente)
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Manual Attendance Tab */}
+          <TabsContent value="manual">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Quick Check-in */}
+              <Card data-testid="quick-checkin-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Timer className="h-5 w-5" />
+                    {t("quick_checkin", language)}
+                  </CardTitle>
+                </CardHeader>
           <CardContent>
             <div className="text-center mb-6">
               <div className="text-6xl text-primary mb-4 font-mono" data-testid="current-time">
@@ -405,7 +425,6 @@ export default function Attendance() {
                   variant="outline"
                   className="py-3 px-4 text-center hover:bg-gray-50"
                   data-testid="qr-method-button"
-                  onClick={() => window.location.href = '/qr-attendance'}
                 >
                   <div>
                     <QrCode className="h-6 w-6 text-primary mx-auto mb-2" />

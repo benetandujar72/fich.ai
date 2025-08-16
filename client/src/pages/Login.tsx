@@ -105,55 +105,35 @@ export default function Login() {
   };
 
   const onQuickAttendance = async (data: QuickAttendanceData) => {
-    console.log("🚀 INICI onQuickAttendance amb dades:", data);
     setIsQuickAttendanceLoading(true);
     
     try {
       // First authenticate
-      console.log("📡 Enviant petició quick-auth...");
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
-      console.log("✅ Resposta quick-auth:", authResponse);
-      console.log("🔍 Tipus de authResponse:", typeof authResponse);
-      console.log("🔍 És Response object?", authResponse instanceof Response);
       
       // Parse JSON if it's a Response object
       const authData = authResponse instanceof Response ? await authResponse.json() : authResponse;
-      console.log("📦 Dades parseadas:", authData);
       
       if (authData.user && authData.employee) {
-        console.log("👤 Usuari autenticat:", authData.user);
-        console.log("💼 Empleat trobat:", authData.employee);
-        console.log("🎯 Següent acció:", authData.nextAction);
-        
         // Now register attendance
         const attendanceData = {
           employeeId: authData.employee.id,
           type: authData.nextAction // "check-in" or "check-out"
         };
-        console.log("📡 Enviant petició quick-attendance amb:", attendanceData);
         
         const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", attendanceData);
-        console.log("✅ Resposta quick-attendance:", attendanceResponse);
         
         // Parse JSON if it's a Response object
         const attendanceData_parsed = attendanceResponse instanceof Response ? await attendanceResponse.json() : attendanceResponse;
-        console.log("📦 Dades attendance parseadas:", attendanceData_parsed);
 
         // Use the response directly from the server which already has all the formatted data
-        console.log("💾 Guardant attendanceResult:", attendanceData_parsed);
         setAttendanceResult(attendanceData_parsed);
-        
-        console.log("🎭 Mostrant modal d'assistència...");
         setShowAttendanceModal(true);
 
         // Clear form
         quickForm.reset();
-        console.log("✨ Formulari netejat i procés completat");
-      } else {
-        console.error("❌ No s'ha trobat user o employee a la resposta");
       }
     } catch (error: any) {
-      console.error("💥 Error en onQuickAttendance:", error);
       toast({
         title: t("error", language),
         description: error.message || (language === "ca" ? "Error en el marcatge" : "Error en el marcaje"),
@@ -161,7 +141,6 @@ export default function Login() {
       });
     } finally {
       setIsQuickAttendanceLoading(false);
-      console.log("🏁 onQuickAttendance finalitzat");
     }
   };
 
@@ -456,7 +435,7 @@ export default function Login() {
         
         {/* Attendance Result Modal */}
         <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
-          <DialogContent>
+          <DialogContent className="modal-content-solid bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700">
             <DialogHeader>
               <DialogTitle className="flex items-center">
                 <CheckCircle className="mr-2 h-5 w-5 text-green-600" />
@@ -464,11 +443,7 @@ export default function Login() {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {(() => {
-                console.log("🎭 Renderitzant modal amb attendanceResult:", attendanceResult);
-                console.log("🎭 showAttendanceModal estat:", showAttendanceModal);
-                return null;
-              })()}
+
               {attendanceResult ? (
                 <>
                   <div className="text-center">
@@ -509,7 +484,6 @@ export default function Login() {
                   
                   <Button
                     onClick={() => {
-                      console.log("🚪 Tancant modal d'assistència");
                       setShowAttendanceModal(false);
                       setAttendanceResult(null);
                     }}
@@ -523,10 +497,6 @@ export default function Login() {
                   <div className="text-muted-foreground">
                     {language === "ca" ? "No hi ha dades d'assistència" : "No hay datos de asistencia"}
                   </div>
-                  {(() => {
-                    console.log("❌ Modal mostrat però attendanceResult és null!");
-                    return null;
-                  })()}
                 </div>
               )}
             </div>

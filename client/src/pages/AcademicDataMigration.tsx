@@ -101,7 +101,7 @@ export default function AcademicDataMigration() {
     onSuccess: (data) => {
       toast({
         title: t("success", language),
-        description: "Migración iniciada correctamente",
+        description: language === "ca" ? "Migració iniciada correctament" : "Migración iniciada correctamente",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/academic-years/migrations"] });
       setShowConfirmDialog(false);
@@ -110,7 +110,7 @@ export default function AcademicDataMigration() {
     onError: (error: any) => {
       toast({
         title: t("error", language),
-        description: error.message || 'Error al iniciar la migración',
+        description: error.message || (language === "ca" ? 'Error a l\'iniciar la migració' : 'Error al iniciar la migración'),
         variant: "destructive",
       });
     },
@@ -124,14 +124,14 @@ export default function AcademicDataMigration() {
     onSuccess: () => {
       toast({
         title: t("success", language),
-        description: "Registro de migración eliminado",
+        description: language === "ca" ? "Registre de migració eliminat" : "Registro de migración eliminado",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/academic-years/migrations"] });
     },
     onError: (error: any) => {
       toast({
         title: t("error", language),
-        description: error.message || 'Error al eliminar el registro',
+        description: error.message || (language === "ca" ? 'Error a l\'eliminar el registre' : 'Error al eliminar el registro'),
         variant: "destructive",
       });
     },
@@ -156,7 +156,7 @@ export default function AcademicDataMigration() {
     if (!sourceYearId || !targetYearId || selectedMigrationTypes.length === 0) {
       toast({
         title: t("error", language),
-        description: "Por favor completa todos los campos requeridos",
+        description: language === "ca" ? "Si us plau completa tots els camps requerits" : "Por favor completa todos los campos requeridos",
         variant: "destructive",
       });
       return;
@@ -165,7 +165,7 @@ export default function AcademicDataMigration() {
     if (sourceYearId === targetYearId) {
       toast({
         title: t("error", language),
-        description: "Los cursos académicos de origen y destino deben ser diferentes",
+        description: language === "ca" ? "Els cursos acadèmics d'origen i destí han de ser diferents" : "Los cursos académicos de origen y destino deben ser diferentes",
         variant: "destructive",
       });
       return;
@@ -190,12 +190,42 @@ export default function AcademicDataMigration() {
   };
 
   const migrationTypeOptions = [
-    { id: 'employees', label: 'Personal/Empleados', icon: Users, description: 'Migrar datos de empleados y contratos' },
-    { id: 'departments', label: 'Departamentos', icon: Building2, description: 'Migrar estructura de departamentos' },
-    { id: 'schedules', label: 'Horarios', icon: Calendar, description: 'Migrar horarios y programaciones' },
-    { id: 'subjects', label: 'Asignaturas', icon: BookOpen, description: 'Migrar materias y programas' },
-    { id: 'groups', label: 'Grupos/Clases', icon: Users, description: 'Migrar grupos de estudiantes' },
-    { id: 'attendance', label: 'Registros de Asistencia', icon: Clock, description: 'Migrar datos históricos de asistencia' },
+    { 
+      id: 'employees', 
+      label: language === "ca" ? 'Personal/Empleats' : 'Personal/Empleados', 
+      icon: Users, 
+      description: language === "ca" ? 'Migrar dades d\'empleats i contractes' : 'Migrar datos de empleados y contratos' 
+    },
+    { 
+      id: 'departments', 
+      label: language === "ca" ? 'Departaments' : 'Departamentos', 
+      icon: Building2, 
+      description: language === "ca" ? 'Migrar estructura de departaments' : 'Migrar estructura de departamentos' 
+    },
+    { 
+      id: 'schedules', 
+      label: language === "ca" ? 'Horaris' : 'Horarios', 
+      icon: Calendar, 
+      description: language === "ca" ? 'Migrar horaris i programacions' : 'Migrar horarios y programaciones' 
+    },
+    { 
+      id: 'subjects', 
+      label: language === "ca" ? 'Assignatures' : 'Asignaturas', 
+      icon: BookOpen, 
+      description: language === "ca" ? 'Migrar matèries i programes' : 'Migrar materias y programas' 
+    },
+    { 
+      id: 'groups', 
+      label: language === "ca" ? 'Grups/Classes' : 'Grupos/Clases', 
+      icon: Users, 
+      description: language === "ca" ? 'Migrar grups d\'estudiants' : 'Migrar grupos de estudiantes' 
+    },
+    { 
+      id: 'attendance', 
+      label: language === "ca" ? 'Registres d\'Assistència' : 'Registros de Asistencia', 
+      icon: Clock, 
+      description: language === "ca" ? 'Migrar dades històriques d\'assistència' : 'Migrar datos históricos de asistencia' 
+    },
   ];
 
   if (loadingYears) {
@@ -225,8 +255,8 @@ export default function AcademicDataMigration() {
 
       <Tabs defaultValue="migrate" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="migrate">Nueva Migración</TabsTrigger>
-          <TabsTrigger value="history">Historial</TabsTrigger>
+          <TabsTrigger value="migrate">{language === "ca" ? "Nova Migració" : "Nueva Migración"}</TabsTrigger>
+          <TabsTrigger value="history">{language === "ca" ? "Historial" : "Historial"}</TabsTrigger>
         </TabsList>
 
         {/* New Migration Tab */}

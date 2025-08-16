@@ -378,7 +378,7 @@ function Router() {
           <Route path="/academic-migration" component={() => 
             <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
               <Header 
-                title="Migración de Datos Académicos"
+                title={language === "ca" ? "Migració de Dades Acadèmiques" : "Migración de Datos Académicos"}
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <AcademicDataMigration />

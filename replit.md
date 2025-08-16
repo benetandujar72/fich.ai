@@ -45,12 +45,15 @@ The application uses a monorepo architecture, separating client and server code:
 - **Role-Based Access Control (RBAC)**: Comprehensive permission system, protecting routes, adapting navigation and UI components.
 - **Quick Attendance System**: Direct login screen attendance marking.
 - **Smart Work Cycle Management**: Automatic check-in/check-out detection.
+- **QR Attendance System (Compliant)**: Unipersonal QR code system complying with Spanish labor regulations, with public access page, automatic check-in/check-out detection, individual QR code generation for printing, and late arrival tracking.
+- **Academic Data Migration System**: Complete data migration between academic years with progress tracking, error handling, and rollback capabilities.
 - **GP Untis Data Import System**: Comprehensive import for teachers, subjects, groups, and schedules from TXT files, including multi-file import with progress tracking.
 - **Teacher-User Relationship Management**: Automatic linking between GP Untis teacher codes and system users.
 - **GDPR Compliance System**: Privacy policy, data subject rights, digitally signed PDF exports, secure data downloads, and a GDPR ticket system.
 - **Risk Assessment Dashboard**: Teacher risk monitoring with color-coded levels and empathetic notification templates.
 - **Email Configuration Panel**: SMTP setup, email template management, and testing capabilities.
 - **Enhanced Administrative Features**: CSV/Excel import for employees, advanced filtering, bulk operations, custom alerts, advanced report generation, weekly schedule view with real data, absence justification workflow, and automated legal alerts.
+- **Complete Catalan Localization**: Full interface translation to Catalan with proper linguistic adaptation.
 - **Accessibility**: Improved dialog accessibility and comprehensive modal contrast improvements.
 - **UI/UX Enhancements**: Complete modal dialog contrast improvements across all components (Dialog, AlertDialog, Sheet, Drawer, Popover, Tooltip, HoverCard, Select, ContextMenu, DropdownMenu), enhanced mobile menu visibility with solid backgrounds, and improved overlay opacity for better visual hierarchy.
 

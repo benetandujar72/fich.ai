@@ -19,7 +19,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/useLanguage';
 import { apiRequest } from '@/lib/queryClient';
+import { t } from '@/lib/i18n';
 import { 
   Mail, 
   Send, 
@@ -73,6 +75,7 @@ interface User {
 
 export default function Communications() {
   const { user } = useAuth();
+  const { language } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'inbox' | 'sent' | 'unread'>('inbox');
@@ -458,7 +461,7 @@ export default function Communications() {
                                   }
                                 </p>
                                 <Badge variant={getPriorityColor(communication.priority)} className="text-xs">
-                                  {communication.priority}
+                                  {t(communication.priority, language)}
                                 </Badge>
                               </div>
                               <p className="text-sm font-medium truncate mb-1">
@@ -515,7 +518,7 @@ export default function Communications() {
                         </span>
                       </div>
                       <Badge variant={getPriorityColor(selectedCommunication.priority)}>
-                        {selectedCommunication.priority}
+                        {t(selectedCommunication.priority, language)}
                       </Badge>
                     </div>
                   </div>

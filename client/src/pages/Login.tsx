@@ -113,25 +113,35 @@ export default function Login() {
       console.log("📡 Enviant petició quick-auth...");
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
       console.log("✅ Resposta quick-auth:", authResponse);
+      console.log("🔍 Tipus de authResponse:", typeof authResponse);
+      console.log("🔍 És Response object?", authResponse instanceof Response);
       
-      if ((authResponse as any).user && (authResponse as any).employee) {
-        console.log("👤 Usuari autenticat:", (authResponse as any).user);
-        console.log("💼 Empleat trobat:", (authResponse as any).employee);
-        console.log("🎯 Següent acció:", (authResponse as any).nextAction);
+      // Parse JSON if it's a Response object
+      const authData = authResponse instanceof Response ? await authResponse.json() : authResponse;
+      console.log("📦 Dades parseadas:", authData);
+      
+      if (authData.user && authData.employee) {
+        console.log("👤 Usuari autenticat:", authData.user);
+        console.log("💼 Empleat trobat:", authData.employee);
+        console.log("🎯 Següent acció:", authData.nextAction);
         
         // Now register attendance
         const attendanceData = {
-          employeeId: (authResponse as any).employee.id,
-          type: (authResponse as any).nextAction // "check-in" or "check-out"
+          employeeId: authData.employee.id,
+          type: authData.nextAction // "check-in" or "check-out"
         };
         console.log("📡 Enviant petició quick-attendance amb:", attendanceData);
         
         const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", attendanceData);
         console.log("✅ Resposta quick-attendance:", attendanceResponse);
+        
+        // Parse JSON if it's a Response object
+        const attendanceData_parsed = attendanceResponse instanceof Response ? await attendanceResponse.json() : attendanceResponse;
+        console.log("📦 Dades attendance parseadas:", attendanceData_parsed);
 
         // Use the response directly from the server which already has all the formatted data
-        console.log("💾 Guardant attendanceResult:", attendanceResponse);
-        setAttendanceResult(attendanceResponse);
+        console.log("💾 Guardant attendanceResult:", attendanceData_parsed);
+        setAttendanceResult(attendanceData_parsed);
         
         console.log("🎭 Mostrant modal d'assistència...");
         setShowAttendanceModal(true);

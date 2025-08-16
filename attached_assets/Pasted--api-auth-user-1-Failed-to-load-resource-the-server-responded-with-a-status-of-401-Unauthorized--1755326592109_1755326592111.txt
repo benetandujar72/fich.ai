@@ -1,0 +1,160 @@
+/api/auth/user:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🚀 INICI onQuickAttendance amb dades: Object
+ 📡 Enviant petició quick-auth...
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+ 🎭 Renderitzant modal amb attendanceResult: null
+ 🎭 showAttendanceModal estat: false
+ ❌ Modal mostrat però attendanceResult és null!
+/api/quick-auth:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+ 💥 Error en onQuickAttendance: 
+overrideMethod @ installHook.js:1
+Login.tsx:154 🏁 onQuickAttendance finalitzat
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:108 🚀 INICI onQuickAttendance amb dades: Object
+Login.tsx:113 📡 Enviant petició quick-auth...
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:115 ✅ Resposta quick-auth: Response
+hook.js:608 ❌ No s'ha trobat user o employee a la resposta
+overrideMethod @ hook.js:608
+Login.tsx:154 🏁 onQuickAttendance finalitzat
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:108 🚀 INICI onQuickAttendance amb dades: Object
+Login.tsx:113 📡 Enviant petició quick-auth...
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:115 ✅ Resposta quick-auth: Response
+hook.js:608 ❌ No s'ha trobat user o employee a la resposta
+overrideMethod @ hook.js:608
+Login.tsx:154 🏁 onQuickAttendance finalitzat
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!
+Login.tsx:458 🎭 Renderitzant modal amb attendanceResult: null
+Login.tsx:459 🎭 showAttendanceModal estat: false
+Login.tsx:517 ❌ Modal mostrat però attendanceResult és null!

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Link } from 'wouter';
 import { 
   QrCode, 
   Camera, 
@@ -172,7 +173,7 @@ export default function PublicQRAttendance() {
             <Alert className="border-blue-200 bg-blue-50">
               <Smartphone className="h-4 w-4" />
               <AlertDescription className="text-blue-800">
-                <strong>Com utilitzar:</strong> Escaneja o introdueix el teu codi QR personal únic. 
+                <strong>Com utilitzar:</strong> Escaneja o introdueix el teu codi QR personal únic. El sistema detectarà automàticament si és entrada o sortida. 
                 El sistema detectarà automàticament si és entrada o sortida.
               </AlertDescription>
             </Alert>
@@ -244,6 +245,15 @@ export default function PublicQRAttendance() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Navigation back to login */}
+        <div className="text-center">
+          <Link to="/">
+            <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+              ← Tornar a la pàgina principal
+            </Button>
+          </Link>
+        </div>
 
         {/* Footer */}
         <div className="text-center text-xs text-gray-500">

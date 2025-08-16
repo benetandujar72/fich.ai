@@ -418,15 +418,16 @@ export default function Login() {
                     {language === "ca" ? "Altres mètodes de marcatge:" : "Otros métodos de marcaje:"}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <Button 
-                      variant="outline" 
-                      className="w-full" 
-                      disabled
-                      data-testid="qr-attendance-button"
-                    >
-                      <QrCode className="h-4 w-4 mr-2" />
-                      {language === "ca" ? "Codi QR" : "Código QR"}
-                    </Button>
+                    <Link to="/public-qr">
+                      <Button 
+                        variant="outline" 
+                        className="w-full" 
+                        data-testid="qr-attendance-button"
+                      >
+                        <QrCode className="h-4 w-4 mr-2" />
+                        {language === "ca" ? "Codi QR" : "Código QR"}
+                      </Button>
+                    </Link>
                     <Button 
                       variant="outline" 
                       className="w-full" 

@@ -54,6 +54,21 @@ export default function Login() {
     return () => clearInterval(timer);
   }, []);
 
+  // Focus on quick email input when attendance tab is selected
+  useEffect(() => {
+    if (activeTab === "attendance" && quickEmailRef.current) {
+      setTimeout(() => {
+        quickEmailRef.current?.focus();
+      }, 100);
+    }
+  }, [activeTab]);
+
+  // Fetch users for dropdown
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users/all"],
+    enabled: true,
+  });
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -70,22 +85,22 @@ export default function Login() {
     },
   });
 
-  // Get users for quick select
-  const { data: users } = useQuery({
-    queryKey: ["/api/users"],
-    enabled: activeTab === "attendance",
-  });
-
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/auth/login", data);
-      console.log("Login successful", response);
+      const response = await apiRequest("POST", "/api/login", data);
+      
+      toast({
+        title: t("success", language),
+        description: language === "ca" ? "Sessió iniciada correctament" : "Sesión iniciada correctamente",
+      });
+
+      // Reload to trigger auth state update
       window.location.href = "/";
     } catch (error: any) {
       toast({
         title: t("error", language),
-        description: error.message || t("invalid_credentials", language),
+        description: error.message || (language === "ca" ? "Error en l'inici de sessió" : "Error en el inicio de sesión"),
         variant: "destructive",
       });
     } finally {
@@ -95,9 +110,8 @@ export default function Login() {
 
   const onQuickAttendance = async (data: QuickAttendanceData) => {
     setIsQuickAttendanceLoading(true);
-    
     try {
-      // First authenticate
+      // First authenticate the user quickly
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
       
       if ((authResponse as any).user && (authResponse as any).employee) {
@@ -368,7 +382,7 @@ export default function Login() {
                   </Button>
                 </div>
               </div>
-            )}
+            }
           </CardContent>
         </Card>
         
@@ -450,6 +464,244 @@ export default function Login() {
           </DialogContent>
         </Dialog>
       </div>
+    </div>
+  );
+}
+                  <h3 className="text-lg font-semibold">
+                    {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ca" ? "Registra l'entrada o sortida sense entrar al sistema" : "Registra entrada o salida sin entrar al sistema"}
+                  </p>
+                  
+                  {/* Digital Clock */}
+                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                    <div className="text-3xl font-mono font-bold text-primary">
+                      {currentTime.toLocaleTimeString("ca-ES", {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {currentTime.toLocaleDateString("ca-ES", {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <Form {...quickForm}>
+                  <form onSubmit={quickForm.handleSubmit(onQuickAttendance)} className="space-y-4">
+                    <FormField
+                      control={quickForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              {/* User selection dropdown */}
+                              {users && Array.isArray(users) && users.length > 0 && (
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                  }}
+                                  data-testid="quick-user-select"
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={language === "ca" ? "Selecciona un usuari..." : "Selecciona un usuario..."} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {users.map((user: any) => (
+                                      <SelectItem key={user.id} value={user.email}>
+                                        {user.firstName} {user.lastName} - {user.email}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
+                              
+                              {/* Manual email input */}
+                              <div className="text-center text-sm text-muted-foreground">
+                                {language === "ca" ? "o escriu manualment:" : "o escribe manualmente:"}
+                              </div>
+                              <Input
+                                id="quick-email"
+                                type="email"
+                                placeholder="nom@exemple.com"
+                                autoComplete="email"
+                                data-testid="quick-email-input"
+                                ref={quickEmailRef}
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={quickForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {language === "ca" ? "Contrasenya" : "Contraseña"}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                id="quick-password"
+                                type={showQuickPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                autoComplete="current-password"
+                                data-testid="quick-password-input"
+                                {...field}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowQuickPassword(!showQuickPassword)}
+                                data-testid="toggle-quick-password-visibility"
+                              >
+                                {showQuickPassword ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isQuickAttendanceLoading}
+                      data-testid="quick-attendance-button"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      {isQuickAttendanceLoading 
+                        ? (language === "ca" ? "Processant..." : "Procesando...")
+                        : (language === "ca" ? "Marcar Assistència" : "Marcar Asistencia")
+                      }
+                    </Button>
+                  </form>
+                </Form>
+
+                {/* Alternative methods - for future implementation */}
+                <div className="mt-6 space-y-3">
+                  <div className="text-center text-sm text-muted-foreground">
+                    {language === "ca" ? "Altres mètodes de marcatge:" : "Otros métodos de marcaje:"}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link to="/public-qr">
+                      <Button 
+                        variant="outline" 
+                        className="w-full" 
+                        data-testid="qr-attendance-button"
+                      >
+                        <QrCode className="h-4 w-4 mr-2" />
+                        {language === "ca" ? "Codi QR" : "Código QR"}
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      disabled
+                      data-testid="nfc-attendance-button"
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      NFC
+                    </Button>
+                  </div>
+                  <p className="text-xs text-center text-muted-foreground">
+                    {language === "ca" ? "Pròximament disponibles" : "Próximamente disponibles"}
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <div className="text-center text-xs text-gray-500">
+          <p>fich.ai v1.0.0</p>
+          <p>{language === "ca" ? "Sistema intel·ligent de fitxatge" : "Sistema inteligente de fichaje"}</p>
+        </div>
+      </div>
+
+      {/* Attendance Result Modal */}
+      <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
+        <DialogContent className="sm:max-w-md modal-content-solid">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {language === "ca" ? "Marcatge Registrat" : "Marcaje Registrado"}
+            </DialogTitle>
+          </DialogHeader>
+          {attendanceResult && (
+            <div className="space-y-4 p-4">
+              {/* Status with color coding */}
+              <div className={`text-center p-4 rounded-lg ${
+                attendanceResult.status === 'late' ? 'bg-red-100 border-red-300' :
+                attendanceResult.status === 'early' ? 'bg-blue-100 border-blue-300' :
+                'bg-green-100 border-green-300'
+              }`}>
+                <div className={`text-2xl font-bold ${
+                  attendanceResult.status === 'late' ? 'text-red-700' :
+                  attendanceResult.status === 'early' ? 'text-blue-700' :
+                  'text-green-700'
+                }`}>
+                  {attendanceResult.type === 'check_in' 
+                    ? (language === "ca" ? "ENTRADA" : "ENTRADA")
+                    : (language === "ca" ? "SORTIDA" : "SALIDA")
+                  }
+                </div>
+                <div className={`text-sm ${
+                  attendanceResult.status === 'late' ? 'text-red-600' :
+                  attendanceResult.status === 'early' ? 'text-blue-600' :
+                  'text-green-600'
+                }`}>
+                  {attendanceResult.statusMessage}
+                </div>
+              </div>
+
+              {/* Time and date info */}
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-mono font-bold text-gray-800">
+                  {attendanceResult.time}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {attendanceResult.date}
+                </div>
+                <div className="text-sm text-gray-700">
+                  {attendanceResult.employeeName}
+                </div>
+              </div>
+
+              {/* Close button */}
+              <Button 
+                onClick={() => setShowAttendanceModal(false)}
+                className="w-full"
+                variant="outline"
+              >
+                {language === "ca" ? "Tancar" : "Cerrar"}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -2723,12 +2723,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const employee = employeeResult.rows[0];
 
       // Create attendance record with Spanish timezone
-      const timestamp = new Date();
+      const utcTimestamp = new Date();
+      const spanishTimestamp = new Date(utcTimestamp.getTime() + (2 * 60 * 60 * 1000)); // Add 2 hours for Spanish time
+      
+      console.log("🕐 TIMEZONE DEBUG:");
+      console.log("  UTC Timestamp:", utcTimestamp.toISOString());
+      console.log("  Spanish Timestamp:", spanishTimestamp.toISOString());
+      console.log("  Local time should be:", spanishTimestamp.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
+      
       const attendanceResult = await db.execute(sql`
         INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
-        VALUES (${employee.id}, ${type}, (${timestamp.toISOString()}::timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Madrid', 'manual', 'Office', ${`Marcatge ràpid - ${employee.full_name}`})
+        VALUES (${employee.id}, ${type}, ${spanishTimestamp.toISOString()}, 'manual', 'Office', ${`Marcatge ràpid - ${employee.full_name}`})
         RETURNING *
       `);
+      
+      console.log("✅ RECORD INSERTED:", attendanceResult.rows[0]);
       
       const attendance = attendanceResult.rows[0];
 

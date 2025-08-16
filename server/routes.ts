@@ -2613,5 +2613,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // QR ATTENDANCE PUBLIC ENDPOINT - UNIPERSONAL
+  // ============================================
+  
+  // QR Processing (Public endpoint - no auth required)
+  app.post("/api/attendance/qr-process", async (req, res) => {
+    try {
+      const { qrData, timestamp, location } = req.body;
+      
+      if (!qrData || !timestamp) {
+        return res.status(400).json({ error: "Codi QR i timestamp són obligatoris" });
+      }
+
+      // QR data should be the employee ID directly
+      const employeeId = qrData.trim();
+      
+      // Validate employee exists
+      const employee = await storage.getEmployeeById(employeeId);
+      if (!employee) {
+        return res.status(404).json({ error: "Empleat no trobat amb aquest codi QR" });
+      }
+
+      // Get the active academic year for this institution
+      const academicYears = await storage.getAcademicYears(employee.institutionId);
+      const activeYear = academicYears.find(year => year.isActive);
+      if (!activeYear) {
+        return res.status(400).json({ error: "No hi ha cap curs acadèmic actiu" });
+      }
+
+      // Get employee's latest attendance record for today
+      const today = new Date(timestamp);
+      const startOfDay = new Date(today);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const todayAttendance = await storage.getAttendanceRecords(
+        employeeId, 
+        startOfDay.toISOString(), 
+        endOfDay.toISOString()
+      );
+
+      // Determine if this should be check-in or check-out
+      let attendanceType: "check_in" | "check_out" = "check_in";
+      
+      if (todayAttendance.length > 0) {
+        // Sort by timestamp to get the latest
+        const sortedAttendance = todayAttendance.sort((a, b) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        const lastRecord = sortedAttendance[0];
+        
+        // If last record was check_in, this should be check_out
+        if (lastRecord.type === "check_in") {
+          attendanceType = "check_out";
+        }
+      }
+
+      // Check if this employee is late (for check-in only)
+      let isLate = false;
+      let lateMinutes = 0;
+      
+      if (attendanceType === "check_in") {
+        // Get employee's schedule for today
+        const dayOfWeek = today.getDay() === 0 ? 7 : today.getDay(); // Convert Sunday from 0 to 7
+        const schedules = await storage.getEmployeeSchedule(employeeId);
+        const todaySchedule = schedules.find(s => s.dayOfWeek === dayOfWeek);
+        
+        if (todaySchedule) {
+          const scheduledTime = new Date(today);
+          const [hours, minutes] = todaySchedule.startTime.split(':');
+          scheduledTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+          
+          const actualTime = new Date(timestamp);
+          if (actualTime > scheduledTime) {
+            isLate = true;
+            lateMinutes = Math.floor((actualTime.getTime() - scheduledTime.getTime()) / (1000 * 60));
+          }
+        }
+      }
+
+      // Create attendance record
+      const attendance = await storage.createAttendanceRecord({
+        employeeId,
+        academicYearId: activeYear.id,
+        type: attendanceType,
+        timestamp: new Date(timestamp),
+        method: "qr",
+        location,
+        notes: `Fitxatge automàtic per codi QR - ${employee.fullName}`,
+        isLate,
+        lateMinutes: isLate ? lateMinutes : 0
+      });
+
+      // Return detailed response
+      res.json({
+        ...attendance,
+        employeeName: employee.fullName,
+        isLate,
+        lateMinutes,
+        message: attendanceType === "check_in" ? 
+          `Entrada registrada per ${employee.fullName}` : 
+          `Sortida registrada per ${employee.fullName}`
+      });
+
+    } catch (error) {
+      console.error("Error processing QR:", error);
+      res.status(500).json({ error: "Error processant el codi QR" });
+    }
+  });
+
   return httpServer;
 }

@@ -108,10 +108,17 @@ export default function Sidebar(props: SidebarProps = {}) {
           badge: null,
         },
         {
-          name: "Fichaje QR",
+          name: language === "ca" ? "Fitxatge QR" : "Fichaje QR",
           href: "/qr-attendance",
           icon: QrCode,
           show: permissions.canViewOwnAttendance || permissions.canViewAllAttendance,
+          badge: null,
+        },
+        {
+          name: language === "ca" ? "Generador de QR" : "Generador de QR",
+          href: "/qr-generator",
+          icon: QrCode,
+          show: (user?.role === 'admin' || user?.role === 'superadmin'),
           badge: null,
         },
         {
@@ -194,7 +201,7 @@ export default function Sidebar(props: SidebarProps = {}) {
           badge: null,
         },
         {
-          name: "Migración de Datos",
+          name: language === "ca" ? "Migració de Dades" : "Migración de Datos",
           href: "/academic-migration",
           icon: Database,
           show: (user?.role === 'admin' || user?.role === 'superadmin'),

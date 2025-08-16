@@ -215,10 +215,10 @@ export default function AcademicDataMigration() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            Migración de Datos Académicos
+            {language === "ca" ? "Migració de Dades Acadèmiques" : "Migración de Datos Académicos"}
           </h1>
           <p className="text-muted-foreground">
-            Transfiere datos entre cursos académicos de forma segura y controlada
+            {language === "ca" ? "Transfereix dades entre cursos acadèmics de forma segura i controlada" : "Transfiere datos entre cursos académicos de forma segura y controlada"}
           </p>
         </div>
       </div>

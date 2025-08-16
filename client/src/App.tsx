@@ -32,6 +32,8 @@ import WeeklyScheduleAdmin from "@/pages/WeeklyScheduleAdmin";
 import Communications from "@/pages/Communications";
 import QRAttendancePage from "@/pages/QRAttendance";
 import AcademicDataMigration from "@/pages/AcademicDataMigration";
+import PublicQRAttendance from "@/pages/PublicQRAttendance";
+import EmployeeQRGenerator from "@/pages/EmployeeQRGenerator";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -418,6 +420,18 @@ function Router() {
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <QRAttendancePage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/public-qr" component={PublicQRAttendance} />
+
+          <Route path="/qr-generator" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title="Generador de Códigos QR"
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <EmployeeQRGenerator />
             </ProtectedRoute>
           } />
 

@@ -1,7 +1,7 @@
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { t } from "@/lib/i18n";
-import { Bell, Clock, Search, Sun, Moon, Globe } from "lucide-react";
+import { Bell, Clock, Search, Sun, Moon, Globe, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -56,6 +56,18 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
 
         {/* Right section with actions */}
         <div className="flex items-center space-x-3">
+          {/* QR Public Access */}
+          <Button 
+            onClick={() => window.open('/public-qr', '_blank')}
+            size="sm"
+            variant="outline"
+            className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hidden sm:flex"
+            data-testid="public-qr-button"
+          >
+            <QrCode className="mr-2 h-4 w-4" />
+            {language === "ca" ? "Fitxatge QR" : "Fichaje QR"}
+          </Button>
+
           {onQuickAttendance && (
             <Button 
               onClick={onQuickAttendance}

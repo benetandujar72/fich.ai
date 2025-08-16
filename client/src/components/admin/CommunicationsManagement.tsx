@@ -39,7 +39,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import { apiRequest } from "@/lib/queryClient";
+import { t } from "@/lib/i18n";
 
 interface Communication {
   id: string;
@@ -60,6 +62,7 @@ interface Communication {
 export function CommunicationsManagement() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { language } = useLanguage();
   const queryClient = useQueryClient();
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -245,10 +248,10 @@ export function CommunicationsManagement() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="select-content-solid">
-                        <SelectItem value="low">Baixa</SelectItem>
-                        <SelectItem value="normal">Normal</SelectItem>
-                        <SelectItem value="high">Alta</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
+                        <SelectItem value="low">{t("low", language)}</SelectItem>
+                        <SelectItem value="normal">{t("normal", language)}</SelectItem>
+                        <SelectItem value="high">{t("high", language)}</SelectItem>
+                        <SelectItem value="urgent">{t("urgent", language)}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

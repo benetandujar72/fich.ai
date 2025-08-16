@@ -290,14 +290,14 @@ export default function Sidebar(props: SidebarProps = {}) {
             <div className="flex items-center justify-between">
               {!isCollapsed && (
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-rose-400 via-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <Activity className="w-6 h-6 text-white" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-lg font-bold text-white">F</span>
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-foreground">
-                      EduPresència
+                      fich.ai
                     </h2>
-                    <p className="text-xs text-muted-foreground font-medium">Sistema de Presència</p>
+                    <p className="text-xs text-muted-foreground font-medium">Sistema Intel·ligent de Fitxatge</p>
                   </div>
                 </div>
               )}

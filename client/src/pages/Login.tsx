@@ -447,8 +447,8 @@ export default function Login() {
         </Card>
 
         <div className="text-center text-xs text-gray-500">
-          <p>EduPresència v1.0.0</p>
-          <p>{language === "ca" ? "Sistema de control de presència" : "Sistema de control de presencia"}</p>
+          <p>fich.ai v1.0.0</p>
+          <p>{language === "ca" ? "Sistema intel·ligent de fitxatge" : "Sistema inteligente de fichaje"}</p>
         </div>
       </div>
 

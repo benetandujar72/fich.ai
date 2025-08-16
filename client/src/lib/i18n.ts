@@ -120,6 +120,12 @@ export const translations = {
     "day_summary": "Resum del dia",
     "punctual": "Puntual",
     "delay": "Retard",
+    "logout": "Sortir",
+    "low": "Baix",
+    "medium": "Mitjà", 
+    "high": "Alt",
+    "urgent": "Urgent",
+    "normal": "Normal",
   },
   es: {
     // Navigation
@@ -241,7 +247,13 @@ export const translations = {
     "actual_time": "Marcaje real",
     "day_summary": "Resumen del día",
     "punctual": "Puntual",
-    "delay": "Retraso",
+    "delay": "Retraso", 
+    "logout": "Salir",
+    "low": "Bajo",
+    "medium": "Medio",
+    "high": "Alto", 
+    "urgent": "Urgente", 
+    "normal": "Normal",
   },
 };
 

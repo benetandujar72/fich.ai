@@ -2665,18 +2665,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const employee = employeeResult.rows[0];
 
-      // Determine next action (check-in or check-out) based on today's attendance
-      const today = new Date();
-      const startOfDay = new Date(today);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(today);
-      endOfDay.setHours(23, 59, 59, 999);
-
+      // Determine next action (check-in or check-out) based on today's attendance (Spanish timezone)
       const todayAttendanceResult = await db.execute(sql`
         SELECT * FROM attendance_records 
         WHERE employee_id = ${employee.id}
-        AND timestamp >= ${startOfDay.toISOString()}
-        AND timestamp <= ${endOfDay.toISOString()}
+        AND DATE(timestamp AT TIME ZONE 'Europe/Madrid') = CURRENT_DATE
         ORDER BY timestamp DESC
         LIMIT 1
       `);
@@ -2729,11 +2722,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const employee = employeeResult.rows[0];
 
-      // Create attendance record
+      // Create attendance record with Spanish timezone
       const timestamp = new Date();
       const attendanceResult = await db.execute(sql`
         INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
-        VALUES (${employee.id}, ${type}, ${timestamp.toISOString()}, 'manual', 'Office', ${`Marcatge ràpid - ${employee.full_name}`})
+        VALUES (${employee.id}, ${type}, (${timestamp.toISOString()}::timestamp AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Madrid', 'manual', 'Office', ${`Marcatge ràpid - ${employee.full_name}`})
         RETURNING *
       `);
       

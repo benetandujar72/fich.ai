@@ -31,6 +31,7 @@ import WeeklySchedule from "@/pages/WeeklySchedule";
 import WeeklyScheduleAdmin from "@/pages/WeeklyScheduleAdmin";
 import Communications from "@/pages/Communications";
 import QRAttendancePage from "@/pages/QRAttendance";
+import AcademicDataMigration from "@/pages/AcademicDataMigration";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -369,6 +370,16 @@ function Router() {
                 title={language === "ca" ? "Gestió de Cursos Acadèmics" : "Gestión de Cursos Académicos"}
               />
               <AcademicYearManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/academic-migration" component={() => 
+            <ProtectedRoute requiredRoles={['superadmin', 'admin']}>
+              <Header 
+                title="Migración de Datos Académicos"
+                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+              />
+              <AcademicDataMigration />
             </ProtectedRoute>
           } />
 

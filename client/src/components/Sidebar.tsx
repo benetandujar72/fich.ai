@@ -30,7 +30,9 @@ import {
   Shield,
   Bell,
   BarChart3,
-  Briefcase
+  Briefcase,
+  QrCode,
+  Database
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -189,6 +191,13 @@ export default function Sidebar(props: SidebarProps = {}) {
           href: "/academic-years",
           icon: GraduationCap,
           show: permissions.canCreateAcademicYear || permissions.canEditAcademicYear,
+          badge: null,
+        },
+        {
+          name: "Migración de Datos",
+          href: "/academic-migration",
+          icon: Database,
+          show: (user?.role === 'admin' || user?.role === 'superadmin'),
           badge: null,
         },
         {

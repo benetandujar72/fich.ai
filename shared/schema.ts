@@ -62,16 +62,52 @@ export const academicYears = pgTable("academic_years", {
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
   isActive: boolean("is_active").notNull().default(false),
+  status: varchar("status").notNull().default("draft"), // draft, active, archived
+  description: text("description"),
+  settings: jsonb("settings"), // Academic year specific settings
   createdAt: timestamp("created_at").defaultNow(),
-});
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  unique("unique_institution_active").on(table.institutionId, table.isActive),
+  index("idx_academic_years_institution").on(table.institutionId),
+  index("idx_academic_years_dates").on(table.startDate, table.endDate),
+]);
+
+// Academic Year Migration Logs
+export const academicYearMigrations = pgTable("academic_year_migrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  sourceYearId: varchar("source_year_id").notNull(),
+  targetYearId: varchar("target_year_id").notNull(),
+  migrationType: varchar("migration_type").notNull(), // employees, schedules, departments, all
+  status: varchar("status").notNull().default("pending"), // pending, in_progress, completed, failed
+  totalRecords: integer("total_records").default(0),
+  migratedRecords: integer("migrated_records").default(0),
+  failedRecords: integer("failed_records").default(0),
+  errors: jsonb("errors"),
+  migrationData: jsonb("migration_data"), // Detailed migration information
+  initiatedBy: varchar("initiated_by").notNull(),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_migrations_institution").on(table.institutionId),
+  index("idx_migrations_status").on(table.status),
+]);
 
 // Departments
 export const departments = pgTable("departments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   institutionId: varchar("institution_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(), // Link to academic year
   name: varchar("name").notNull(),
+  description: text("description"),
+  headOfDepartment: varchar("head_of_department"), // Employee ID
+  budget: decimal("budget", { precision: 12, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow(),
-});
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_departments_institution_year").on(table.institutionId, table.academicYearId),
+]);
 
 // Employee contract types
 export const contractTypeEnum = pgEnum("contract_type", ["full_time", "part_time", "substitute"]);
@@ -82,6 +118,7 @@ export const employees = pgTable("employees", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),
   institutionId: varchar("institution_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(), // Link to academic year
   departmentId: varchar("department_id"),
   dni: varchar("dni").notNull(),
   fullName: varchar("full_name").notNull(),
@@ -91,9 +128,18 @@ export const employees = pgTable("employees", {
   status: employeeStatusEnum("status").notNull().default("active"),
   startDate: date("start_date").notNull(),
   endDate: date("end_date"),
+  teacherCode: varchar("teacher_code"), // For GP Untis integration
+  position: varchar("position"),
+  contractHours: decimal("contract_hours", { precision: 5, scale: 2 }),
+  salary: decimal("salary", { precision: 10, scale: 2 }),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_employees_institution_year").on(table.institutionId, table.academicYearId),
+  index("idx_employees_teacher_code").on(table.teacherCode),
+  index("idx_employees_email").on(table.email),
+]);
 
 // Subjects/Materies (GP Untis compatible)
 export const subjects = pgTable("subjects", {
@@ -194,13 +240,20 @@ export const attendanceMethodEnum = pgEnum("attendance_method", ["web", "qr", "n
 export const attendanceRecords = pgTable("attendance_records", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   employeeId: varchar("employee_id").notNull(),
+  academicYearId: varchar("academic_year_id").notNull(), // Link to academic year
   type: attendanceTypeEnum("type").notNull(),
   timestamp: timestamp("timestamp").notNull(),
   method: attendanceMethodEnum("method").notNull().default("web"),
   location: text("location"), // For geolocation verification
   notes: text("notes"),
+  justificationId: varchar("justification_id"), // Link to absence justification
+  isLate: boolean("is_late").default(false),
+  lateMinutes: integer("late_minutes").default(0),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_attendance_employee_year").on(table.employeeId, table.academicYearId),
+  index("idx_attendance_timestamp").on(table.timestamp),
+]);
 
 // Absence types and reasons
 export const absenceTypeEnum = pgEnum("absence_type", ["sick_leave", "personal", "vacation", "training", "other"]);

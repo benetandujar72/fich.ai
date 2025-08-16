@@ -43,7 +43,7 @@ export default function Login() {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const quickEmailRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState("attendance");
+  const [activeTab, setActiveTab] = useState("login");
 
   // Update clock every second
   useEffect(() => {
@@ -129,18 +129,20 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        {/* Quick attendance button in top right */}
-        <div className="absolute top-4 right-4">
-          <Button 
-            onClick={() => setActiveTab("attendance")}
-            size="sm"
-            className="bg-gradient-to-r from-rose-400 via-pink-400 to-purple-500 hover:from-rose-500 hover:via-pink-500 hover:to-purple-600 shadow-lg hover:shadow-rose-400/25 text-white"
-            data-testid="quick-attendance-button"
-          >
-            <Clock className="mr-2 h-4 w-4" />
-            {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
-          </Button>
-        </div>
+        {/* Quick attendance button in top right - only show when on login tab */}
+        {activeTab === "login" && (
+          <div className="absolute top-4 right-4">
+            <Button 
+              onClick={() => setActiveTab("attendance")}
+              size="sm"
+              className="bg-gradient-to-r from-rose-400 via-pink-400 to-purple-500 hover:from-rose-500 hover:via-pink-500 hover:to-purple-600 shadow-lg hover:shadow-rose-400/25 text-white"
+              data-testid="quick-attendance-button"
+            >
+              <Clock className="mr-2 h-4 w-4" />
+              {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
+            </Button>
+          </div>
+        )}
 
         {/* Header */}
         <div className="text-center">

@@ -56,13 +56,13 @@ export default function Header({ title, onQuickAttendance }: HeaderProps) {
 
         {/* Right section with actions */}
         <div className="flex items-center space-x-3">
-          {/* QR Public Access */}
+          {/* QR Unified Access */}
           <Button 
-            onClick={() => window.open('/public-qr', '_blank')}
+            onClick={() => window.open('/unified-qr', '_blank')}
             size="sm"
             variant="outline"
             className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hidden sm:flex"
-            data-testid="public-qr-button"
+            data-testid="unified-qr-button"
           >
             <QrCode className="mr-2 h-4 w-4" />
             {language === "ca" ? "Fitxatge QR" : "Fichaje QR"}

@@ -6,11 +6,11 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { t } from "@/lib/i18n";
 import { apiRequest } from "@/lib/queryClient";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Eye, EyeOff, QrCode, Clock, CheckCircle, X } from "lucide-react";
+import { Eye, EyeOff, QrCode, Clock, CheckCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "wouter";
@@ -28,7 +28,7 @@ const quickAttendanceSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 type QuickAttendanceData = z.infer<typeof quickAttendanceSchema>;
 
-export default function LoginSimple() {
+export default function LoginFixed() {
   const { language } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -85,15 +85,13 @@ export default function LoginSimple() {
     setIsQuickAttendanceLoading(true);
     
     try {
-      // First authenticate
       const authResponse = await apiRequest("POST", "/api/quick-auth", data);
       const authData = authResponse instanceof Response ? await authResponse.json() : authResponse;
       
       if (authData.user && authData.employee) {
-        // Now register attendance
         const attendanceData = {
           employeeId: authData.employee.id,
-          type: authData.nextAction // "check-in" or "check-out"
+          type: authData.nextAction
         };
         
         const attendanceResponse = await apiRequest("POST", "/api/quick-attendance", attendanceData);
@@ -117,7 +115,6 @@ export default function LoginSimple() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        {/* Header */}
         <div className="text-center">
           <div className="flex justify-center">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -134,7 +131,6 @@ export default function LoginSimple() {
           </p>
         </div>
 
-        {/* Main Form */}
         <Card>
           <CardContent className="p-0">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -251,140 +247,88 @@ export default function LoginSimple() {
                       {language === "ca" ? "Accedeix al sistema complet" : "Accede al sistema completo"}
                     </p>
                   </div>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="nom@exemple.com"
-                          autoComplete="email"
-                          data-testid="email-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="nom@exemple.com"
+                                autoComplete="email"
+                                data-testid="email-input"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {language === "ca" ? "Contrasenya" : "Contraseña"}
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            autoComplete="current-password"
-                            data-testid="password-input"
-                            {...field}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                            onClick={() => setShowPassword(!showPassword)}
-                            data-testid="toggle-password-visibility"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {language === "ca" ? "Contrasenya" : "Contraseña"}
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="••••••••"
+                                  autoComplete="current-password"
+                                  data-testid="password-input"
+                                  {...field}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  data-testid="toggle-password-visibility"
+                                >
+                                  {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                  ) : (
+                                    <Eye className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                  data-testid="login-button"
-                >
-                  {isLoading 
-                    ? (language === "ca" ? "Iniciant sessió..." : "Iniciando sesión...")
-                    : (language === "ca" ? "Iniciar Sessió" : "Iniciar Sesión")
-                  }
-                </Button>
-              </form>
-            </Form>
-            </TabsContent>
-          </div>
-        </Tabs>
-      </CardContent>
-    </Card>
-    
-    {/* Modal for attendance result */}
-    <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            {language === "ca" ? "Fitxatge Registrat" : "Fichaje Registrado"}
-          </DialogTitle>
-        </DialogHeader>
-        
-        {attendanceResult && (
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className="text-lg font-semibold text-green-600">
-                {attendanceResult.message}
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isLoading}
+                        data-testid="login-button"
+                      >
+                        {isLoading 
+                          ? (language === "ca" ? "Iniciant sessió..." : "Iniciando sesión...")
+                          : (language === "ca" ? "Iniciar Sessió" : "Iniciar Sesión")
+                        }
+                      </Button>
+                    </form>
+                  </Form>
+                </TabsContent>
               </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                {new Date(attendanceResult.timestamp || attendanceResult.created_at).toLocaleString("ca-ES", {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-                })}
-              </div>
-            </div>
-            
-            {attendanceResult.isLate && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <div className="text-sm text-yellow-800">
-                  <strong>{language === "ca" ? "Arribada tardana:" : "Llegada tardía:"}</strong> {attendanceResult.lateMinutes} {language === "ca" ? "minuts" : "minutos"}
-                </div>
-              </div>
-            )}
-            
-            <div className="flex justify-center">
-              <Button onClick={() => setShowAttendanceModal(false)} data-testid="close-modal">
-                {language === "ca" ? "Tancar" : "Cerrar"}
-              </Button>
-            </div>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
-                </Button>
-              </form>
-            </Form>
+            </Tabs>
           </CardContent>
         </Card>
         
-        {/* QR Link */}
         <div className="text-center space-y-3">
           <Link href="/public-qr">
             <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="lg" data-testid="qr-attendance-button">
@@ -406,6 +350,52 @@ export default function LoginSimple() {
           </p>
         </div>
       </div>
+      
+      <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              {language === "ca" ? "Fitxatge Registrat" : "Fichaje Registrado"}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {attendanceResult && (
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-lg font-semibold text-green-600">
+                  {attendanceResult.message}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {new Date(attendanceResult.timestamp || attendanceResult.created_at).toLocaleString("ca-ES", {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </div>
+              </div>
+              
+              {attendanceResult.isLate && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <div className="text-sm text-yellow-800">
+                    <strong>{language === "ca" ? "Arribada tardana:" : "Llegada tardía:"}</strong> {attendanceResult.lateMinutes} {language === "ca" ? "minuts" : "minutos"}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex justify-center">
+                <Button onClick={() => setShowAttendanceModal(false)} data-testid="close-modal">
+                  {language === "ca" ? "Tancar" : "Cerrar"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

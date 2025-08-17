@@ -9,7 +9,7 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import MobileHeader from "@/components/MobileHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Login from "@/pages/LoginSimple";
+import Login from "@/pages/LoginFixed";
 import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
 import Employees from "@/pages/Employees";

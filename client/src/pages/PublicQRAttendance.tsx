@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function PublicQRAttendance() {
-  console.log("🚀 PublicQRAttendance component mounted!");
+  console.log("🚀 PublicQRAttendance component mounted/re-rendered at:", new Date().toISOString());
   
   const { toast } = useToast();
   
@@ -38,12 +38,17 @@ export default function PublicQRAttendance() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
+    console.log("🕐 CLOCK EFFECT: Setting up timer");
     // Start the clock timer
     timerRef.current = setInterval(() => {
-      setDisplayTime(new Date());
+      const newTime = new Date();
+      // TEMPORALLY DISABLE CLOCK LOGS TO REDUCE CONSOLE SPAM
+      // console.log("⏰ CLOCK UPDATE:", newTime.toLocaleTimeString());
+      setDisplayTime(newTime);
     }, 1000);
     
     return () => {
+      console.log("🕐 CLOCK EFFECT: Cleaning up timer");
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }

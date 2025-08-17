@@ -2869,7 +2869,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ================================================
+  // UNTIS IMPORT ENDPOINTS - SISTEMA D'IMPORTACIÓ
+  // ================================================
+  
+  // POST /api/schedule-import/complete-import - Importació completa de dades GP Untis
+  app.post("/api/schedule-import/complete-import", isAuthenticated, async (req: any, res) => {
+    try {
+      console.log('UNTIS_IMPORT: Starting complete import for institution:', req.user?.institutionId);
+      
+      if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+        return res.status(403).json({ message: 'Access denied: admin role required' });
+      }
 
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(req.user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: 'No hi ha cap curs acadèmic actiu' });
+      }
+
+      // Execute complete import
+      const result = await storage.importCompleteUntisData(req.user.institutionId, activeYear.id);
+      
+      res.json({
+        success: true,
+        ...result,
+        message: 'Importació completa d\'Untis realitzada correctament'
+      });
+    } catch (error) {
+      console.error('UNTIS_IMPORT: Complete import error:', error);
+      res.status(500).json({ 
+        message: 'Error en la importació completa d\'Untis',
+        error: error instanceof Error ? error.message : 'Error desconegut'
+      });
+    }
+  });
+
+  // POST /api/schedule-import/import-teachers - Importació només de professorat
+  app.post("/api/schedule-import/import-teachers", isAuthenticated, async (req: any, res) => {
+    try {
+      console.log('UNTIS_IMPORT: Starting teachers import for institution:', req.user?.institutionId);
+      
+      if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+        return res.status(403).json({ message: 'Access denied: admin role required' });
+      }
+
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(req.user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: 'No hi ha cap curs acadèmic actiu' });
+      }
+
+      // Import only teachers from predefined file
+      const fs = await import('fs');
+      const teachersPath = './attached_assets/PROFESSORAT_1754044133486.TXT';
+      
+      if (!fs.existsSync(teachersPath)) {
+        return res.status(404).json({ 
+          message: 'Fitxer de professorat no trobat: PROFESSORAT_1754044133486.TXT' 
+        });
+      }
+
+      const teachersContent = fs.readFileSync(teachersPath, 'utf8');
+      const result = await storage.importUntisTeachers(teachersContent, req.user.institutionId, activeYear.id);
+      
+      res.json({
+        success: true,
+        created: result.created,
+        updated: result.updated,
+        message: `Professorat importat: ${result.created} creats, ${result.updated} actualitzats`
+      });
+    } catch (error) {
+      console.error('UNTIS_IMPORT: Teachers import error:', error);
+      res.status(500).json({ 
+        message: 'Error en la importació de professorat',
+        error: error instanceof Error ? error.message : 'Error desconegut'
+      });
+    }
+  });
+
+  // POST /api/schedule-import/test-real - Importació només d'horaris
+  app.post("/api/schedule-import/test-real", isAuthenticated, async (req: any, res) => {
+    try {
+      console.log('UNTIS_IMPORT: Starting schedules import for institution:', req.user?.institutionId);
+      
+      if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+        return res.status(403).json({ message: 'Access denied: admin role required' });
+      }
+
+      // Get active academic year
+      const activeYear = await storage.getActiveAcademicYear(req.user.institutionId);
+      if (!activeYear) {
+        return res.status(400).json({ message: 'No hi ha cap curs acadèmic actiu' });
+      }
+
+      // Import only schedules from predefined file
+      const fs = await import('fs');
+      const schedulesPath = './attached_assets/HORARIS UNTIS - Full 1_1754042189827.csv';
+      
+      if (!fs.existsSync(schedulesPath)) {
+        return res.status(404).json({ 
+          message: 'Fitxer d\'horaris no trobat: HORARIS UNTIS - Full 1_1754042189827.csv' 
+        });
+      }
+
+      const schedulesContent = fs.readFileSync(schedulesPath, 'utf8');
+      const result = await storage.importUntisSchedule(schedulesContent, req.user.institutionId, activeYear.id);
+      
+      res.json({
+        success: true,
+        sessionsImported: result.sessionsImported,
+        linkedSessions: result.linkedSessions,
+        message: `Horaris importats: ${result.sessionsImported} sessions d'horaris`
+      });
+    } catch (error) {
+      console.error('UNTIS_IMPORT: Schedules import error:', error);
+      res.status(500).json({ 
+        message: 'Error en la importació d\'horaris',
+        error: error instanceof Error ? error.message : 'Error desconegut'
+      });
+    }
+  });
+
+  // GET /api/schedule-import/statistics - Estadístiques d'importació
+  app.get("/api/schedule-import/statistics/:institutionId/:academicYearId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { institutionId, academicYearId } = req.params;
+      
+      if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+        return res.status(403).json({ message: 'Access denied: admin role required' });
+      }
+
+      if (institutionId !== req.user.institutionId) {
+        return res.status(403).json({ message: 'Access denied: institution mismatch' });
+      }
+
+      const stats = await storage.getUntisScheduleStatistics(institutionId, academicYearId);
+      
+      res.json({
+        success: true,
+        statistics: stats
+      });
+    } catch (error) {
+      console.error('UNTIS_IMPORT: Statistics error:', error);
+      res.status(500).json({ 
+        message: 'Error obtenint estadístiques d\'importació',
+        error: error instanceof Error ? error.message : 'Error desconegut'
+      });
+    }
+  });
 
   return httpServer;
 }

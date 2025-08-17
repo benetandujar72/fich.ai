@@ -106,19 +106,64 @@ export default function QRScanner() {
   // Start camera for scanning
   const startScanning = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } // Use back camera on mobile
-      });
+      // Check if we're on mobile and request camera permissions explicitly
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported');
+      }
+
+      console.log('🎥 Requesting camera access...');
+      
+      // First try with environment camera (back camera on mobile)
+      let constraints = { 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      };
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (envError) {
+        console.log('🎥 Environment camera failed, trying any camera...');
+        // Fallback to any available camera
+        constraints = { 
+          video: { 
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          } 
+        };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      }
+      
+      console.log('🎥 Camera access granted!');
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsScanning(true);
+        
+        // Wait for video to load
+        videoRef.current.onloadedmetadata = () => {
+          console.log('🎥 Video metadata loaded');
+          videoRef.current?.play();
+        };
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      console.error('❌ Camera error:', error);
+      let errorMessage = "No es pot accedir a la càmera.";
+      
+      if (error.name === 'NotAllowedError') {
+        errorMessage = "Permisos de càmera denegats. Permet l'accés a la càmera i torna a provar.";
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = "No s'ha trobat cap càmera. Utilitza l'entrada manual.";
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = "Càmera no compatible amb aquest dispositiu.";
+      }
+      
       toast({
         title: "Error de Càmera",
-        description: "No es pot accedir a la càmera. Utilitza l'entrada manual.",
+        description: errorMessage,
         variant: "destructive",
       });
       setShowManualInput(true);
@@ -169,7 +214,7 @@ export default function QRScanner() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <Link href="/dashboard">
+          <Link href={user?.role === 'employee' ? "/my-qr" : "/dashboard"}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -248,11 +293,17 @@ export default function QRScanner() {
                   ref={videoRef}
                   autoPlay 
                   playsInline
+                  muted
                   className="w-full rounded-lg border-2 border-dashed border-primary"
-                  style={{ maxHeight: '300px' }}
+                  style={{ maxHeight: '400px', objectFit: 'cover' }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-48 h-48 border-2 border-primary rounded-lg"></div>
+                  <div className="w-48 h-48 border-2 border-primary rounded-lg bg-white/10 backdrop-blur-sm">
+                    <div className="w-full h-full border border-primary/50 rounded-lg m-1"></div>
+                  </div>
+                </div>
+                <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                  📱 Apunta al QR
                 </div>
               </div>
               
@@ -334,13 +385,25 @@ export default function QRScanner() {
           </Alert>
 
           {/* Quick access to generate QR */}
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t space-y-3">
             <Link href="/my-qr">
               <Button variant="outline" className="w-full">
                 <QrCode className="mr-2 h-4 w-4" />
                 Anar a generar el meu QR
               </Button>
             </Link>
+            
+            {/* Auto-start camera on mobile */}
+            {!isScanning && !showManualInput && (
+              <Button
+                onClick={startScanning}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                size="lg"
+              >
+                <Camera className="mr-2 h-5 w-5" />
+                Començar a escanejar
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -225,11 +225,18 @@ function Router() {
         <Switch>
           <Route path="/" component={() => 
             <ProtectedRoute>
-              <Header 
-                title={t("dashboard", language)}
-                onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
-              />
-              <Dashboard />
+              {/* Redirect employees directly to QR scanner */}
+              {user?.role === 'employee' ? (
+                <QRScanner />
+              ) : (
+                <>
+                  <Header 
+                    title={t("dashboard", language)}
+                    onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
+                  />
+                  <Dashboard />
+                </>
+              )}
             </ProtectedRoute>
           } />
           

@@ -417,13 +417,16 @@ export default function Login() {
         </Card>
         
         {/* QR and Register Links */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-3">
           <Link href="/public-qr">
-            <Button variant="outline" size="sm" className="text-sm">
-              <QrCode className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Fitxatge amb Codi QR" : "Fichaje con Código QR"}
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="lg" data-testid="qr-attendance-button">
+              <QrCode className="mr-2 h-5 w-5" />
+              {language === "ca" ? "🔷 Fitxatge amb Codi QR Personal" : "🔷 Fichaje con Código QR Personal"}
             </Button>
           </Link>
+          <div className="text-xs text-blue-600 font-medium">
+            {language === "ca" ? "Accés directe sense iniciar sessió" : "Acceso directo sin iniciar sesión"}
+          </div>
           
           {activeTab === "login" && (
             <p className="text-sm text-gray-600">

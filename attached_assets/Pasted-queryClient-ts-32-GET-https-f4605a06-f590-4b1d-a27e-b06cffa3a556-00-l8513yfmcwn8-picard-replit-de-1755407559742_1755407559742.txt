@@ -1,0 +1,82 @@
+queryClient.ts:32  GET https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/api/auth/user 401 (Unauthorized)
+(anónimo) @ queryClient.ts:32
+fetchFn @ @tanstack_react-query.js?v=be57b3f7:840
+run @ @tanstack_react-query.js?v=be57b3f7:494
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19432
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=be57b3f7:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18718
+workLoop @ chunk-RPCDYKBN.js?v=be57b3f7:197
+flushWork @ chunk-RPCDYKBN.js?v=be57b3f7:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=be57b3f7:384
+feature_collector.js:23 using deprecated parameters for the initialization function; pass a single object instead
+H @ feature_collector.js:23
+main @ feature_collector.js:23
+mainFunction @ feature_collector.js:23
+(anónimo) @ feature_collector.js:23
+Login.tsx:108 🕐 FRONTEND QUICK ATTENDANCE DEBUG:
+Login.tsx:109   Frontend current time: 2025-08-17T05:12:13.540Z
+Login.tsx:110   Frontend local time: 17/8/2025, 7:12:13
+hook.js:608 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. Error Component Stack
+    at DescriptionWarning (@radix-ui_react-dialog.js?v=be57b3f7:334:29)
+    at @radix-ui_react-dialog.js?v=be57b3f7:238:13
+    at @radix-ui_react-dialog.js?v=be57b3f7:161:58
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at @radix-ui_react-dialog.js?v=be57b3f7:152:64
+    at chunk-2K77HOHX.js?v=be57b3f7:79:13
+    at chunk-2K77HOHX.js?v=be57b3f7:56:13
+    at chunk-AXMZZQ2X.js?v=be57b3f7:42:13
+    at chunk-G76BAGTM.js?v=be57b3f7:260:22
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at DialogPortal (@radix-ui_react-dialog.js?v=be57b3f7:114:11)
+    at _c3 (dialog.tsx:35:6)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at Dialog (@radix-ui_react-dialog.js?v=be57b3f7:55:5)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Login (Login.tsx:36:24)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at Router (App.tsx:48:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+(anónimo) @ @radix-ui_react-dialog.js?v=be57b3f7:342
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19432
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=be57b3f7:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18718
+workLoop @ chunk-RPCDYKBN.js?v=be57b3f7:197
+flushWork @ chunk-RPCDYKBN.js?v=be57b3f7:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=be57b3f7:384

@@ -96,12 +96,12 @@ export default function UnifiedQR() {
   // Process QR mutation
   const processQRMutation = useMutation({
     mutationFn: async (qrCode: string) => {
-      const response = await fetch('/api/qr/process', {
+      const response = await fetch('/api/attendance/qr-process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          qrCode: qrCode.trim(),
+          qrData: qrCode.trim(),
           timestamp: new Date().toISOString(),
           location: window.location.origin
         }),

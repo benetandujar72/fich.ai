@@ -278,7 +278,7 @@ export default function Employees() {
                   <TableHead>{t("employee", language)}</TableHead>
                   <TableHead>DNI</TableHead>
                   <TableHead>{t("department", language)}</TableHead>
-                  <TableHead>{t("schedule", language)}</TableHead>
+                  <TableHead>{language === "ca" ? "Hores setmanals" : "Horas semanales"}</TableHead>
                   <TableHead>{t("status", language)}</TableHead>
                   <TableHead>{t("actions", language)}</TableHead>
                 </TableRow>
@@ -329,7 +329,10 @@ export default function Employees() {
                         {employee.departmentId || t("administration", language)}
                       </TableCell>
                       <TableCell data-testid={`employee-schedule-${employee.id}`}>
-                        {employee.role || "Employee"}
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-gray-500" />
+                          <span>{employee.totalHours || "0"} {language === "ca" ? "hores" : "horas"}</span>
+                        </div>
                       </TableCell>
                       <TableCell data-testid={`employee-status-${employee.id}`}>
                         <Badge variant="default" className="bg-secondary/10 text-secondary">

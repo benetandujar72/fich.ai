@@ -689,19 +689,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
           u.email,
           u.role,
           u.created_at as "createdAt",
+          e.dni,
+          e.phone,
+          e.department_id as "departmentId",
+          e.contract_type as "contractType",
+          e.status,
+          e.full_name as "fullName",
+          e.teacher_code as "teacherCode",
           MAX(a.timestamp) as "lastAttendance",
-          COALESCE(
-            EXTRACT(EPOCH FROM (
-              MAX(CASE WHEN a.type = 'check_out' THEN a.timestamp END) - 
-              MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
-            ))/3600, 
-            0
-          ) as "totalHours"
+          COALESCE(uss.session_count, 0) as "totalHours"
         FROM users u
+        LEFT JOIN employees e ON u.id = e.user_id
         LEFT JOIN attendance_records a ON u.id = a.employee_id 
           AND a.timestamp >= date_trunc('week', CURRENT_DATE)
+        LEFT JOIN (
+          SELECT employee_id, COUNT(*) as session_count
+          FROM untis_schedule_sessions
+          WHERE institution_id = ${institutionId}
+          GROUP BY employee_id
+        ) uss ON e.id = uss.employee_id
         WHERE u.institution_id = ${institutionId}
-        GROUP BY u.id, u.first_name, u.last_name, u.email, u.role, u.created_at
+        GROUP BY u.id, u.first_name, u.last_name, u.email, u.role, u.created_at,
+                 e.dni, e.phone, e.department_id, e.contract_type, e.status, e.full_name, e.teacher_code, uss.session_count
         ORDER BY u.created_at DESC
       `);
 
@@ -792,9 +801,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('EMPLOYEE_UPDATE: Employee record updated');
       }
 
+      // Return updated employee data
+      const updatedUser = await db.execute(sql`
+        SELECT 
+          u.id,
+          u.first_name as "firstName",
+          u.last_name as "lastName",
+          u.email,
+          u.role,
+          u.created_at as "createdAt",
+          e.dni,
+          e.phone,
+          e.department_id as "departmentId",
+          e.contract_type as "contractType",
+          e.status,
+          e.full_name as "fullName"
+        FROM users u
+        LEFT JOIN employees e ON u.id = e.user_id
+        WHERE u.id = ${employeeId}
+      `);
+      
       res.json({ 
         success: true, 
-        message: 'Employee updated successfully' 
+        message: 'Employee updated successfully',
+        employee: updatedUser.rows[0]
       });
     } catch (error) {
       console.error("Error updating employee:", error);
@@ -2471,6 +2501,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       
       const actualEmployeeId = employeeData.rows[0]?.id;
+      
+      if (!actualEmployeeId) {
+        console.log('ADMIN_PERSONAL_SCHEDULE: No employee record found for user:', employeeId);
+        return res.json([]);
+      }
       
       const result = await db.execute(sql`
         SELECT 

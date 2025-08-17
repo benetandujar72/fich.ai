@@ -1,0 +1,294 @@
+
+> rest-express@1.0.0 dev
+9:30:06 AM [express] serving on port 5000s
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+AUTH_DEBUG: Checking authentication for GET /api/auth/user
+AUTH_DEBUG: Session ID: AlCUOMf-BHAyNW1Uo6GhhVilk9PrUyAo
+AUTH_DEBUG: User object: undefined
+AUTH_DEBUG: isAuthenticated(): false
+AUTH_DEBUG: Authentication failed
+9:30:10 AM [express] GET /api/auth/user 401 in 3ms :: {"message":"Unauthorized"}
+AUTH_DEBUG: Checking authentication for GET /api/auth/user
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+9:30:16 AM [express] GET /api/auth/user 304 in 180ms :: {"id":"96a60da5-87bb-4db2-8e07-1bb42ecc7296"…
+AUTH_DEBUG: Checking authentication for GET /api/alerts/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+AUTH_DEBUG: Checking authentication for GET /api/dashboard/weekly-stats/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+WEEKLY_STATS: Fetching for institution: 5262a4a1-44ec-48e5-b520-102b2dffea43 user: 96a60da5-87bb-4db2-8e07-1bb42ecc7296 role: superadmin
+WEEKLY_STATS: Week range from 2025-08-11T00:00:00.000Z to 2025-08-15T23:59:59.999Z
+AUTH_DEBUG: Checking authentication for GET /api/dashboard/recent-activity/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+RECENT_ACTIVITY: Fetching for institution: 5262a4a1-44ec-48e5-b520-102b2dffea43 user: 96a60da5-87bb-4db2-8e07-1bb42ecc7296 role: superadmin
+AUTH_DEBUG: Checking authentication for GET /api/dashboard/stats/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+9:30:16 AM [express] GET /api/alerts/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 182ms :: [{"id":"4d…
+RECENT_ACTIVITY: Found 10 activities
+WEEKLY_STATS: Returning stats with 3 main keys
+9:30:16 AM [express] GET /api/dashboard/recent-activity/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in …
+9:30:16 AM [express] GET /api/dashboard/weekly-stats/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 253…
+9:30:16 AM [express] GET /api/attendance/96a60da5-87bb-4db2-8e07-1bb42ecc7296 200 in 273ms
+9:30:16 AM [express] GET /api/dashboard/stats/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 280ms :: {…
+AUTH_DEBUG: Checking authentication for GET /api/auth/user
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+9:31:15 AM [express] GET /api/auth/user 304 in 171ms :: {"id":"96a60da5-87bb-4db2-8e07-1bb42ecc7296"…
+AUTH_DEBUG: Checking authentication for GET /api/alerts/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+AUTH_DEBUG: Checking authentication for GET /api/academic-years/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+9:31:16 AM [express] GET /api/attendance/96a60da5-87bb-4db2-8e07-1bb42ecc7296 200 in 128ms
+9:31:16 AM [express] GET /api/alerts/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 170ms :: [{"id":"4d…
+9:31:16 AM [express] GET /api/academic-years/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 170ms :: [{…
+AUTH_DEBUG: Checking authentication for GET /api/academic-years/5262a4a1-44ec-48e5-b520-102b2dffea43
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+9:31:40 AM [express] GET /api/academic-years/5262a4a1-44ec-48e5-b520-102b2dffea43 304 in 595ms :: [{…
+AUTH_DEBUG: Checking authentication for POST /api/schedule-import/complete-import
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+UNTIS_IMPORT: Starting complete import for institution: 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-17T09:31:42.034Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-17T09:31:42.079Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-17T09:31:42.081Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-17T09:31:42.081Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 25 teachers
+[2025-08-17T09:31:42.126Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:31:42.139Z] ERROR [SCHEDULE_IMPORT] COMPLETE_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+UNTIS_IMPORT: Complete import error: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22) {
+  length: 116,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '43',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn'
+}
+9:31:42 AM [express] POST /api/schedule-import/complete-import 500 in 239ms :: {"message":"Error en …
+AUTH_DEBUG: Checking authentication for POST /api/schedule-import/complete-import
+AUTH_DEBUG: Session ID: f7d19so44Ef9hM2CICCpux2LWbCqd_tG
+AUTH_DEBUG: User object: {
+  id: '96a60da5-87bb-4db2-8e07-1bb42ecc7296',
+  email: 'bandujar@edutac.es',
+  firstName: 'Super',
+  lastName: 'Admin',
+  profileImageUrl: null,
+  passwordHash: '$2b$10$tzAEiCN/QEFTc09Kj2psi.b5p2VIyNcQQQ.w4k0izwFsusnq4SjUC',
+  role: 'superadmin',
+  institutionId: '5262a4a1-44ec-48e5-b520-102b2dffea43',
+  createdAt: 2025-08-01T07:31:24.099Z,
+  updatedAt: 2025-08-11T09:21:09.820Z
+}
+AUTH_DEBUG: isAuthenticated(): true
+AUTH_DEBUG: Authentication successful
+UNTIS_IMPORT: Starting complete import for institution: 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-17T09:32:01.807Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-17T09:32:01.849Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-17T09:32:01.851Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-17T09:32:01.851Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 25 teachers
+[2025-08-17T09:32:01.893Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:32:01.893Z] ERROR [SCHEDULE_IMPORT] COMPLETE_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+UNTIS_IMPORT: Complete import error: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22) {
+  length: 116,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '43',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn'
+}
+9:32:01 AM [express] POST /api/schedule-import/complete-import 500 in 631ms :: {"message":"Error en …

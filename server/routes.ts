@@ -2926,6 +2926,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Main attendance endpoint for frontend buttons
+  app.post("/api/attendance", isAuthenticated, async (req: any, res) => {
+    try {
+      const { type, timestamp, method, location } = req.body;
+      const currentUser = req.user;
+      
+      if (!type || !timestamp) {
+        return res.status(400).json({ error: "Tipus i timestamp són obligatoris" });
+      }
+
+      if (!["check_in", "check_out"].includes(type)) {
+        return res.status(400).json({ error: "Tipus ha de ser check_in o check_out" });
+      }
+
+      // Get employee record from user_id
+      const employeeResult = await db.execute(sql`
+        SELECT id, user_id, full_name, email, institution_id 
+        FROM employees 
+        WHERE user_id = ${currentUser.id}
+        LIMIT 1
+      `);
+      
+      if (employeeResult.rows.length === 0) {
+        return res.status(404).json({ error: "No s'ha trobat el perfil d'empleat" });
+      }
+      
+      const employee = employeeResult.rows[0];
+
+      // Create attendance record
+      const attendanceResult = await db.execute(sql`
+        INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
+        VALUES (${employee.id}, ${type}, ${timestamp}, ${method || 'web'}, ${location || 'attendance_page'}, ${`Fitxatge ${type === 'check_in' ? 'entrada' : 'sortida'} - ${employee.full_name}`})
+        RETURNING *
+      `);
+      
+      console.log("✅ ATTENDANCE RECORD CREATED:", attendanceResult.rows[0]);
+      
+      const attendance = attendanceResult.rows[0];
+
+      res.json({
+        ...attendance,
+        employeeName: employee.full_name,
+        message: type === "check_in" ? 
+          `Entrada registrada correctament` : 
+          `Sortida registrada correctament`,
+        isLate: false,
+        lateMinutes: 0
+      });
+    } catch (error) {
+      console.error("Error creating attendance record:", error);
+      res.status(500).json({ error: "Error en el fitxatge" });
+    }
+  });
+
   // Quick attendance endpoint
   app.post("/api/quick-attendance", async (req, res) => {
     try {

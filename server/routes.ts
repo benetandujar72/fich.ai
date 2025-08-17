@@ -2761,20 +2761,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // QR ATTENDANCE PUBLIC ENDPOINT - UNIPERSONAL
   // ============================================
   
-  // NEW QR Processing endpoint for UnifiedQR (auth required)
+  // QR Processing endpoint for UnifiedQR (auth required)
   app.post("/api/qr/process", isAuthenticated, async (req: any, res) => {
-    console.log("🔥 NEW QR ENDPOINT HIT!");
-    console.log("🔥 Request body:", req.body);
-    console.log("🔥 User:", req.user);
-    
     try {
       const { qrCode, timestamp, location } = req.body;
       const currentUser = req.user;
       
-      console.log("🔥 Extracted data - QR:", qrCode, "Timestamp:", timestamp, "Location:", location);
-      
       if (!qrCode || !timestamp) {
-        console.log("🔥 Missing required fields!");
         return res.status(400).json({ error: "Codi QR i timestamp són obligatoris" });
       }
 
@@ -2786,17 +2779,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Extraure user ID i data del QR
-      const userIdParts = qrParts.slice(0, -3); // Tots els parts menys els últims 3 (any-mes-dia)
+      const userIdParts = qrParts.slice(0, -3);
       const qrUserId = userIdParts.join('-');
       const qrDate = `${qrParts[qrParts.length-3]}-${qrParts[qrParts.length-2]}-${qrParts[qrParts.length-1]}`;
       const todayDate = new Date().toISOString().split('T')[0];
-      
-      console.log("🔍 QR VALIDATION:");
-      console.log("  Original QR:", qrCode);
-      console.log("  QR User ID:", qrUserId);
-      console.log("  Current User ID:", currentUser.id);
-      console.log("  QR Date:", qrDate);
-      console.log("  Today Date:", todayDate);
       
       // Security: Only allow users to scan their own QR code
       if (qrUserId !== currentUser.id) {
@@ -2836,8 +2822,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ORDER BY timestamp DESC
       `);
       
-      console.log("  Today's attendance records found:", todayAttendanceResult.rows.length);
-      
       const todayAttendance = todayAttendanceResult.rows;
 
       // Determine if this should be check-in or check-out
@@ -2849,20 +2833,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
         const lastRecord = sortedAttendance[0];
         
-        // If last record was check_in, this should be check_out
         if (lastRecord.type === "check_in") {
           attendanceType = "check_out";
         }
       }
-      
-      console.log("  Attendance type determined:", attendanceType);
 
       // Create attendance record with Spanish timezone adjustment
       const utcTimestamp = new Date(timestamp);
       const spanishTimestamp = new Date(utcTimestamp.getTime() + (2 * 60 * 60 * 1000));
-      
-      console.log("  UTC Timestamp:", utcTimestamp.toISOString());
-      console.log("  Spanish Timestamp:", spanishTimestamp.toISOString());
 
       const attendanceResult = await db.execute(sql`
         INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
@@ -2870,14 +2848,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         RETURNING *
       `);
       
-      console.log("✅ QR RECORD INSERTED:", attendanceResult.rows[0]);
-      
       const attendance = attendanceResult.rows[0];
 
       // Return detailed response
       res.json({
         ...attendance,
         employeeName: employee.full_name,
+        type: attendanceType,
+        timestamp: attendance.timestamp,
         isLate: false,
         lateMinutes: 0,
         message: attendanceType === "check_in" ? 
@@ -2891,135 +2869,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // QR Processing (Public endpoint - no auth required)
-  app.post("/api/attendance/qr-process", async (req, res) => {
-    console.log("🔥 QR ENDPOINT HIT!");
-    console.log("🔥 Request body:", req.body);
-    console.log("🔥 Headers:", req.headers);
-    
-    try {
-      const { qrData, timestamp, location } = req.body;
-      
-      console.log("🔥 Extracted data - QR:", qrData, "Timestamp:", timestamp, "Location:", location);
-      
-      if (!qrData || !timestamp) {
-        console.log("🔥 Missing required fields!");
-        return res.status(400).json({ error: "Codi QR i timestamp són obligatoris" });
-      }
 
-      // QR data format: userId-YYYY-MM-DD (per complir normativa vigent)
-      const qrParts = qrData.trim().split('-');
-      
-      if (qrParts.length < 4) {
-        return res.status(400).json({ error: "Format del codi QR no vàlid" });
-      }
-      
-      // Extraure user ID i data del QR
-      const userIdParts = qrParts.slice(0, -3); // Tots els parts menys els últims 3 (any-mes-dia)
-      const employeeId = userIdParts.join('-');
-      const qrDate = `${qrParts[qrParts.length-3]}-${qrParts[qrParts.length-2]}-${qrParts[qrParts.length-1]}`;
-      const todayDate = new Date().toISOString().split('T')[0];
-      
-      console.log("🔍 QR VALIDATION:");
-      console.log("  Original QR:", qrData);
-      console.log("  Employee ID:", employeeId);
-      console.log("  QR Date:", qrDate);
-      console.log("  Today Date:", todayDate);
-      
-      // Validar que el QR és d'avui (normativa vigent)
-      if (qrDate !== todayDate) {
-        return res.status(400).json({ 
-          error: "Aquest codi QR ha caducat. Genera un nou codi QR des de la teva àrea personal.",
-          code: "QR_EXPIRED"
-        });
-      }
-      
-      // Validate employee exists (QR contains user_id) - direct DB query
-      const employeeResult = await db.execute(sql`
-        SELECT id, user_id, full_name, email, institution_id 
-        FROM employees 
-        WHERE user_id = ${employeeId}
-        LIMIT 1
-      `);
-      
-      if (employeeResult.rows.length === 0) {
-        return res.status(404).json({ error: "Empleat no trobat amb aquest codi QR" });
-      }
-      
-      const employee = employeeResult.rows[0];
-
-      // Skip academic year check for now - focus on basic QR functionality
-
-      // Get employee's latest attendance record for today (Spanish timezone)
-      console.log("🕐 QR TIMEZONE DEBUG:");
-      console.log("  Received timestamp:", timestamp);
-      console.log("  Employee:", employee.full_name);
-      
-      const todayAttendanceResult = await db.execute(sql`
-        SELECT * FROM attendance_records 
-        WHERE employee_id = ${employee.id}
-        AND DATE(timestamp AT TIME ZONE 'Europe/Madrid') = CURRENT_DATE
-        ORDER BY timestamp DESC
-      `);
-      
-      console.log("  Today's attendance records found:", todayAttendanceResult.rows.length);
-      
-      const todayAttendance = todayAttendanceResult.rows;
-
-      // Determine if this should be check-in or check-out
-      let attendanceType: "check_in" | "check_out" = "check_in";
-      
-      if (todayAttendance.length > 0) {
-        // Sort by timestamp to get the latest
-        const sortedAttendance = todayAttendance.sort((a: any, b: any) => 
-          new Date(String(b.timestamp)).getTime() - new Date(String(a.timestamp)).getTime()
-        );
-        const lastRecord = sortedAttendance[0];
-        
-        // If last record was check_in, this should be check_out
-        if (lastRecord.type === "check_in") {
-          attendanceType = "check_out";
-        }
-      }
-
-      // Skip late checking for now - would need working schedule system
-      
-      console.log("  Attendance type determined:", attendanceType);
-
-      // Create attendance record with Spanish timezone adjustment
-      const utcTimestamp = new Date(timestamp);
-      const spanishTimestamp = new Date(utcTimestamp.getTime() + (2 * 60 * 60 * 1000)); // Add 2 hours for Spanish time
-      
-      console.log("  UTC Timestamp:", utcTimestamp.toISOString());
-      console.log("  Spanish Timestamp:", spanishTimestamp.toISOString());
-      console.log("  Local time should be:", spanishTimestamp.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
-
-      const attendanceResult = await db.execute(sql`
-        INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
-        VALUES (${employee.id}, ${attendanceType}, ${spanishTimestamp.toISOString()}, 'qr', ${location}, ${`Fitxatge automàtic per codi QR - ${employee.full_name}`})
-        RETURNING *
-      `);
-      
-      console.log("✅ QR RECORD INSERTED:", attendanceResult.rows[0]);
-      
-      const attendance = attendanceResult.rows[0];
-
-      // Return detailed response
-      res.json({
-        ...attendance,
-        employeeName: employee.full_name,
-        isLate: false,
-        lateMinutes: 0,
-        message: attendanceType === "check_in" ? 
-          `Entrada registrada per ${employee.full_name}` : 
-          `Sortida registrada per ${employee.full_name}`
-      });
-
-    } catch (error) {
-      console.error("Error processing QR:", error);
-      res.status(500).json({ error: "Error processant el codi QR" });
-    }
-  });
 
   return httpServer;
 }

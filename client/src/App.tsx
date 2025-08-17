@@ -32,7 +32,7 @@ import WeeklyScheduleAdmin from "@/pages/WeeklyScheduleAdmin";
 import Communications from "@/pages/Communications";
 import QRAttendancePage from "@/pages/QRAttendance";
 import AcademicDataMigration from "@/pages/AcademicDataMigration";
-import PublicQRAttendance from "@/pages/PublicQRAttendance";
+
 import EmployeeQRGenerator from "@/pages/EmployeeQRGenerator";
 import MyQRCode from "@/pages/MyQRCode";
 import QRScanner from "@/pages/QRScanner";
@@ -454,8 +454,6 @@ function Router() {
               <UnifiedQR />
             </ProtectedRoute>
           } />
-
-          <Route path="/public-qr" component={PublicQRAttendance} />
 
           <Route path="/qr-generator" component={() => 
             <ProtectedRoute requiredRoles={['superadmin', 'admin']}>

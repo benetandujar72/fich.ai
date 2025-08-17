@@ -2892,7 +2892,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.importCompleteUntisData(req.user.institutionId, activeYear.id);
       
       res.json({
-        success: true,
         ...result,
         message: 'Importació completa d\'Untis realitzada correctament'
       });
@@ -2965,11 +2964,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Import only schedules from predefined file
       const fs = await import('fs');
-      const schedulesPath = './attached_assets/HORARIS UNTIS - Full 1_1754042189827.csv';
+      const schedulesPath = './attached_assets/HORARIS_1755422110445.TXT';
       
       if (!fs.existsSync(schedulesPath)) {
         return res.status(404).json({ 
-          message: 'Fitxer d\'horaris no trobat: HORARIS UNTIS - Full 1_1754042189827.csv' 
+          message: 'Fitxer d\'horaris no trobat: HORARIS_1755422110445.TXT' 
         });
       }
 
@@ -2979,7 +2978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: true,
         sessionsImported: result.sessionsImported,
-        linkedSessions: result.linkedSessions,
+        employeesLinked: result.employeesLinked,
         message: `Horaris importats: ${result.sessionsImported} sessions d'horaris`
       });
     } catch (error) {

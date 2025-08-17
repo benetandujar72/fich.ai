@@ -1128,38 +1128,62 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
   async parseUntisCSV(csvContent: string, institutionId: string, academicYearId: string) {
     logger.scheduleImport('CSV_PARSE_START', `Starting GP Untis CSV parse for institution ${institutionId}`);
     
-    const lines = csvContent.split('\n').filter(line => line.trim() && !line.startsWith('#'));
+    const lines = csvContent.split('\n');
     const parsedSessions: any[] = [];
     const teachers = new Set<string>();
     const subjects = new Set<string>();
     const classGroups = new Set<string>();
     const classrooms = new Set<string>();
+    let lineNumber = 0;
 
     try {
       for (const line of lines) {
-        const [classe, grup, docent, materia, aula, dia, hora] = line.split(',').map(s => s.trim());
+        lineNumber++;
+        if (!line.trim() || line.startsWith('#')) continue;
+
+        // Parse format: #classe,"grup","id_docent","id_materia","aula",dia,hora,,
+        // Example: 4,"2n A","MS","MAT2","2A",2,3,,
+        const parts = line.split(',').map(p => p.trim().replace(/"/g, ''));
         
-        if (!grup || !docent || !materia || !dia || !hora) {
-          logger.warn('SCHEDULE_IMPORT', `Skipping invalid line: ${line}`);
+        if (parts.length < 7) {
+          logger.scheduleImport('CSV_PARSE_WARNING', `Skipping malformed line ${lineNumber}: ${line}`);
+          continue;
+        }
+
+        const [classNumber, groupCode, teacherCode, subjectCode, classroomCode, dayOfWeek, hourPeriod] = parts;
+        
+        if (!teacherCode || !subjectCode || !groupCode || !dayOfWeek || !hourPeriod) {
+          logger.scheduleImport('CSV_PARSE_WARNING', `Skipping incomplete line ${lineNumber}: ${line}`);
+          continue;
+        }
+
+        const day = parseInt(dayOfWeek);
+        const hour = parseInt(hourPeriod);
+        
+        if (isNaN(day) || isNaN(hour) || day < 1 || day > 7 || hour < 1 || hour > 8) {
+          logger.scheduleImport('CSV_PARSE_WARNING', `Invalid day/hour on line ${lineNumber}: day=${day}, hour=${hour}`);
           continue;
         }
 
         // Extract unique values
-        teachers.add(docent);
-        subjects.add(materia);
-        classGroups.add(grup);
-        if (aula && aula !== '') classrooms.add(aula);
+        teachers.add(teacherCode);
+        subjects.add(subjectCode);
+        classGroups.add(groupCode);
+        if (classroomCode && classroomCode !== '') classrooms.add(classroomCode);
 
         parsedSessions.push({
           institutionId,
           academicYearId,
-          classeId: classe || null,
-          groupCode: grup,
-          teacherCode: docent,
-          subjectCode: materia,
-          classroomCode: aula || null,
-          dayOfWeek: parseInt(dia),
-          hourPeriod: parseInt(hora),
+          classNumber: classNumber || null,
+          groupCode: groupCode,
+          teacherCode: teacherCode,
+          subjectCode: subjectCode,
+          classroomCode: classroomCode || null,
+          dayOfWeek: day,
+          hourPeriod: hour,
+          employeeId: null, // Will be linked later
+          createdAt: new Date(),
+          updatedAt: new Date()
         });
       }
 
@@ -1747,7 +1771,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       }
       
       // Import subjects
-      const subjectsPath = './attached_assets/MATÈRIES_1754044172639.TXT';
+      const subjectsPath = './attached_assets/MATÈRIES_1755422344956.TXT';
       if (fs.existsSync(subjectsPath)) {
         const subjectsContent = fs.readFileSync(subjectsPath, 'utf8');
         const subjectsResult = await this.importUntisSubjects(subjectsContent, institutionId, academicYearId);
@@ -1765,10 +1789,10 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       }
       
       // Import schedule sessions
-      const schedulePath = './attached_assets/HORARIS_1754043300200.TXT';
+      const schedulePath = './attached_assets/HORARIS_1755422110445.TXT';
       if (fs.existsSync(schedulePath)) {
         const scheduleContent = fs.readFileSync(schedulePath, 'utf8');
-        const scheduleResult = await this.importUntisScheduleFromTXT(scheduleContent, institutionId, academicYearId);
+        const scheduleResult = await this.importUntisSchedule(scheduleContent, institutionId, academicYearId);
         schedulesImported = scheduleResult.sessionsImported || 0;
         logger.scheduleImport('SCHEDULE_IMPORTED', `Sessions: ${schedulesImported} imported, ${scheduleResult.employeesLinked} linked`);
       }

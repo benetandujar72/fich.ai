@@ -170,6 +170,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "academic_year_id": {
+          "name": "academic_year_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "name": {
           "name": "name",
           "type": "varchar",
@@ -1073,6 +1079,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "teacher_code": {
+          "name": "teacher_code",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "phone": {
           "name": "phone",
           "type": "varchar",
@@ -1085,6 +1097,12 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "contract_hours": {
+          "name": "contract_hours",
+          "type": "decimal",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",

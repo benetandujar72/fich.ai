@@ -1,0 +1,144 @@
+[2025-08-01T10:12:42.912Z] DEBUG [DATABASE] SELECT_STATS on untis_schedule_sessions | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","academicYearId":"51c809e8-6bc8-433a-bc01-d3a4bb391d9b"}
+[2025-08-01T10:27:54.785Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-01T10:27:54.830Z] INFO [SCHEDULE_IMPORT] TXT_IMPORT_START: Starting GP Untis TXT import for institution 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-01T10:27:54.834Z] INFO [SCHEDULE_IMPORT] TXT_PARSE_SUCCESS: Parsed 702 sessions from TXT | Data: {"teachers":44,"subjects":125,"classGroups":14,"classrooms":34}
+[2025-08-01T10:27:55.398Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_START: Starting employee linking process
+[2025-08-01T10:27:59.202Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_SUCCESS: Linked 0 sessions to employees
+[2025-08-01T10:41:23.368Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-01T10:41:23.416Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-01T10:41:23.419Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-01T10:41:23.420Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 50 teachers
+[2025-08-01T10:41:23.528Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: null value in column "user_id" of relation "employees" violates not-null constraint | Stack: error: null value in column "user_id" of relation "employees" violates not-null constraint
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1445:11)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1591:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:612:22)
+[2025-08-01T10:41:23.549Z] ERROR [SCHEDULE_IMPORT] COMPLETE_IMPORT_ERROR failed | Error: null value in column "user_id" of relation "employees" violates not-null constraint | Stack: error: null value in column "user_id" of relation "employees" violates not-null constraint
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1445:11)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1591:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:612:22)
+[2025-08-01T10:41:28.249Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-01T10:41:28.296Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-01T10:41:28.297Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 50 teachers
+[2025-08-01T10:41:28.387Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: null value in column "user_id" of relation "employees" violates not-null constraint | Stack: error: null value in column "user_id" of relation "employees" violates not-null constraint
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1445:11)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:645:22)
+[2025-08-01T10:41:30.445Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-01T10:41:30.523Z] INFO [SCHEDULE_IMPORT] TXT_IMPORT_START: Starting GP Untis TXT import for institution 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-01T10:41:30.563Z] INFO [SCHEDULE_IMPORT] TXT_PARSE_SUCCESS: Parsed 702 sessions from TXT | Data: {"teachers":44,"subjects":125,"classGroups":14,"classrooms":34}
+[2025-08-01T10:41:31.452Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_START: Starting employee linking process
+[2025-08-01T10:41:35.359Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_SUCCESS: Linked 0 sessions to employees
+[2025-08-01T10:44:40.048Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-01T10:44:40.093Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-01T10:44:40.096Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-01T10:44:40.097Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 50 teachers
+[2025-08-01T10:44:40.308Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a..mart.@insbitacola.cat
+[2025-08-01T10:44:40.545Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a..oliver@insbitacola.cat
+[2025-08-01T10:44:40.783Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a.aldeguer@insbitacola.cat
+[2025-08-01T10:44:41.029Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a.aparicio@insbitacola.cat
+[2025-08-01T10:44:41.271Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a.lazo@insbitacola.cat
+[2025-08-01T10:44:41.512Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a.palomares@insbitacola.cat
+[2025-08-01T10:44:41.767Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a.p.rez@insbitacola.cat
+[2025-08-01T10:44:42.034Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: a.rodellar@insbitacola.cat
+[2025-08-01T10:44:42.318Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: alba@insbitacola.cat
+[2025-08-01T10:44:42.588Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: b.and.jar@insbitacola.cat
+[2025-08-01T10:44:42.877Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: c.cant.@insbitacola.cat
+[2025-08-01T10:44:43.127Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: c.l.pez@insbitacola.cat
+[2025-08-01T10:44:43.394Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: c.murillo@insbitacola.cat
+[2025-08-01T10:44:43.651Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: c.ruano@insbitacola.cat
+[2025-08-01T10:44:43.895Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: c.sanz@insbitacola.cat
+[2025-08-01T10:44:44.147Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: c.suarez@insbitacola.cat
+[2025-08-01T10:44:44.399Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: d.stein@insbitacola.cat
+[2025-08-01T10:44:44.658Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: e.su.rez@insbitacola.cat
+[2025-08-01T10:44:44.925Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: esther@insbitacola.cat
+[2025-08-01T10:44:45.221Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: f.juanico@insbitacola.cat
+[2025-08-01T10:44:45.511Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: g.ripoll@insbitacola.cat
+[2025-08-01T10:44:45.883Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: h.urgell@insbitacola.cat
+[2025-08-01T10:44:46.146Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: i.sol.@insbitacola.cat
+[2025-08-01T10:44:46.449Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: j.alburquerque@insbitacola.cat
+[2025-08-01T10:44:46.734Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: j.g.mez@insbitacola.cat
+[2025-08-01T10:44:47.007Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: j.p.rez@insbitacola.cat
+[2025-08-01T10:44:47.258Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: jm.navarra@insbitacola.cat
+[2025-08-01T10:44:47.502Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: l..julve@insbitacola.cat
+[2025-08-01T10:44:47.746Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: l.abad@insbitacola.cat
+[2025-08-01T10:44:47.983Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: l.pascual@insbitacola.cat
+[2025-08-01T10:44:48.222Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: l.peralta@insbitacola.cat
+[2025-08-01T10:44:48.459Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: l.poch@insbitacola.cat
+[2025-08-01T10:44:48.696Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: l.ramos@insbitacola.cat
+[2025-08-01T10:44:48.947Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: laia@insbitacola.cat
+[2025-08-01T10:44:49.189Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: m..velert@insbitacola.cat
+[2025-08-01T10:44:49.436Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: m.estop@insbitacola.cat
+[2025-08-01T10:44:49.681Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: m.fern.ndez@insbitacola.cat
+[2025-08-01T10:44:49.932Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: m.ruiz@insbitacola.cat
+[2025-08-01T10:44:50.172Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: m.ruiz.m@insbitacola.cat
+[2025-08-01T10:44:50.411Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: n.arnau@insbitacola.cat
+[2025-08-01T10:44:50.647Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: n.cruz@insbitacola.cat
+[2025-08-01T10:44:50.889Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: prof.acollida@insbitacola.cat
+[2025-08-01T10:44:51.130Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: r.mas@insbitacola.cat
+[2025-08-01T10:44:51.368Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: s.blasco@insbitacola.cat
+[2025-08-01T10:44:51.610Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: s.rusi.ol@insbitacola.cat
+[2025-08-01T10:44:51.865Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: s.defurundarena@insbitacola.cat
+[2025-08-01T10:44:52.111Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: t..socias@insbitacola.cat
+[2025-08-01T10:44:52.346Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: tecno.2@insbitacola.cat
+[2025-08-01T10:44:52.584Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: v.llerena@insbitacola.cat
+[2025-08-01T10:44:52.832Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: v.portela@insbitacola.cat
+[2025-08-01T10:44:52.876Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORTED: Teachers: 50 created, 0 updated
+[2025-08-01T10:44:52.877Z] INFO [SCHEDULE_IMPORT] SUBJECTS_IMPORT_START: Starting GP Untis subjects import
+[2025-08-01T10:44:52.878Z] INFO [SCHEDULE_IMPORT] SUBJECTS_PARSE_SUCCESS: Parsed 227 subjects
+[2025-08-01T10:44:53.189Z] INFO [SCHEDULE_IMPORT] SUBJECTS_IMPORTED: Subjects: 227 imported
+[2025-08-01T10:44:53.189Z] INFO [SCHEDULE_IMPORT] GROUPS_IMPORT_START: Starting GP Untis class groups import
+[2025-08-01T10:44:53.190Z] INFO [SCHEDULE_IMPORT] GROUPS_PARSE_SUCCESS: Parsed 14 class groups
+[2025-08-01T10:44:53.282Z] INFO [SCHEDULE_IMPORT] GROUPS_IMPORTED: Groups: 14 imported
+[2025-08-01T10:44:53.283Z] INFO [SCHEDULE_IMPORT] TXT_IMPORT_START: Starting GP Untis TXT import for institution 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-01T10:44:53.288Z] INFO [SCHEDULE_IMPORT] TXT_PARSE_SUCCESS: Parsed 702 sessions from TXT | Data: {"teachers":44,"subjects":125,"classGroups":14,"classrooms":34}
+[2025-08-01T10:44:53.738Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_START: Starting employee linking process
+[2025-08-01T10:44:57.540Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 16 sessions to A. MARTÍ using pattern: A. MARTÍ
+[2025-08-01T10:44:57.805Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 6 sessions to ALEXANDER ALDEGUER using pattern: A.ALDEGUER
+[2025-08-01T10:44:57.848Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 13 sessions to A.APARICIO using pattern: A.APARICIO
+[2025-08-01T10:44:57.892Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 8 sessions to A.LAZO using pattern: A.LAZO
+[2025-08-01T10:44:57.938Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 17 sessions to A.PALOMARES using pattern: A.PALOMARES
+[2025-08-01T10:44:57.982Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 10 sessions to A.PÉREZ using pattern: A.PÉREZ
+[2025-08-01T10:44:58.027Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 16 sessions to A.RODELLAR using pattern: A.RODELLAR
+[2025-08-01T10:44:58.072Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 18 sessions to ALBA using pattern: ALBA
+[2025-08-01T10:44:58.116Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 8 sessions to B.ANDÚJAR using pattern: B.ANDÚJAR
+[2025-08-01T10:44:58.161Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 28 sessions to C.CANTÓ using pattern: C.CANTÓ
+[2025-08-01T10:44:58.206Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 16 sessions to C.LÓPEZ using pattern: C.LÓPEZ
+[2025-08-01T10:44:58.251Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 26 sessions to C.MURILLO using pattern: C.MURILLO
+[2025-08-01T10:44:58.469Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 19 sessions to C.SANZ using pattern: C.SANZ
+[2025-08-01T10:44:58.687Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 18 sessions to D.STEIN using pattern: D.STEIN
+[2025-08-01T10:44:58.732Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 27 sessions to E.SUÁREZ using pattern: E.SUÁREZ
+[2025-08-01T10:44:58.779Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 3 sessions to ESTHER using pattern: ESTHER
+[2025-08-01T10:44:58.824Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 3 sessions to F.JUANICO using pattern: F.JUANICO
+[2025-08-01T10:44:58.868Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 17 sessions to G.RIPOLL using pattern: G.RIPOLL
+[2025-08-01T10:44:58.913Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 10 sessions to H.URGELL using pattern: H.URGELL
+[2025-08-01T10:44:58.957Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 2 sessions to I.SOLÉ using pattern: I.SOLÉ
+[2025-08-01T10:44:59.002Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 23 sessions to J.ALBURQUERQUE using pattern: J.ALBURQUERQUE
+[2025-08-01T10:44:59.048Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 19 sessions to J.GÓMEZ using pattern: J.GÓMEZ
+[2025-08-01T10:44:59.092Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 7 sessions to J.PÉREZ using pattern: J.PÉREZ
+[2025-08-01T10:44:59.137Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 14 sessions to JM.NAVARRA using pattern: JM.NAVARRA
+[2025-08-01T10:44:59.354Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 10 sessions to L.ABAD using pattern: L.ABAD
+[2025-08-01T10:44:59.399Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 18 sessions to L.PASCUAL using pattern: L.PASCUAL
+[2025-08-01T10:44:59.487Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 31 sessions to LUCAS PERALTA using pattern: L.PERALTA
+[2025-08-01T10:44:59.531Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 15 sessions to L.POCH using pattern: L.POCH
+[2025-08-01T10:44:59.576Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 18 sessions to L.RAMOS using pattern: L.RAMOS
+[2025-08-01T10:44:59.619Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 21 sessions to LAIA using pattern: LAIA
+[2025-08-01T10:44:59.838Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 18 sessions to M.ESTOP using pattern: M.ESTOP
+[2025-08-01T10:44:59.883Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 19 sessions to M.FERNÁNDEZ using pattern: M.FERNÁNDEZ
+[2025-08-01T10:45:00.273Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 12 sessions to N.ARNAU using pattern: N.ARNAU
+[2025-08-01T10:45:00.318Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 17 sessions to N.CRUZ using pattern: N.CRUZ
+[2025-08-01T10:45:00.362Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 1 sessions to PROF_ACOLLIDA using pattern: PROF_ACOLLIDA
+[2025-08-01T10:45:00.450Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 24 sessions to RAT MAS using pattern: R.MAS
+[2025-08-01T10:45:00.538Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 33 sessions to SUSANA BLASCO using pattern: S.BLASCO
+[2025-08-01T10:45:00.582Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 16 sessions to S.RUSIÑOL using pattern: S.RUSIÑOL
+[2025-08-01T10:45:00.801Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 25 sessions to T. SOCIAS using pattern: T. SOCIAS
+[2025-08-01T10:45:01.018Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 15 sessions to V.LLERENA using pattern: V.LLERENA
+[2025-08-01T10:45:01.064Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 12 sessions to V.PORTELA using pattern: V.PORTELA
+[2025-08-01T10:45:01.064Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_SUCCESS: Linked 649 sessions to employees
+[2025-08-01T10:45:01.065Z] INFO [SCHEDULE_IMPORT] SCHEDULE_IMPORTED: Sessions: 702 imported, 649 linked
+[2025-08-01T10:45:01.065Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_START: Starting employee linking process
+[2025-08-01T10:45:13.709Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_SUCCESS: Linked 0 sessions to employees

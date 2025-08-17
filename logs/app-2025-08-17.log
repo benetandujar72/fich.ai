@@ -1,0 +1,223 @@
+[2025-08-17T09:31:42.034Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-17T09:31:42.079Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-17T09:31:42.081Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-17T09:31:42.081Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 25 teachers
+[2025-08-17T09:31:42.126Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:31:42.139Z] ERROR [SCHEDULE_IMPORT] COMPLETE_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:32:01.807Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-17T09:32:01.849Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-17T09:32:01.851Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-17T09:32:01.851Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 25 teachers
+[2025-08-17T09:32:01.893Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:32:01.893Z] ERROR [SCHEDULE_IMPORT] COMPLETE_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:33:13.955Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-17T09:33:13.999Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-17T09:33:14.000Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-17T09:33:14.001Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 25 teachers
+[2025-08-17T09:33:14.045Z] ERROR [SCHEDULE_IMPORT] TEACHERS_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:33:14.045Z] ERROR [SCHEDULE_IMPORT] COMPLETE_IMPORT_ERROR failed | Error: column "academic_year_id" does not exist | Stack: error: column "academic_year_id" does not exist
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.importUntisTeachers (/home/runner/workspace/server/storage.ts:1561:28)
+    at async DatabaseStorage.importCompleteUntisData (/home/runner/workspace/server/storage.ts:1767:32)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:2892:22)
+[2025-08-17T09:36:36.653Z] DEBUG [DATABASE] SELECT on academic_years | Data: {"institutionId":"5262a4a1-44ec-48e5-b520-102b2dffea43","isActive":true}
+[2025-08-17T09:36:36.694Z] INFO [SCHEDULE_IMPORT] COMPLETE_IMPORT_START: Starting complete GP Untis data import
+[2025-08-17T09:36:36.697Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORT_START: Starting GP Untis teachers import
+[2025-08-17T09:36:36.697Z] INFO [SCHEDULE_IMPORT] TEACHERS_PARSE_SUCCESS: Parsed 25 teachers
+[2025-08-17T09:36:36.885Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: ab@insbitacola.cat
+[2025-08-17T09:36:37.107Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: abs@insbitacola.cat
+[2025-08-17T09:36:37.327Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: am@insbitacola.cat
+[2025-08-17T09:36:37.548Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: ap@insbitacola.cat
+[2025-08-17T09:36:37.767Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: apm@insbitacola.cat
+[2025-08-17T09:36:37.987Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: as@insbitacola.cat
+[2025-08-17T09:36:38.208Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: ba@insbitacola.cat
+[2025-08-17T09:36:38.428Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: bl@insbitacola.cat
+[2025-08-17T09:36:38.649Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: bp@insbitacola.cat
+[2025-08-17T09:36:38.869Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: cg@insbitacola.cat
+[2025-08-17T09:36:39.088Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: dp@insbitacola.cat
+[2025-08-17T09:36:39.309Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: fra.2@insbitacola.cat
+[2025-08-17T09:36:39.529Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: jc@insbitacola.cat
+[2025-08-17T09:36:39.749Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: jt@insbitacola.cat
+[2025-08-17T09:36:39.969Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: jtp@insbitacola.cat
+[2025-08-17T09:36:40.188Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: lg@insbitacola.cat
+[2025-08-17T09:36:40.417Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: lm@insbitacola.cat
+[2025-08-17T09:36:40.641Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: mc@insbitacola.cat
+[2025-08-17T09:36:40.864Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: mf@insbitacola.cat
+[2025-08-17T09:36:41.085Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: ms@insbitacola.cat
+[2025-08-17T09:36:41.307Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: mv@insbitacola.cat
+[2025-08-17T09:36:41.527Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: mig.ef@insbitacola.cat
+[2025-08-17T09:36:41.747Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: nm@insbitacola.cat
+[2025-08-17T09:36:41.967Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: tc@insbitacola.cat
+[2025-08-17T09:36:42.187Z] INFO [SCHEDULE_IMPORT] USER_CREATED: Created user for teacher: xr@insbitacola.cat
+[2025-08-17T09:36:42.229Z] INFO [SCHEDULE_IMPORT] TEACHERS_IMPORTED: Teachers: 25 created, 0 updated
+[2025-08-17T09:36:42.229Z] INFO [SCHEDULE_IMPORT] SUBJECTS_IMPORT_START: Starting GP Untis subjects import
+[2025-08-17T09:36:42.229Z] INFO [SCHEDULE_IMPORT] SUBJECTS_PARSE_SUCCESS: Parsed 63 subjects
+[2025-08-17T09:36:42.403Z] INFO [SCHEDULE_IMPORT] SUBJECTS_IMPORTED: Subjects: 63 imported
+[2025-08-17T09:36:42.404Z] INFO [SCHEDULE_IMPORT] GROUPS_IMPORT_START: Starting GP Untis class groups import
+[2025-08-17T09:36:42.404Z] INFO [SCHEDULE_IMPORT] GROUPS_PARSE_SUCCESS: Parsed 14 class groups
+[2025-08-17T09:36:42.491Z] INFO [SCHEDULE_IMPORT] GROUPS_IMPORTED: Groups: 14 imported
+[2025-08-17T09:36:42.491Z] INFO [SCHEDULE_IMPORT] IMPORT_START: Starting GP Untis import for institution 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-17T09:36:42.492Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_START: Starting GP Untis CSV parse for institution 5262a4a1-44ec-48e5-b520-102b2dffea43
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 216: 60,,"AS","RCAEI",,2,5,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 217: 60,,"DP","RCAEI",,2,5,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 218: 61,,"LM","RLING",,2,2,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 219: 61,,"JTP","RLING",,2,2,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 220: 61,,"MF","RLING",,2,2,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 221: 61,,"FRA 2","RLING",,2,2,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 222: 61,,"AS","RLING",,2,2,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 223: 61,,"BP","RLING",,2,2,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 224: 62,,"JC","RED",,2,3,,
+[2025-08-17T09:36:42.493Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 225: 62,,"JC","RED",,3,2,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 226: 62,,"JC","RED",,3,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 227: 62,,"XR","RED",,2,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 228: 62,,"XR","RED",,3,2,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 229: 62,,"XR","RED",,3,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 230: 62,,"LM","RED",,2,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 231: 62,,"LM","RED",,3,2,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 232: 62,,"LM","RED",,3,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 233: 62,,"DP","RED",,2,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 234: 62,,"DP","RED",,3,2,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 235: 62,,"DP","RED",,3,3,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 236: 64,,"JT","REG23",,2,4,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 237: 64,,"MF","REG23",,2,4,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 238: 64,,"AP","REG23",,2,4,,
+[2025-08-17T09:36:42.494Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 239: 64,,"NM","REG23",,2,4,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 240: 64,,"APM","REG23",,2,4,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 241: 64,,"AB","REG23",,2,4,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 242: 66,,"JC","RPRIM",,1,3,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 243: 66,,"LM","RPRIM",,1,3,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 244: 67,,"ABS","RTUT2",,3,3,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 245: 67,,"BL","RTUT2",,3,3,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 246: 67,,"MV","RTUT2",,3,3,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 247: 71,,"DP","RANG",,4,4,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 248: 71,,"MV","RANG",,4,4,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 249: 71,,"CG","RANG",,4,4,,
+[2025-08-17T09:36:42.495Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 250: 71,,"BL","RANG",,4,4,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 290: 107,,,"REF",,5,3,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 291: 107,,"JC","REF",,5,3,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 292: 107,,"TC","REF",,5,3,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 293: 107,,"Mig EF","REF",,5,3,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 295: 110,,"ABS","PIS A2",,2,6,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 297: 111,,"ABS","PIS B1",,5,6,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 304: 116,,"FRA 2","PIS A1",,3,4,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 307: 117,,"JC","PIS C2",,2,1,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 308: 117,,"JC","PIS C2",,5,2,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 310: 118,,"MS","PISB2",,1,1,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 311: 123,,"BA","RMAT",,2,1,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 312: 123,,"AM","RMAT",,2,1,,
+[2025-08-17T09:36:42.496Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 313: 123,,"MS","RMAT",,2,1,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 314: 123,,"JT","RMAT",,2,1,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 315: 125,,"LG","RMUS",,1,5,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 316: 125,,"ABS","RMUS",,1,5,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 317: 125,,"APM","RMUS",,1,5,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 379: 179,,"AS","RTUT1",,5,1,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 380: 179,,"MS","RTUT1",,5,1,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 381: 179,,"CG","RTUT1",,5,1,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 382: 180,,"BA","RTUT4",,3,5,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 383: 180,,"AP","RTUT4",,3,5,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 384: 180,,"BP","RTUT4",,3,5,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 385: 181,,"NM","RIP",,5,3,,
+[2025-08-17T09:36:42.497Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 386: 181,,"LG","RIP",,5,3,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 387: 181,,"XR","RIP",,5,3,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 388: 181,,"AP","RIP",,5,3,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 389: 181,,"AB","RIP",,5,3,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 390: 185,,"MC","REG1",,3,2,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 391: 185,,"AM","REG1",,3,2,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 392: 185,,"AS","REG1",,3,2,,
+[2025-08-17T09:36:42.498Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 575: 202,,,"T",,5,5,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 656: 257,,"AS","CP",,1,2,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 657: 257,,"AS","CP",,1,3,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 658: 257,,"AM","CP",,1,2,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 659: 257,,"AM","CP",,1,3,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 660: 257,,"AP","CP",,1,2,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 661: 257,,"AP","CP",,1,3,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 662: 257,,"BL","CP",,1,2,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 663: 257,,"BL","CP",,1,3,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 664: 257,,"DP","CP",,1,2,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 665: 257,,"DP","CP",,1,3,,
+[2025-08-17T09:36:42.499Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 666: 258,,"AM","RTUT3",,5,2,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 667: 258,,"NM","RTUT3",,5,2,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 668: 258,,"APM","RTUT3",,5,2,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 741: 261,,"NM","EX","2A",3,2,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 742: 261,,"NM","EX","2A",3,3,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 743: 261,,"NM","EX","2A",4,3,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 744: 261,,"NM","EX","2A",4,4,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 745: 261,,"NM","EX","2A",5,5,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 746: 261,,"NM","EX","2A",5,6,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 747: 261,,"APM","EX","3A",3,2,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 748: 261,,"APM","EX","3A",3,3,,
+[2025-08-17T09:36:42.500Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 749: 261,,"APM","EX","3A",4,3,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 750: 261,,"APM","EX","3A",4,4,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 751: 261,,"APM","EX","3A",5,5,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 752: 261,,"APM","EX","3A",5,6,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 753: 261,,"MF","EX","3C",3,2,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 754: 261,,"MF","EX","3C",3,3,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 755: 261,,"MF","EX","3C",4,3,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 756: 261,,"MF","EX","3C",4,4,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 757: 261,,"MF","EX","3C",5,5,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 758: 261,,"MF","EX","3C",5,6,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 759: 261,,"AB",,"2B",3,2,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 760: 261,,"AB",,"2B",3,3,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 761: 261,,"AB",,"2B",4,3,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 762: 261,,"AB",,"2B",4,4,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 763: 261,,"AB",,"2B",5,5,,
+[2025-08-17T09:36:42.501Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 764: 261,,"AB",,"2B",5,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 783: 291,,"JC","RCO",,4,5,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 784: 291,,"DP","RCO",,4,5,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 785: 291,,"NM","RCO",,4,5,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 801: 298,,"AS","RCAEI",,3,4,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 802: 298,,"DP","RCAEI",,3,4,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 815: 300,,"NM","EX","2C",1,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 816: 300,,"APM","EX","3B",1,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 817: 300,,"MF","EX","3C",1,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 818: 300,,"AB","EX","3A",1,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 831: 301,,"NM","EX",,2,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 832: 301,,"APM","EX",,2,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 833: 301,,"MF","EX",,2,6,,
+[2025-08-17T09:36:42.502Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_WARNING: Skipping incomplete line 834: 301,,"AB","EX",,2,6,,
+[2025-08-17T09:36:42.503Z] INFO [SCHEDULE_IMPORT] CSV_PARSE_SUCCESS: Parsed 737 sessions | Data: {"teachers":26,"subjects":43,"classGroups":12,"classrooms":22}
+[2025-08-17T09:36:42.503Z] INFO [SCHEDULE_IMPORT] CLEANUP: Removing existing schedule sessions
+[2025-08-17T09:36:42.568Z] INFO [SCHEDULE_IMPORT] SUBJECTS_SYNC: Syncing 43 subjects
+[2025-08-17T09:36:44.345Z] INFO [SCHEDULE_IMPORT] GROUPS_SYNC: Syncing 12 class groups
+[2025-08-17T09:36:44.846Z] INFO [SCHEDULE_IMPORT] CLASSROOMS_SYNC: Syncing 22 classrooms
+[2025-08-17T09:36:45.757Z] INFO [SCHEDULE_IMPORT] SESSIONS_INSERT: Inserting 737 schedule sessions
+[2025-08-17T09:36:46.103Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING: Linking sessions to existing employees
+[2025-08-17T09:36:46.103Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_START: Starting employee linking process
+[2025-08-17T09:36:48.309Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKED: Linked 27 sessions to FRA 2 using pattern: FRA 2
+[2025-08-17T09:36:50.416Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_SUCCESS: Linked 27 sessions to employees
+[2025-08-17T09:36:50.416Z] INFO [SCHEDULE_IMPORT] IMPORT_SUCCESS: Import completed successfully | Data: {"sessionsImported":737,"employeesLinked":27,"summary":{"teachers":["MS","CG","LG","JT","ABS","NM","XR","BP","APM","TC","AS","MC","Mig EF","MV","BL","FRA 2","?","JTP","AM","BA","AP","JC","LM","MF","AB","DP"],"subjects":["MAT2","ANG1","EC","TUT1","MUS1","MAT1","EF3","MUS2","EF2","ANG2","FR2","FR1","PISC1A","FR4","ANG4","MAT3","MUS3","TUT4","TUT3","PIS A2","PIS B1","PIS C1","PMU1B","PIS A1","PIS C2","PISB2","LIN14","EF 4","MAT4","LIN23","IP 1","IP 2","FR3","TR","T","TUT2","ANG3","EG1","EX","ANGD","PMAT1B","APL","APM"],"classGroups":["2n A","1r C","1r A","1r B","2n B","2n C","3r A","3r B","3r C","4t A","4t B","4t C"],"classrooms":["2A","1C","1B","1A","2C","3A","3B","MUS","PAV","2B","4A","4B","4C","3C","1B~4B","1C~4C","4C~1C","1A~2A","2B~3B","2C~3C","3A~4A","4B~1B"]}}
+[2025-08-17T09:36:50.416Z] INFO [SCHEDULE_IMPORT] SCHEDULE_IMPORTED: Sessions: 737 imported, 27 linked
+[2025-08-17T09:36:50.416Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_START: Starting employee linking process
+[2025-08-17T09:36:54.774Z] INFO [SCHEDULE_IMPORT] EMPLOYEE_LINKING_SUCCESS: Linked 0 sessions to employees

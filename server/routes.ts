@@ -2882,11 +2882,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Credencials incorrectes" });
       }
 
-      // Find employee record
+      // Find employee record for active academic year
       const employeeResult = await db.execute(sql`
-        SELECT id, user_id, full_name, email, institution_id 
-        FROM employees 
-        WHERE user_id = ${user.id}
+        SELECT e.id, e.user_id, e.full_name, e.email, e.institution_id 
+        FROM employees e
+        JOIN academic_years ay ON ay.institution_id = e.institution_id AND ay.is_active = true
+        WHERE e.user_id = ${user.id} AND e.academic_year_id = ay.id
         LIMIT 1
       `);
       
@@ -2954,10 +2955,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const employee = employeeResult.rows[0];
 
-      // Create attendance record
+      // Determine active academic year for this employee's institution
+      const activeYearResult = await db.execute(sql`
+        SELECT id FROM academic_years 
+        WHERE institution_id = ${employee.institution_id} AND is_active = true 
+        LIMIT 1
+      `);
+      const activeAcademicYearId = activeYearResult.rows[0]?.id;
+
+      // Create attendance record including academic year
       const attendanceResult = await db.execute(sql`
-        INSERT INTO attendance_records (employee_id, type, timestamp, method, location, notes)
-        VALUES (${employee.id}, ${type}, ${timestamp}, ${method || 'web'}, ${location || 'attendance_page'}, ${`Fitxatge ${type === 'check_in' ? 'entrada' : 'sortida'} - ${employee.full_name}`})
+        INSERT INTO attendance_records (employee_id, academic_year_id, type, timestamp, method, location, notes)
+        VALUES (${employee.id}, ${activeAcademicYearId}, ${type}, ${timestamp}, ${method || 'web'}, ${location || 'attendance_page'}, ${`Fitxatge ${type === 'check_in' ? 'entrada' : 'sortida'} - ${employee.full_name}`})
         RETURNING *
       `);
       

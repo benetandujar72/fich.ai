@@ -1,0 +1,1406 @@
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPresència - Sistema de Control de Presència Educatiu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,0,1;wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#1976D2',
+                        secondary: '#388E3C',
+                        accent: '#F57C00',
+                        surface: '#FFFFFF',
+                        background: '#FAFAFA',
+                        text: '#212121',
+                        error: '#D32F2F',
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="font-roboto bg-background text-text min-h-screen">
+
+<!-- @COMPONENT: LanguageSwitcher -->
+<div id="language-switcher" class="fixed top-4 right-4 z-50">
+    <div class="bg-surface rounded-lg shadow-md border border-gray-200 overflow-hidden">
+        <button onclick="switchLanguage('ca')" class="px-3 py-2 text-sm font-medium text-text hover:bg-gray-50 transition-colors duration-200 border-r border-gray-200 language-btn active" data-lang="ca">
+            <i class="fas fa-flag mr-1"></i> Català
+        </button>
+        <button onclick="switchLanguage('es')" class="px-3 py-2 text-sm font-medium text-text hover:bg-gray-50 transition-colors duration-200 language-btn" data-lang="es">
+            <i class="fas fa-flag mr-1"></i> Español
+        </button>
+    </div>
+</div>
+<!-- @END_COMPONENT: LanguageSwitcher -->
+
+<!-- @COMPONENT: LoginPage -->
+<div id="login-page" class="min-h-screen flex">
+    <!-- Left Panel - Branding -->
+    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-blue-600 text-white p-12 flex-col justify-center">
+        <div class="max-w-md mx-auto">
+            <div class="mb-8">
+                <i class="fas fa-graduation-cap text-6xl mb-4"></i>
+                <h1 class="text-4xl font-bold mb-4" data-ca="EduPresència" data-es="EduPresencia">EduPresència</h1>
+                <p class="text-xl text-blue-100" data-ca="Sistema integral de control de presència per a centres educatius" data-es="Sistema integral de control de presencia para centros educativos">Sistema integral de control de presència per a centres educatius</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold" data-ca="Compliment RGPD" data-es="Cumplimiento RGPD">Compliment RGPD</h3>
+                        <p class="text-blue-100 text-sm" data-ca="Protecció de dades garantida" data-es="Protección de datos garantizada">Protecció de dades garantida</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-clock text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold" data-ca="Control horari intel·ligent" data-es="Control horario inteligente">Control horari intel·ligent</h3>
+                        <p class="text-blue-100 text-sm" data-ca="Gestió automatizada d'absències" data-es="Gestión automatizada de ausencias">Gestió automatizada d'absències</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold" data-ca="Informes detallats" data-es="Informes detallados">Informes detallats</h3>
+                        <p class="text-blue-100 text-sm" data-ca="Estadístiques i anàlisis avançades" data-es="Estadísticas y análisis avanzados">Estadístiques i anàlisis avançades</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel - Login Form -->
+    <div class="w-full lg:w-1/2 flex flex-col justify-center px-8 py-12">
+        <div class="max-w-md mx-auto w-full">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-text mb-2" data-ca="Accés al sistema" data-es="Acceso al sistema">Accés al sistema</h2>
+                <p class="text-gray-600" data-ca="Inicia sessió amb el teu compte institucional" data-es="Inicia sesión con tu cuenta institucional">Inicia sessió amb el teu compte institucional</p>
+            </div>
+
+            <form class="space-y-6" data-implementation="Integrate with Replit Auth">
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Correu electrònic" data-es="Correo electrónico">Correu electrònic</label>
+                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" placeholder="usuari@centre.edu" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Contrasenya" data-es="Contraseña">Contrasenya</label>
+                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors" required>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <span class="ml-2 text-sm text-gray-600" data-ca="Recordar-me" data-es="Recordarme">Recordar-me</span>
+                    </label>
+                    <a href="#" class="text-sm text-primary hover:underline" data-ca="Has oblidat la contrasenya?" data-es="¿Has olvidado la contraseña?">Has oblidat la contrasenya?</a>
+                </div>
+
+                <button type="submit" onclick="showDashboard()" class="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
+                    <span data-ca="Iniciar sessió" data-es="Iniciar sesión">Iniciar sessió</span>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-600" data-ca="Necessites ajuda? Contacta amb l'administrador del centre" data-es="¿Necesitas ayuda? Contacta con el administrador del centro">Necessites ajuda? Contacta amb l'administrador del centre</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- @END_COMPONENT: LoginPage -->
+
+<!-- @COMPONENT: MainDashboard -->
+<div id="main-dashboard" class="hidden min-h-screen bg-background">
+    <!-- Navigation Sidebar -->
+    <nav class="fixed top-0 left-0 h-full w-64 bg-surface shadow-lg z-40 transform transition-transform duration-300" id="sidebar">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center">
+                <i class="fas fa-graduation-cap text-2xl text-primary mr-3"></i>
+                <div>
+                    <h1 class="text-xl font-bold text-text">EduPresència</h1>
+                    <p class="text-sm text-gray-600" data-ca="Centre Educatiu Exemple" data-es="Centro Educativo Ejemplo">Centre Educatiu Exemple</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" onclick="showSection('dashboard')" class="nav-link active flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span data-ca="Tauler de control" data-es="Panel de control">Tauler de control</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('employees')" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-users mr-3"></i>
+                        <span data-ca="Personal" data-es="Personal">Personal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('attendance')" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-clock mr-3"></i>
+                        <span data-ca="Fitxatge" data-es="Fichaje">Fitxatge</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('alerts')" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-bell mr-3"></i>
+                        <span data-ca="Alertes" data-es="Alertas">Alertes</span>
+                        <span class="ml-auto bg-error text-white text-xs px-2 py-1 rounded-full">3</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('reports')" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-chart-bar mr-3"></i>
+                        <span data-ca="Informes" data-es="Informes">Informes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('settings')" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span data-ca="Configuració" data-es="Configuración">Configuració</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+            <div class="flex items-center">
+                <!-- Profile image with proper object-fit -->
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face" alt="Profile" class="w-10 h-10 rounded-full object-cover mr-3">
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-text">Joan Pérez</p>
+                    <p class="text-xs text-gray-600" data-ca="Administrador" data-es="Administrador">Administrador</p>
+                </div>
+                <button onclick="logout()" class="text-gray-600 hover:text-error transition-colors">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="ml-64 transition-all duration-300" id="main-content">
+        <!-- Top Header -->
+        <header class="bg-surface shadow-sm border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <button class="lg:hidden mr-4" onclick="toggleSidebar()">
+                        <i class="fas fa-bars text-xl text-text"></i>
+                    </button>
+                    <h1 class="text-2xl font-semibold text-text" id="page-title" data-ca="Tauler de control" data-es="Panel de control">Tauler de control</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Quick Actions -->
+                    <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors" onclick="showQuickAttendance()">
+                        <i class="fas fa-clock mr-2"></i>
+                        <span data-ca="Fitxar ara" data-es="Fichar ahora">Fitxar ara</span>
+                    </button>
+                    <button class="relative text-gray-600 hover:text-text transition-colors">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="p-6">
+            <!-- @SECTION: Dashboard Overview -->
+            <div id="dashboard-section" class="section-content">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600" data-ca="Personal present" data-es="Personal presente">Personal present</p>
+                                <p class="text-3xl font-bold text-text">42</p>
+                                <p class="text-sm text-secondary">de 48 total</p>
+                            </div>
+                            <div class="bg-secondary bg-opacity-10 p-3 rounded-full">
+                                <i class="fas fa-users text-secondary text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600" data-ca="Retards avui" data-es="Retrasos hoy">Retards avui</p>
+                                <p class="text-3xl font-bold text-text">3</p>
+                                <p class="text-sm text-accent">-2 respecte ahir</p>
+                            </div>
+                            <div class="bg-accent bg-opacity-10 p-3 rounded-full">
+                                <i class="fas fa-clock text-accent text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600" data-ca="Absències" data-es="Ausencias">Absències</p>
+                                <p class="text-3xl font-bold text-text">6</p>
+                                <p class="text-sm text-error">+1 respecte ahir</p>
+                            </div>
+                            <div class="bg-error bg-opacity-10 p-3 rounded-full">
+                                <i class="fas fa-user-times text-error text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600" data-ca="Guàrdies actives" data-es="Guardias activas">Guàrdies actives</p>
+                                <p class="text-3xl font-bold text-text">4</p>
+                                <p class="text-sm text-primary">2 automàtiques</p>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-full">
+                                <i class="fas fa-shield-alt text-primary text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions and Recent Activity -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Quick Actions -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-semibold text-text mb-4" data-ca="Accions ràpides" data-es="Acciones rápidas">Accions ràpides</h3>
+                            <div class="space-y-3">
+                                <button class="w-full bg-primary text-white p-3 rounded-lg text-left hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-user-plus mr-3"></i>
+                                    <span data-ca="Afegir nou empleat" data-es="Añadir nuevo empleado">Afegir nou empleat</span>
+                                </button>
+                                <button class="w-full bg-secondary text-white p-3 rounded-lg text-left hover:bg-green-700 transition-colors">
+                                    <i class="fas fa-file-import mr-3"></i>
+                                    <span data-ca="Importar horaris" data-es="Importar horarios">Importar horaris</span>
+                                </button>
+                                <button class="w-full bg-accent text-white p-3 rounded-lg text-left hover:bg-orange-600 transition-colors">
+                                    <i class="fas fa-download mr-3"></i>
+                                    <span data-ca="Generar informe" data-es="Generar informe">Generar informe</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-semibold text-text mb-4" data-ca="Activitat recent" data-es="Actividad reciente">Activitat recent</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <div class="bg-secondary bg-opacity-10 p-2 rounded-full mr-4">
+                                        <i class="fas fa-check text-secondary"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-text">Maria García ha fitxat l'entrada</p>
+                                        <p class="text-xs text-gray-600">08:15 - Educació Primària</p>
+                                    </div>
+                                    <span class="text-xs text-gray-500">fa 5 min</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="bg-accent bg-opacity-10 p-2 rounded-full mr-4">
+                                        <i class="fas fa-clock text-accent"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-text">Retard detectat: Pere Martínez</p>
+                                        <p class="text-xs text-gray-600">08:25 - Educació Secundària</p>
+                                    </div>
+                                    <span class="text-xs text-gray-500">fa 10 min</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded-full mr-4">
+                                        <i class="fas fa-shield-alt text-primary"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-text">Guàrdia assignada automàticament</p>
+                                        <p class="text-xs text-gray-600">Anna López - Aula 203</p>
+                                    </div>
+                                    <span class="text-xs text-gray-500">fa 15 min</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Chart -->
+                <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-text mb-4" data-ca="Assistència setmanal" data-es="Asistencia semanal">Assistència setmanal</h3>
+                    <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <!-- Placeholder for chart - would be implemented with Chart.js or similar -->
+                        <div class="text-center">
+                            <i class="fas fa-chart-line text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600" data-ca="Gràfic d'assistència setmanal" data-es="Gráfico de asistencia semanal">Gràfic d'assistència setmanal</p>
+                            <p class="text-sm text-gray-500" data-ca="(Implementar amb Chart.js)" data-es="(Implementar con Chart.js)">(Implementar amb Chart.js)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- @SECTION: Employee Management -->
+            <div id="employees-section" class="section-content hidden">
+                <!-- Employee Management Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-semibold text-text mb-2" data-ca="Gestió de personal" data-es="Gestión de personal">Gestió de personal</h2>
+                        <p class="text-gray-600" data-ca="Administra els empleats del centre educatiu" data-es="Administra los empleados del centro educativo">Administra els empleats del centre educatiu</p>
+                    </div>
+                    <div class="flex space-x-3 mt-4 sm:mt-0">
+                        <button class="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                            <i class="fas fa-file-import mr-2"></i>
+                            <span data-ca="Importar" data-es="Importar">Importar</span>
+                        </button>
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors" onclick="showEmployeeModal()">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span data-ca="Afegir empleat" data-es="Añadir empleado">Afegir empleat</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text mb-2" data-ca="Buscar" data-es="Buscar">Buscar</label>
+                            <input type="text" placeholder="Nom, DNI, correu..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text mb-2" data-ca="Departament" data-es="Departamento">Departament</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option data-ca="Tots" data-es="Todos">Tots</option>
+                                <option data-ca="Educació Primària" data-es="Educación Primaria">Educació Primària</option>
+                                <option data-ca="Educació Secundària" data-es="Educación Secundaria">Educació Secundària</option>
+                                <option data-ca="Administració" data-es="Administración">Administració</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text mb-2" data-ca="Estat" data-es="Estado">Estat</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option data-ca="Tots" data-es="Todos">Tots</option>
+                                <option data-ca="Actiu" data-es="Activo">Actiu</option>
+                                <option data-ca="Inactiu" data-es="Inactivo">Inactiu</option>
+                                <option data-ca="Baixa temporal" data-es="Baja temporal">Baixa temporal</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors w-full">
+                                <i class="fas fa-search mr-2"></i>
+                                <span data-ca="Filtrar" data-es="Filtrar">Filtrar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Table -->
+                <div class="bg-surface rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-text" data-ca="Llista d'empleats" data-es="Lista de empleados">Llista d'empleats</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-ca="Empleat" data-es="Empleado">Empleat</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DNI</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-ca="Departament" data-es="Departamento">Departament</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-ca="Horari" data-es="Horario">Horari</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-ca="Estat" data-es="Estado">Estat</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-ca="Accions" data-es="Acciones">Accions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" data-mock="true">
+                                <!-- @MAP: employees.map(employee => ( -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <!-- Professional headshot of a teacher -->
+                                            <img src="https://pixabay.com/get/g6339da653b545eafcd37a7a756cbf216fd3eb80056cec6f7655321589ddeb8a689e5be4d691222191cbe1b7b8bce26b3303b6da5956b4986a956e1a35d574c31_1280.jpg" alt="Maria García" class="w-10 h-10 rounded-full object-cover mr-4">
+                                            <div>
+                                                <div class="text-sm font-medium text-text" data-bind="employee.name">Maria García Fernández</div>
+                                                <div class="text-sm text-gray-500" data-bind="employee.email">maria.garcia@centre.edu</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text" data-bind="employee.dni">12345678A</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text" data-bind="employee.department">Educació Primària</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text" data-bind="employee.schedule">08:00 - 16:00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-secondary bg-opacity-10 text-secondary" data-bind="employee.status">Actiu</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-orange-600" title="Horaris">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button class="text-error hover:text-red-700" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <!-- Professional headshot of a male teacher -->
+                                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face" alt="Joan Pérez" class="w-10 h-10 rounded-full object-cover mr-4">
+                                            <div>
+                                                <div class="text-sm font-medium text-text">Joan Pérez Martínez</div>
+                                                <div class="text-sm text-gray-500">joan.perez@centre.edu</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text">87654321B</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text">Educació Secundària</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text">09:00 - 17:00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-secondary bg-opacity-10 text-secondary">Actiu</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-orange-600" title="Horaris">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button class="text-error hover:text-red-700" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <!-- Professional headshot of a female administrator -->
+                                            <img src="https://pixabay.com/get/g2b1d5edb29da055aa316f4209e3be4d787889f5a5a45b90a8df1d651d0d2d10a64fecff67a5b4094b2749c065a68b397f2ae54b766132430305ef88a6988d17a_1280.jpg" alt="Anna López" class="w-10 h-10 rounded-full object-cover mr-4">
+                                            <div>
+                                                <div class="text-sm font-medium text-text">Anna López Vila</div>
+                                                <div class="text-sm text-gray-500">anna.lopez@centre.edu</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text">11223344C</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text">Administració</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text">08:30 - 16:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-accent bg-opacity-10 text-accent">Baixa temporal</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-blue-700" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-orange-600" title="Horaris">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button class="text-error hover:text-red-700" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 border-t border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-gray-600" data-ca="Mostrant 1-3 de 48 empleats" data-es="Mostrando 1-3 de 48 empleados">Mostrant 1-3 de 48 empleats</p>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                                    <span data-ca="Anterior" data-es="Anterior">Anterior</span>
+                                </button>
+                                <button class="px-3 py-1 bg-primary text-white rounded text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                                    <span data-ca="Següent" data-es="Siguiente">Següent</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- @SECTION: Attendance Tracking -->
+            <div id="attendance-section" class="section-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Quick Check-in -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Fitxatge ràpid" data-es="Fichaje rápido">Fitxatge ràpid</h3>
+                        
+                        <div class="text-center mb-6">
+                            <div class="text-6xl text-primary mb-4" id="current-time">08:15</div>
+                            <p class="text-gray-600" data-ca="Hora actual" data-es="Hora actual">Hora actual</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <button class="w-full bg-secondary text-white py-4 px-6 rounded-lg text-lg font-medium hover:bg-green-700 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-3"></i>
+                                <span data-ca="Fitxar entrada" data-es="Fichar entrada">Fitxar entrada</span>
+                            </button>
+                            <button class="w-full bg-error text-white py-4 px-6 rounded-lg text-lg font-medium hover:bg-red-700 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-3"></i>
+                                <span data-ca="Fitxar sortida" data-es="Fichar salida">Fitxar sortida</span>
+                            </button>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h4 class="font-medium text-text mb-3" data-ca="Mètodes alternatius" data-es="Métodos alternativos">Mètodes alternatius</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="border border-gray-300 py-3 px-4 rounded-lg text-center hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-qrcode text-xl text-primary mb-2"></i>
+                                    <p class="text-sm text-text" data-ca="Codi QR" data-es="Código QR">Codi QR</p>
+                                </button>
+                                <button class="border border-gray-300 py-3 px-4 rounded-lg text-center hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-id-card text-xl text-primary mb-2"></i>
+                                    <p class="text-sm text-text" data-ca="Targeta NFC" data-es="Tarjeta NFC">Targeta NFC</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Schedule -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Horari d'avui" data-es="Horario de hoy">Horari d'avui</h3>
+                        
+                        <div class="space-y-4" data-mock="true">
+                            <div class="flex items-center justify-between p-3 bg-secondary bg-opacity-10 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-secondary mr-3"></i>
+                                    <div>
+                                        <p class="font-medium text-text">08:00 - 09:00</p>
+                                        <p class="text-sm text-gray-600" data-ca="Matemàtiques - 3r A" data-es="Matemáticas - 3º A">Matemàtiques - 3r A</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs bg-secondary text-white px-2 py-1 rounded-full" data-ca="Completat" data-es="Completado">Completat</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-3 bg-primary bg-opacity-10 rounded-lg border-l-4 border-primary">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-primary mr-3"></i>
+                                    <div>
+                                        <p class="font-medium text-text">09:00 - 10:00</p>
+                                        <p class="text-sm text-gray-600" data-ca="Ciències - 3r B" data-es="Ciencias - 3º B">Ciències - 3r B</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs bg-primary text-white px-2 py-1 rounded-full" data-ca="Actual" data-es="Actual">Actual</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-gray-400 mr-3"></i>
+                                    <div>
+                                        <p class="font-medium text-text">10:30 - 11:30</p>
+                                        <p class="text-sm text-gray-600" data-ca="Tutoria - 3r A" data-es="Tutoría - 3º A">Tutoria - 3r A</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs bg-gray-400 text-white px-2 py-1 rounded-full" data-ca="Pendent" data-es="Pendiente">Pendent</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600" data-ca="Hores lectives:" data-es="Horas lectivas:">Hores lectives:</span>
+                                <span class="font-medium text-text">6h</span>
+                            </div>
+                            <div class="flex justify-between text-sm mt-2">
+                                <span class="text-gray-600" data-ca="Hores no lectives:" data-es="Horas no lectivas:">Hores no lectives:</span>
+                                <span class="font-medium text-text">2h</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance History -->
+                <div class="mt-6 bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-text mb-6" data-ca="Historial de fitxatges" data-es="Historial de fichajes">Historial de fitxatges</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Data" data-es="Fecha">Data</th>
+                                    <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Entrada" data-es="Entrada">Entrada</th>
+                                    <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Sortida" data-es="Salida">Sortida</th>
+                                    <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Hores" data-es="Horas">Hores</th>
+                                    <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Estat" data-es="Estado">Estat</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100" data-mock="true">
+                                <tr>
+                                    <td class="py-3 text-sm text-text">15/01/2025</td>
+                                    <td class="py-3 text-sm text-text">08:15</td>
+                                    <td class="py-3 text-sm text-text">16:30</td>
+                                    <td class="py-3 text-sm text-text">8h 15m</td>
+                                    <td class="py-3">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-secondary bg-opacity-10 text-secondary" data-ca="Normal" data-es="Normal">Normal</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 text-sm text-text">14/01/2025</td>
+                                    <td class="py-3 text-sm text-text">08:25</td>
+                                    <td class="py-3 text-sm text-text">16:35</td>
+                                    <td class="py-3 text-sm text-text">8h 10m</td>
+                                    <td class="py-3">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-accent bg-opacity-10 text-accent" data-ca="Retard" data-es="Retraso">Retard</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 text-sm text-text">13/01/2025</td>
+                                    <td class="py-3 text-sm text-text">--</td>
+                                    <td class="py-3 text-sm text-text">--</td>
+                                    <td class="py-3 text-sm text-text">0h</td>
+                                    <td class="py-3">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-primary bg-opacity-10 text-primary" data-ca="Baixa mèdica" data-es="Baja médica">Baixa mèdica</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- @SECTION: Alerts -->
+            <div id="alerts-section" class="section-content hidden">
+                <div class="space-y-6">
+                    <!-- Alert Configuration -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Configuració d'alertes" data-es="Configuración de alertas">Configuració d'alertes</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Tolerància de retard (minuts)" data-es="Tolerancia de retraso (minutos)">Tolerància de retard (minuts)</label>
+                                <input type="number" value="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Retards màxims per mes" data-es="Retrasos máximos por mes">Retards màxims per mes</label>
+                                <input type="number" value="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <button class="mt-4 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                            <span data-ca="Guardar configuració" data-es="Guardar configuración">Guardar configuració</span>
+                        </button>
+                    </div>
+
+                    <!-- Active Alerts -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Alertes actives" data-es="Alertas activas">Alertes actives</h3>
+                        
+                        <div class="space-y-4" data-mock="true">
+                            <div class="border-l-4 border-error bg-error bg-opacity-5 p-4 rounded-r-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-exclamation-triangle text-error mr-3"></i>
+                                        <div>
+                                            <p class="font-medium text-text" data-ca="Absència sense justificar" data-es="Ausencia sin justificar">Absència sense justificar</p>
+                                            <p class="text-sm text-gray-600">Pere Martínez - No ha fitxat l'entrada</p>
+                                            <p class="text-xs text-gray-500">fa 25 minuts</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700 text-sm" data-ca="Assignar guàrdia" data-es="Asignar guardia">Assignar guàrdia</button>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-l-4 border-accent bg-accent bg-opacity-5 p-4 rounded-r-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock text-accent mr-3"></i>
+                                        <div>
+                                            <p class="font-medium text-text" data-ca="Retard detectat" data-es="Retraso detectado">Retard detectat</p>
+                                            <p class="text-sm text-gray-600">Maria López - 15 minuts de retard</p>
+                                            <p class="text-xs text-gray-500">fa 10 minuts</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button class="text-primary hover:text-blue-700 text-sm" data-ca="Justificar" data-es="Justificar">Justificar</button>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-l-4 border-primary bg-primary bg-opacity-5 p-4 rounded-r-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-info-circle text-primary mr-3"></i>
+                                        <div>
+                                            <p class="font-medium text-text" data-ca="Guàrdia assignada automàticament" data-es="Guardia asignada automáticamente">Guàrdia assignada automàticament</p>
+                                            <p class="text-sm text-gray-600">Anna Garcia - Aula 205 (substitució Pere Martínez)</p>
+                                            <p class="text-xs text-gray-500">fa 5 minuts</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alert History -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Historial d'alertes" data-es="Historial de alertas">Historial d'alertes</h3>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200">
+                                        <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Data/Hora" data-es="Fecha/Hora">Data/Hora</th>
+                                        <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Empleat" data-es="Empleado">Empleat</th>
+                                        <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Tipus" data-es="Tipo">Tipus</th>
+                                        <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Estat" data-es="Estado">Estat</th>
+                                        <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Accions" data-es="Acciones">Accions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100" data-mock="true">
+                                    <tr>
+                                        <td class="py-3 text-sm text-text">15/01/2025 08:25</td>
+                                        <td class="py-3 text-sm text-text">Pere Martínez</td>
+                                        <td class="py-3 text-sm text-text" data-ca="Absència" data-es="Ausencia">Absència</td>
+                                        <td class="py-3">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-error bg-opacity-10 text-error" data-ca="Activa" data-es="Activa">Activa</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <button class="text-primary hover:text-blue-700 text-sm" data-ca="Gestionar" data-es="Gestionar">Gestionar</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 text-sm text-text">14/01/2025 08:20</td>
+                                        <td class="py-3 text-sm text-text">Maria López</td>
+                                        <td class="py-3 text-sm text-text" data-ca="Retard" data-es="Retraso">Retard</td>
+                                        <td class="py-3">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-secondary bg-opacity-10 text-secondary" data-ca="Resolta" data-es="Resuelta">Resolta</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <button class="text-gray-500 text-sm" data-ca="Veure detalls" data-es="Ver detalles">Veure detalls</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- @SECTION: Reports -->
+            <div id="reports-section" class="section-content hidden">
+                <div class="space-y-6">
+                    <!-- Report Generator -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Generador d'informes" data-es="Generador de informes">Generador d'informes</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Tipus d'informe" data-es="Tipo de informe">Tipus d'informe</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option data-ca="Assistència general" data-es="Asistencia general">Assistència general</option>
+                                    <option data-ca="Retards i absències" data-es="Retrasos y ausencias">Retards i absències</option>
+                                    <option data-ca="Hores treballades" data-es="Horas trabajadas">Hores treballades</option>
+                                    <option data-ca="Guàrdies realitzades" data-es="Guardias realizadas">Guàrdies realitzades</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Data inici" data-es="Fecha inicio">Data inici</label>
+                                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Data fi" data-es="Fecha fin">Data fi</label>
+                                <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex space-x-3">
+                            <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-chart-bar mr-2"></i>
+                                <span data-ca="Generar informe" data-es="Generar informe">Generar informe</span>
+                            </button>
+                            <button class="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                                <i class="fas fa-file-excel mr-2"></i>
+                                <span data-ca="Exportar CSV" data-es="Exportar CSV">Exportar CSV</span>
+                            </button>
+                            <button class="bg-error text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+                                <i class="fas fa-file-pdf mr-2"></i>
+                                <span data-ca="Exportar PDF" data-es="Exportar PDF">Exportar PDF</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Dashboard -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Attendance Overview -->
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h4 class="text-lg font-semibold text-text mb-4" data-ca="Resum d'assistència" data-es="Resumen de asistencia">Resum d'assistència</h4>
+                            <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-pie text-4xl text-gray-400 mb-4"></i>
+                                    <p class="text-gray-600" data-ca="Gràfic d'assistència mensual" data-es="Gráfico de asistencia mensual">Gràfic d'assistència mensual</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Department Comparison -->
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h4 class="text-lg font-semibold text-text mb-4" data-ca="Comparativa per departaments" data-es="Comparativa por departamentos">Comparativa per departaments</h4>
+                            <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-bar text-4xl text-gray-400 mb-4"></i>
+                                    <p class="text-gray-600" data-ca="Gràfic comparatiu departaments" data-es="Gráfico comparativo departamentos">Gràfic comparatiu departaments</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+                            <i class="fas fa-percentage text-3xl text-primary mb-3"></i>
+                            <p class="text-2xl font-bold text-text">94.2%</p>
+                            <p class="text-sm text-gray-600" data-ca="Taxa d'assistència" data-es="Tasa de asistencia">Taxa d'assistència</p>
+                        </div>
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+                            <i class="fas fa-clock text-3xl text-accent mb-3"></i>
+                            <p class="text-2xl font-bold text-text">8.3</p>
+                            <p class="text-sm text-gray-600" data-ca="Mitjana hores/dia" data-es="Media horas/día">Mitjana hores/dia</p>
+                        </div>
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+                            <i class="fas fa-exclamation-triangle text-3xl text-error mb-3"></i>
+                            <p class="text-2xl font-bold text-text">12</p>
+                            <p class="text-sm text-gray-600" data-ca="Retards aquest mes" data-es="Retrasos este mes">Retards aquest mes</p>
+                        </div>
+                        <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+                            <i class="fas fa-shield-alt text-3xl text-secondary mb-3"></i>
+                            <p class="text-2xl font-bold text-text">45</p>
+                            <p class="text-sm text-gray-600" data-ca="Guàrdies cobertes" data-es="Guardias cubiertas">Guàrdies cobertes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- @SECTION: Settings -->
+            <div id="settings-section" class="section-content hidden">
+                <div class="space-y-6">
+                    <!-- Center Configuration -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Configuració del centre" data-es="Configuración del centro">Configuració del centre</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Nom del centre" data-es="Nombre del centro">Nom del centre</label>
+                                <input type="text" value="Centre Educatiu Exemple" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Curs acadèmic" data-es="Curso académico">Curs acadèmic</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option>2024-2025</option>
+                                    <option>2025-2026</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Zona horària" data-es="Zona horaria">Zona horària</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option>Europe/Barcelona</option>
+                                    <option>Europe/Madrid</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text mb-2" data-ca="Idioma per defecte" data-es="Idioma por defecto">Idioma per defecte</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="ca">Català</option>
+                                    <option value="es">Español</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Retention Policy -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Política de retenció de dades" data-es="Política de retención de datos">Política de retenció de dades</h3>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-600 mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-blue-800" data-ca="Compliment RGPD" data-es="Cumplimiento RGPD">Compliment RGPD</p>
+                                    <p class="text-sm text-blue-700" data-ca="Les dades es conservaran durant 4 anys segons la normativa vigent" data-es="Los datos se conservarán durante 4 años según la normativa vigente">Les dades es conservaran durant 4 anys segons la normativa vigent</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                <div>
+                                    <p class="font-medium text-text" data-ca="Eliminació automàtica" data-es="Eliminación automática">Eliminació automàtica</p>
+                                    <p class="text-sm text-gray-600" data-ca="Eliminar dades automàticament després de 4 anys" data-es="Eliminar datos automáticamente después de 4 años">Eliminar dades automàticament després de 4 anys</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Management -->
+                    <div class="bg-surface rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-text mb-6" data-ca="Gestió d'usuaris" data-es="Gestión de usuarios">Gestió d'usuaris</h3>
+                        
+                        <div class="space-y-4">
+                            <button class="w-full sm:w-auto bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                <span data-ca="Afegir administrador" data-es="Añadir administrador">Afegir administrador</span>
+                            </button>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-gray-200">
+                                            <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Usuari" data-es="Usuario">Usuari</th>
+                                            <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Rol" data-es="Rol">Rol</th>
+                                            <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Últim accés" data-es="Último acceso">Últim accés</th>
+                                            <th class="text-left py-3 text-sm font-medium text-gray-600" data-ca="Accions" data-es="Acciones">Accions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100" data-mock="true">
+                                        <tr>
+                                            <td class="py-3">
+                                                <div class="flex items-center">
+                                                    <!-- System administrator professional photo -->
+                                                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face" alt="Admin" class="w-8 h-8 rounded-full object-cover mr-3">
+                                                    <div>
+                                                        <p class="text-sm font-medium text-text">Joan Pérez</p>
+                                                        <p class="text-xs text-gray-500">joan.perez@centre.edu</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-3 text-sm text-text" data-ca="Superadministrador" data-es="Superadministrador">Superadministrador</td>
+                                            <td class="py-3 text-sm text-text">fa 2 hores</td>
+                                            <td class="py-3">
+                                                <button class="text-primary hover:text-blue-700 text-sm mr-3" data-ca="Editar" data-es="Editar">Editar</button>
+                                                <button class="text-error hover:text-red-700 text-sm" data-ca="Eliminar" data-es="Eliminar">Eliminar</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<!-- @END_COMPONENT: MainDashboard -->
+
+<!-- @COMPONENT: EmployeeModal -->
+<div id="employee-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-surface rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-text" data-ca="Afegir nou empleat" data-es="Añadir nuevo empleado">Afegir nou empleat</h3>
+                <button onclick="hideEmployeeModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form class="p-6 space-y-6" data-implementation="Employee creation with validation">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Nom complet" data-es="Nombre completo">Nom complet</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2">DNI/NIE</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Correu electrònic" data-es="Correo electrónico">Correu electrònic</label>
+                    <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Telèfon" data-es="Teléfono">Telèfon</label>
+                    <input type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Departament" data-es="Departamento">Departament</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <option value="">Selecciona departament</option>
+                        <option data-ca="Educació Primària" data-es="Educación Primaria">Educació Primària</option>
+                        <option data-ca="Educació Secundària" data-es="Educación Secundaria">Educació Secundària</option>
+                        <option data-ca="Administració" data-es="Administración">Administració</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2" data-ca="Tipus de contracte" data-es="Tipo de contrato">Tipus de contracte</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <option value="">Selecciona tipus</option>
+                        <option data-ca="Jornada completa" data-es="Jornada completa">Jornada completa</option>
+                        <option data-ca="Jornada parcial" data-es="Jornada parcial">Jornada parcial</option>
+                        <option data-ca="Substitució" data-es="Sustitución">Substitució</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-text mb-2" data-ca="Horari setmanal" data-es="Horario semanal">Horari setmanal</label>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1" data-ca="Dilluns" data-es="Lunes">Dilluns</label>
+                        <input type="text" placeholder="08:00-16:00" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1" data-ca="Dimarts" data-es="Martes">Dimarts</label>
+                        <input type="text" placeholder="08:00-16:00" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1" data-ca="Dimecres" data-es="Miércoles">Dimecres</label>
+                        <input type="text" placeholder="08:00-16:00" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1" data-ca="Dijous" data-es="Jueves">Dijous</label>
+                        <input type="text" placeholder="08:00-16:00" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1" data-ca="Divendres" data-es="Viernes">Divendres</label>
+                        <input type="text" placeholder="08:00-16:00" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <button type="button" onclick="hideEmployeeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-text hover:bg-gray-50 transition-colors">
+                    <span data-ca="Cancel·lar" data-es="Cancelar">Cancel·lar</span>
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <span data-ca="Crear empleat" data-es="Crear empleado">Crear empleat</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- @END_COMPONENT: EmployeeModal -->
+
+<!-- @COMPONENT: QuickAttendanceModal -->
+<div id="quick-attendance-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-surface rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="p-6 text-center">
+            <i class="fas fa-clock text-4xl text-primary mb-4"></i>
+            <h3 class="text-xl font-semibold text-text mb-2" data-ca="Fitxatge ràpid" data-es="Fichaje rápido">Fitxatge ràpid</h3>
+            <p class="text-gray-600 mb-6" id="current-time-modal">08:15:32</p>
+            
+            <div class="space-y-3">
+                <button class="w-full bg-secondary text-white py-3 px-6 rounded-lg text-lg font-medium hover:bg-green-700 transition-colors" onclick="checkIn()">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    <span data-ca="Entrada" data-es="Entrada">Entrada</span>
+                </button>
+                <button class="w-full bg-error text-white py-3 px-6 rounded-lg text-lg font-medium hover:bg-red-700 transition-colors" onclick="checkOut()">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span data-ca="Sortida" data-es="Salida">Sortida</span>
+                </button>
+            </div>
+            
+            <button onclick="hideQuickAttendance()" class="mt-4 text-gray-500 hover:text-gray-700 text-sm">
+                <span data-ca="Tancar" data-es="Cerrar">Tancar</span>
+            </button>
+        </div>
+    </div>
+</div>
+<!-- @END_COMPONENT: QuickAttendanceModal -->
+
+<script>
+(function() {
+    // TODO: Implement business logic, API calls, and state management
+
+    // @STATE: currentLanguage:string = 'ca'
+    let currentLanguage = 'ca';
+    
+    // @STATE: currentSection:string = 'dashboard'
+    let currentSection = 'dashboard';
+
+    // Language switching functionality
+    window.switchLanguage = function(lang) {
+        currentLanguage = lang;
+        
+        // Update active language button
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) {
+                btn.classList.add('active', 'bg-primary', 'text-white');
+            } else {
+                btn.classList.remove('bg-primary', 'text-white');
+            }
+        });
+        
+        // Update all translatable elements
+        document.querySelectorAll('[data-ca]').forEach(element => {
+            const translation = element.getAttribute(`data-${lang}`);
+            if (translation) {
+                if (element.tagName === 'INPUT' && element.type === 'submit') {
+                    element.value = translation;
+                } else if (element.placeholder !== undefined) {
+                    element.placeholder = translation;
+                } else {
+                    element.textContent = translation;
+                }
+            }
+        });
+    };
+
+    // Navigation functionality
+    window.showSection = function(sectionName) {
+        currentSection = sectionName;
+        
+        // Hide all sections
+        document.querySelectorAll('.section-content').forEach(section => {
+            section.classList.add('hidden');
+        });
+        
+        // Show selected section
+        const targetSection = document.getElementById(`${sectionName}-section`);
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+        }
+        
+        // Update navigation active state
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active', 'bg-primary', 'text-white');
+            link.classList.add('text-gray-700', 'hover:bg-gray-100');
+        });
+        
+        // Set active nav item
+        event.target.closest('.nav-link').classList.add('active', 'bg-primary', 'text-white');
+        event.target.closest('.nav-link').classList.remove('text-gray-700', 'hover:bg-gray-100');
+        
+        // Update page title
+        const titles = {
+            'dashboard': { ca: 'Tauler de control', es: 'Panel de control' },
+            'employees': { ca: 'Gestió de personal', es: 'Gestión de personal' },
+            'attendance': { ca: 'Control de presència', es: 'Control de presencia' },
+            'alerts': { ca: 'Alertes i notificacions', es: 'Alertas y notificaciones' },
+            'reports': { ca: 'Informes i estadístiques', es: 'Informes y estadísticas' },
+            'settings': { ca: 'Configuració', es: 'Configuración' }
+        };
+        
+        const pageTitle = document.getElementById('page-title');
+        if (pageTitle && titles[sectionName]) {
+            pageTitle.textContent = titles[sectionName][currentLanguage];
+        }
+    };
+
+    // Authentication functions
+    window.showDashboard = function() {
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('main-dashboard').classList.remove('hidden');
+    };
+
+    window.logout = function() {
+        document.getElementById('main-dashboard').classList.add('hidden');
+        document.getElementById('login-page').classList.remove('hidden');
+    };
+
+    // Modal management
+    window.showEmployeeModal = function() {
+        document.getElementById('employee-modal').classList.remove('hidden');
+    };
+
+    window.hideEmployeeModal = function() {
+        document.getElementById('employee-modal').classList.add('hidden');
+    };
+
+    window.showQuickAttendance = function() {
+        document.getElementById('quick-attendance-modal').classList.remove('hidden');
+        updateModalTime();
+    };
+
+    window.hideQuickAttendance = function() {
+        document.getElementById('quick-attendance-modal').classList.add('hidden');
+    };
+
+    // Attendance functions
+    window.checkIn = function() {
+        // TODO: Implement check-in logic with API call
+        alert(currentLanguage === 'ca' ? 'Entrada registrada correctament!' : '¡Entrada registrada correctamente!');
+        hideQuickAttendance();
+    };
+
+    window.checkOut = function() {
+        // TODO: Implement check-out logic with API call
+        alert(currentLanguage === 'ca' ? 'Sortida registrada correctament!' : '¡Salida registrada correctamente!');
+        hideQuickAttendance();
+    };
+
+    // Sidebar toggle for mobile
+    window.toggleSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        sidebar.classList.toggle('-translate-x-full');
+        mainContent.classList.toggle('ml-0');
+        mainContent.classList.toggle('ml-64');
+    };
+
+    // Time updates
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ca-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+        });
+        
+        const currentTimeEl = document.getElementById('current-time');
+        if (currentTimeEl) {
+            currentTimeEl.textContent = timeString;
+        }
+    }
+
+    function updateModalTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ca-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        
+        const modalTimeEl = document.getElementById('current-time-modal');
+        if (modalTimeEl) {
+            modalTimeEl.textContent = timeString;
+        }
+    }
+
+    // Initialize application
+    function init() {
+        // Update time every second
+        setInterval(updateTime, 1000);
+        setInterval(updateModalTime, 1000);
+        
+        // Set initial time
+        updateTime();
+        
+        // Set initial language
+        switchLanguage('ca');
+        
+        // Set initial active navigation
+        const firstNavLink = document.querySelector('.nav-link');
+        if (firstNavLink) {
+            firstNavLink.classList.add('active', 'bg-primary', 'text-white');
+            firstNavLink.classList.remove('text-gray-700', 'hover:bg-gray-100');
+        }
+
+        // Handle responsive sidebar on mobile
+        function handleResize() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            if (window.innerWidth < 1024) {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-0');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                mainContent.classList.add('ml-64');
+                mainContent.classList.remove('ml-0');
+            }
+        }
+        
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
+    }
+
+    // Start the application when DOM is loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+<style>
+.nav-link.active {
+    @apply bg-primary text-white;
+}
+
+.nav-link {
+    @apply text-gray-700 hover:bg-gray-100;
+}
+
+.language-btn.active {
+    @apply bg-primary text-white;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Ensure proper mobile behavior */
+@media (max-width: 1023px) {
+    #sidebar {
+        transform: translateX(-100%);
+    }
+    
+    #main-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Focus styles for accessibility */
+input:focus, select:focus, button:focus {
+    outline: 2px solid #1976D2;
+    outline-offset: 2px;
+}
+
+/* Animation for smooth transitions */
+.section-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</body>
+</html>

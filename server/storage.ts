@@ -1301,25 +1301,31 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     logger.scheduleImport('EMPLOYEE_LINKING_START', 'Starting employee linking process');
     
     try {
-      // Get all employees for this institution
+      // Get all employees for this institution and academic year
       const employeesList = await db.select().from(employees)
-        .where(eq(employees.institutionId, institutionId));
+        .where(
+          and(
+            eq(employees.institutionId, institutionId),
+            eq(employees.academicYearId, academicYearId)
+          )
+        );
 
       let linkedCount = 0;
 
-      // Link schedule sessions to employees by matching names
+      // Link schedule sessions to employees by matching names/teacher codes
       for (const employee of employeesList) {
         const fullNameParts = employee.fullName.split(' ');
         const lastName = fullNameParts[fullNameParts.length - 1];
         const firstName = fullNameParts[0];
         
-        // Try different name matching patterns
+        // Try deterministic match by teacher_code first, then name patterns
         const namePatterns = [
+          employee.teacherCode ? String(employee.teacherCode).toUpperCase() : undefined,
           employee.fullName.toUpperCase(),
           `${firstName.charAt(0)}.${lastName}`.toUpperCase(),
           `${lastName}`.toUpperCase(),
           `${firstName} ${lastName}`.toUpperCase(),
-        ];
+        ].filter(Boolean) as string[];
 
         for (const pattern of namePatterns) {
           const updated = await db.update(untisScheduleSessions)
@@ -1538,14 +1544,14 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         
         // Generate email from teacher code
         const email = `${teacherCode.toLowerCase().replace(/[^a-z0-9]/g, '.')}@insbitacola.cat`;
-        
+
         teachersData.push({
           institutionId,
+          academicYearId,
           fullName: fullName || teacherCode,
           email,
           teacherCode,
-          weeklyHours: hours,
-          isActive: true,
+          contractHours: hours,
           createdAt: new Date(),
           updatedAt: new Date()
         });
@@ -1563,6 +1569,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
           .where(
             and(
               eq(employees.institutionId, institutionId),
+              eq(employees.academicYearId, academicYearId),
               eq(employees.email, teacherData.email)
             )
           )
@@ -1572,6 +1579,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
           await db.update(employees)
             .set({
               fullName: teacherData.fullName,
+              teacherCode: teacherData.teacherCode,
+              contractHours: teacherData.contractHours,
               updatedAt: new Date()
             })
             .where(eq(employees.id, existing.id));
@@ -1608,12 +1617,19 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
           // Create employee with userId
           await db.insert(employees).values({
-            ...teacherData,
+            institutionId,
+            academicYearId,
             userId,
-            dni: teacherData.teacherCode, // Use teacher code as DNI
+            dni: teacherData.teacherCode,
+            fullName: teacherData.fullName,
+            email: teacherData.email,
+            teacherCode: teacherData.teacherCode,
+            contractHours: teacherData.contractHours,
             startDate: new Date(),
             contractType: 'full_time',
-            status: 'active'
+            status: 'active',
+            createdAt: new Date(),
+            updatedAt: new Date()
           });
           createdCount++;
         }

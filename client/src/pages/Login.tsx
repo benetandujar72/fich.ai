@@ -41,8 +41,6 @@ export default function Login() {
   const [showQuickPassword, setShowQuickPassword] = useState(false);
   const [attendanceResult, setAttendanceResult] = useState<any>(null);
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const quickEmailRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("attendance");
 
   // Update clock every second - DISABLED to prevent form re-renders
@@ -70,10 +68,14 @@ export default function Login() {
     },
   });
 
-  // Get users for quick select
+  // Get users for quick select - OPTIMIZED to prevent re-renders
   const { data: users } = useQuery({
     queryKey: ["/api/users"],
     enabled: activeTab === "attendance",
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchInterval: false,
   });
 
   const onSubmit = async (data: LoginFormData) => {

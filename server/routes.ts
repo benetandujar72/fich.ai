@@ -859,6 +859,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Get the actual employee_id from employees table if we received user_id
+      const employeeRecord = await db.execute(sql`
+        SELECT 
+          e.id as employee_id,
+          u.id as user_id
+        FROM users u
+        LEFT JOIN employees e ON u.id = e.user_id
+        WHERE u.id = ${employeeId}
+      `);
+      
+      const actualEmployeeId = employeeRecord.rows[0]?.employee_id || employeeId;
+      console.log('ATTENDANCE_HISTORY: Using employee_id:', actualEmployeeId, 'for user_id:', employeeId);
+
       const result = await db.execute(sql`
         WITH daily_attendance AS (
           SELECT 
@@ -867,7 +880,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             MAX(CASE WHEN type = 'check_out' THEN timestamp END) as check_out,
             EXTRACT(DOW FROM DATE(timestamp)) as day_of_week
           FROM attendance_records 
-          WHERE employee_id = ${employeeId}
+          WHERE employee_id = ${actualEmployeeId}
             AND DATE(timestamp) BETWEEN ${startDate} AND ${endDate}
           GROUP BY DATE(timestamp)
         ),

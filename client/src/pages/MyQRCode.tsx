@@ -37,8 +37,9 @@ export default function MyQRCode() {
       const canvas = canvasRef.current;
       if (!canvas) return;
       
-      // QR data contains only user ID (which is the same as employeeId)
-      const qrData = user.id;
+      // QR data amb data actual per complir normativa vigent (regeneració diària)
+      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      const qrData = `${user.id}-${today}`;
       
       await QRCode.toCanvas(canvas, qrData, {
         width: qrSize,
@@ -199,6 +200,9 @@ export default function MyQRCode() {
                 day: 'numeric'
               })}
             </div>
+            <div className="text-xs text-orange-600 mt-2 font-medium">
+              ⚖️ QR generat avui - Compleix normativa vigent
+            </div>
           </CardContent>
         </Card>
 
@@ -245,9 +249,14 @@ export default function MyQRCode() {
         {/* QR Code Display */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <QrCode className="mr-2 h-5 w-5 text-green-600" />
-              {language === "ca" ? "Codi QR Personal" : "Código QR Personal"}
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center">
+                <QrCode className="mr-2 h-5 w-5 text-green-600" />
+                {language === "ca" ? "Codi QR Personal" : "Código QR Personal"}
+              </div>
+              <Badge variant="outline" className="text-orange-600 border-orange-300">
+                Vàlid avui: {new Date().toLocaleDateString('ca-ES')}
+              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -297,7 +306,8 @@ export default function MyQRCode() {
               <div>
                 <p className="font-medium">Descarrega o imprimeix</p>
                 <p className="text-sm text-gray-600">
-                  Pots descarregar el QR com a imatge o imprimir-lo per tenir-lo sempre a mà
+                  Pots descarregar el QR com a imatge o imprimir-lo. 
+                  <strong className="text-orange-600"> Important: Genera un nou QR cada dia per complir la normativa.</strong>
                 </p>
               </div>
             </div>

@@ -2777,8 +2777,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Codi QR i timestamp són obligatoris" });
       }
 
-      // QR data should be the employee ID directly
-      const employeeId = qrData.trim();
+      // QR data format: userId-YYYY-MM-DD (per complir normativa vigent)
+      const qrParts = qrData.trim().split('-');
+      
+      if (qrParts.length < 4) {
+        return res.status(400).json({ error: "Format del codi QR no vàlid" });
+      }
+      
+      // Extraure user ID i data del QR
+      const userIdParts = qrParts.slice(0, -3); // Tots els parts menys els últims 3 (any-mes-dia)
+      const employeeId = userIdParts.join('-');
+      const qrDate = `${qrParts[qrParts.length-3]}-${qrParts[qrParts.length-2]}-${qrParts[qrParts.length-1]}`;
+      const todayDate = new Date().toISOString().split('T')[0];
+      
+      console.log("🔍 QR VALIDATION:");
+      console.log("  Original QR:", qrData);
+      console.log("  Employee ID:", employeeId);
+      console.log("  QR Date:", qrDate);
+      console.log("  Today Date:", todayDate);
+      
+      // Validar que el QR és d'avui (normativa vigent)
+      if (qrDate !== todayDate) {
+        return res.status(400).json({ 
+          error: "Aquest codi QR ha caducat. Genera un nou codi QR des de la teva àrea personal.",
+          code: "QR_EXPIRED"
+        });
+      }
       
       // Validate employee exists (QR contains user_id) - direct DB query
       const employeeResult = await db.execute(sql`

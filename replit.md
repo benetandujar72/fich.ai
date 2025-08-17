@@ -45,7 +45,7 @@ The application uses a monorepo architecture, separating client and server code:
 - **Role-Based Access Control (RBAC)**: Comprehensive permission system, protecting routes, adapting navigation and UI components.
 - **Quick Attendance System**: Direct login screen attendance marking.
 - **Smart Work Cycle Management**: Automatic check-in/check-out detection.
-- **QR Attendance System (Compliant)**: Unipersonal QR code system complying with Spanish labor regulations, with public access page, automatic check-in/check-out detection, individual QR code generation for printing, and late arrival tracking.
+- **QR Attendance System (Compliant)**: Unipersonal QR code system complying with Spanish labor regulations, with public access page, automatic check-in/check-out detection, individual QR code generation for printing, late arrival tracking, and daily QR regeneration for regulatory compliance (QR codes expire daily and must be regenerated).
 - **Academic Data Migration System**: Complete data migration between academic years with progress tracking, error handling, and rollback capabilities.
 - **GP Untis Data Import System**: Comprehensive import for teachers, subjects, groups, and schedules from TXT files, including multi-file import with progress tracking.
 - **Teacher-User Relationship Management**: Automatic linking between GP Untis teacher codes and system users.

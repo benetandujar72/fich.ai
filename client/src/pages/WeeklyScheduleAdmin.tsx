@@ -226,52 +226,52 @@ export default function WeeklyScheduleAdmin() {
               ))}
             </div>
 
-            <div className="grid grid-cols-6 gap-2">
-              {timeSlots.map(slot => (
-                <div key={slot.period} className="contents">
-                  <div className={`p-2 text-xs text-center rounded border ${
-                    slot.isPause 
-                      ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-600' 
-                      : 'bg-rose-50 dark:bg-slate-800/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-slate-600'
-                  }`}>
-                    {slot.label}
-                  </div>
-                  {[1, 2, 3, 4, 5].map(dayOfWeek => {
-                    if (slot.isPause) {
+            <div className="space-y-2">
+              {timeSlots.map(slot => {
+                if (slot.isPause) {
+                  return (
+                    <div key={slot.period} className="grid grid-cols-6 gap-2">
+                      <div className="col-span-6 h-6 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded flex items-center justify-center">
+                        <span className="text-xs font-medium text-green-700 dark:text-green-300">☕ Patis Coeducatius</span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={slot.period} className="grid grid-cols-6 gap-2">
+                    <div className="p-2 text-xs text-center rounded border bg-rose-50 dark:bg-slate-800/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-slate-600">
+                      {slot.label}
+                    </div>
+                    {[1, 2, 3, 4, 5].map(dayOfWeek => {
+                      const daySchedule = getScheduleByDay(dayOfWeek);
+                      const session = daySchedule.find(s => s.hourPeriod === slot.period);
+                      
                       return (
-                        <div key={`${dayOfWeek}-${slot.period}`} className="min-h-[40px] border border-yellow-200 dark:border-yellow-600 rounded bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center">
-                          <span className="text-xs text-yellow-700 dark:text-yellow-400">☕</span>
+                        <div key={`${dayOfWeek}-${slot.period}`} className="min-h-[60px] border border-rose-200 dark:border-slate-600 rounded bg-white dark:bg-slate-900">
+                          {session ? (
+                            <div className="p-2 h-full bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 dark:border-rose-400 rounded">
+                              <div className="text-xs font-medium text-rose-700 dark:text-rose-300">
+                                {session.subjectCode}
+                              </div>
+                              <div className="text-xs text-rose-600 dark:text-rose-400">
+                                {session.groupCode}
+                              </div>
+                              <div className="text-xs text-rose-500 dark:text-rose-500">
+                                {session.classroomCode}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="p-2 h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
+                              <span className="text-xs">-</span>
+                            </div>
+                          )}
                         </div>
                       );
-                    }
-
-                    const daySchedule = getScheduleByDay(dayOfWeek);
-                    const session = daySchedule.find(s => s.hourPeriod === slot.period);
-                    
-                    return (
-                      <div key={`${dayOfWeek}-${slot.period}`} className="min-h-[60px] border border-rose-200 dark:border-slate-600 rounded bg-white dark:bg-slate-900">
-                        {session ? (
-                          <div className="p-2 h-full bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 dark:border-rose-400 rounded">
-                            <div className="text-xs font-medium text-rose-700 dark:text-rose-300">
-                              {session.subjectCode}
-                            </div>
-                            <div className="text-xs text-rose-600 dark:text-rose-400">
-                              {session.groupCode}
-                            </div>
-                            <div className="text-xs text-rose-500 dark:text-rose-500">
-                              {session.classroomCode}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="p-2 h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
-                            <span className="text-xs">-</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
+                    })}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </DialogContent>

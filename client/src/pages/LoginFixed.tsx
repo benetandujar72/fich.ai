@@ -352,7 +352,12 @@ export default function LoginFixed() {
       </div>
       
       <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
-        <DialogContent>
+        <DialogContent className="modal-content-solid"
+          style={{
+            background: 'hsl(0 0% 100%)',
+            border: '2px solid hsl(214.3 31.8% 85%)',
+            boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.4)'
+          }}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-600" />

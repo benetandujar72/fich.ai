@@ -63,20 +63,20 @@
 
 /* Modal NO TRANSPARENCY classes - Modern UX/UI without transparency */
 .modal-overlay-solid {
-  background: hsl(0 0% 0% / 0.9) !important;
+  background: hsl(0 0% 0% / 0.95) !important;
   backdrop-filter: none !important;
 }
 
 .modal-content-solid {
   background: hsl(0 0% 100%) !important;
-  border: 1px solid hsl(214.3 31.8% 91.4%) !important;
-  box-shadow: 0 25px 50px -12px hsl(0 0% 0% / 0.25) !important;
+  border: 2px solid hsl(214.3 31.8% 85%) !important;
+  box-shadow: 0 25px 50px -12px hsl(0 0% 0% / 0.4) !important;
 }
 
 .dark .modal-content-solid {
   background: hsl(222.2 84% 4.9%) !important;
-  border: 1px solid hsl(217.2 32.6% 17.5%) !important;
-  box-shadow: 0 25px 50px -12px hsl(0 0% 100% / 0.1) !important;
+  border: 2px solid hsl(217.2 32.6% 25%) !important;
+  box-shadow: 0 25px 50px -12px hsl(0 0% 100% / 0.2) !important;
 }
 
 /* Override all shadcn transparency styles */
@@ -84,10 +84,22 @@
   background: hsl(0 0% 0% / 0.9) !important;
 }
 
-/* Force solid backgrounds for all modal overlays */
+/* Force solid backgrounds for all modal overlays - MAXIMUM OPACITY */
 [data-radix-dialog-overlay] {
-  background: hsl(0 0% 0% / 0.9) !important;
+  background: hsl(0 0% 0% / 0.98) !important;
   backdrop-filter: none !important;
+}
+
+/* Force solid content for dialog content */
+[data-radix-dialog-content] {
+  background: hsl(0 0% 100%) !important;
+  border: 2px solid hsl(214.3 31.8% 85%) !important;
+  box-shadow: 0 25px 50px -12px hsl(0 0% 0% / 0.5) !important;
+}
+
+.dark [data-radix-dialog-content] {
+  background: hsl(222.2 84% 4.9%) !important;
+  border: 2px solid hsl(217.2 32.6% 25%) !important;
 }
 
 /* Force solid backgrounds for all popover/dropdown content */

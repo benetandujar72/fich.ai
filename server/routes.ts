@@ -705,7 +705,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         LEFT JOIN (
           SELECT employee_id, COUNT(*) as session_count
           FROM untis_schedule_sessions
-          WHERE institution_id = ${institutionId}
           GROUP BY employee_id
         ) uss ON e.id = uss.employee_id
         WHERE u.institution_id = ${institutionId}
@@ -2434,10 +2433,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             COUNT(us.id) as total_sessions,
             COALESCE(COUNT(us.id) * 0.9, 0) as weekly_hours
           FROM users u
-          LEFT JOIN untis_schedule_sessions us ON (
-            us.teacher_code = u.first_name
-            OR us.employee_id = u.id
-          )
+          LEFT JOIN employees e ON u.id = e.user_id
+          LEFT JOIN untis_schedule_sessions us ON us.employee_id = e.id
           WHERE u.institution_id = ${req.user.institutionId}
             AND u.role = 'employee'
           GROUP BY u.id, u.first_name, u.last_name, u.email, u.role

@@ -202,28 +202,10 @@ export default function PublicQRAttendance() {
             <form onSubmit={handleQRSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="qr-input" className="text-sm font-medium">
-                  Introdueix el teu codi QR personal:
+                  Introdueix el teu codi QR personal únic:
                 </Label>
-                <div className="text-xs text-gray-600 mb-2">
-                  Exemples per provar:
-                </div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {['user-001', 'user-002', 'user-003', 'user-004', 'user-005'].map((code) => (
-                    <Button
-                      key={code}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => {
-                        console.log("🔘 Quick button clicked:", code);
-                        setQrInput(code);
-                      }}
-                      disabled={processing}
-                    >
-                      {code}
-                    </Button>
-                  ))}
+                <div className="text-xs text-orange-600 mb-2 font-medium">
+                  ⚠️ Només pots introduir el teu propi codi QR personal. El fitxatge és únic i intransferible.
                 </div>
                 <Input
                   id="qr-input"
@@ -258,11 +240,10 @@ export default function PublicQRAttendance() {
             </form>
 
             {/* Instructions */}
-            <Alert className="border-blue-200 bg-blue-50">
+            <Alert className="border-orange-200 bg-orange-50">
               <Smartphone className="h-4 w-4" />
-              <AlertDescription className="text-blue-800">
-                <strong>Com utilitzar:</strong> Escaneja o introdueix el teu codi QR personal únic. El sistema detectarà automàticament si és entrada o sortida. 
-                El sistema detectarà automàticament si és entrada o sortida.
+              <AlertDescription className="text-orange-800">
+                <strong>Important:</strong> Només pots utilitzar el teu propi codi QR personal. El fitxatge és únic i intransferible per empleat segons la normativa vigent.
               </AlertDescription>
             </Alert>
           </CardContent>

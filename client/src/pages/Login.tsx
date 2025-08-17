@@ -153,20 +153,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        {/* Login button in top right - only show when on attendance tab */}
-        {activeTab === "attendance" && (
-          <div className="absolute top-4 right-4">
-            <Button 
-              onClick={() => setActiveTab("login")}
-              size="sm"
-              className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600 shadow-lg hover:shadow-blue-400/25 text-white"
-              data-testid="login-access-button"
-            >
-              <GraduationCap className="mr-2 h-4 w-4" />
-              {language === "ca" ? "Accés Complet" : "Acceso Completo"}
-            </Button>
-          </div>
-        )}
+
 
         {/* Header */}
         <div className="text-center">
@@ -188,125 +175,8 @@ export default function Login() {
         {/* Main Content */}
         <Card>
           <CardContent className="p-6">
-            {/* Show quick attendance if active, otherwise regular login */}
-            {activeTab === "attendance" ? (
-              <div className="space-y-4">
-                <div className="text-center mb-4">
-                  <Clock className="h-8 w-8 text-primary mx-auto mb-2" />
-                  <h3 className="text-lg font-semibold">
-                    {language === "ca" ? "Marcatge Ràpid" : "Marcaje Rápido"}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {language === "ca" ? "Fitxa directament amb les teves credencials" : "Ficha directamente con tus credenciales"}
-                  </p>
-                  
-                  {/* Digital Clock - SIMPLIFIED to prevent re-renders */}
-                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <div className="text-lg font-medium text-primary">
-                      {language === "ca" ? "Marcatge ràpid disponible" : "Marcaje rápido disponible"}
-                    </div>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      {language === "ca" ? "Introdueix les credencials per fitxar" : "Introduce las credenciales para fichar"}
-                    </div>
-                  </div>
-                </div>
-                
-                <Form {...quickForm}>
-                  <form onSubmit={quickForm.handleSubmit(onQuickAttendance)} className="space-y-4">
-                    <FormField
-                      control={quickForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {language === "ca" ? "Correu electrònic" : "Correo electrónico"}
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              id="quick-email"
-                              type="email"
-                              placeholder="nom@exemple.com"
-                              autoComplete="email"
-                              data-testid="quick-email-input"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={quickForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {language === "ca" ? "Contrasenya" : "Contraseña"}
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                id="quick-password"
-                                type={showQuickPassword ? "text" : "password"}
-                                placeholder="••••••••"
-                                autoComplete="current-password"
-                                data-testid="quick-password-input"
-                                {...field}
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                onClick={() => setShowQuickPassword(!showQuickPassword)}
-                                data-testid="quick-password-toggle"
-                              >
-                                {showQuickPassword ? (
-                                  <EyeOff className="h-4 w-4" />
-                                ) : (
-                                  <Eye className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <Button
-                      type="submit"
-                      disabled={isQuickAttendanceLoading}
-                      className="w-full"
-                      data-testid="quick-attendance-submit"
-                    >
-                      {isQuickAttendanceLoading ? (
-                        <>
-                          <Clock className="mr-2 h-4 w-4 animate-spin" />
-                          {language === "ca" ? "Processant..." : "Procesando..."}
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="mr-2 h-4 w-4" />
-                          {language === "ca" ? "Fitxar Ara" : "Fichar Ahora"}
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-                
-                <div className="text-center">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setActiveTab("login")}
-                    className="text-sm text-muted-foreground"
-                  >
-                    {language === "ca" ? "Accés complet al sistema" : "Acceso completo al sistema"}
-                  </Button>
-                </div>
-              </div>
-            ) : (
+            {/* Only show regular login - Quick attendance removed for security */}
+            {true && (
               <div className="space-y-4">
                 <div className="text-center mb-4">
                   <h3 className="text-lg font-semibold">
@@ -395,15 +265,7 @@ export default function Login() {
                   </form>
                 </Form>
 
-                <div className="text-center">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setActiveTab("attendance")}
-                    className="text-sm text-muted-foreground"
-                  >
-                    {language === "ca" ? "Marcatge ràpid" : "Marcaje rápido"}
-                  </Button>
-                </div>
+
               </div>
             )}
           </CardContent>

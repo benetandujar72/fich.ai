@@ -1,0 +1,610 @@
+queryClient.ts:15 🌐 API REQUEST: POST /api/schedule-import/complete-import
+queryClient.ts:16 🌐 API DATA: {}
+queryClient.ts:25 🌐 API RESPONSE STATUS: 200
+queryClient.ts:26 🌐 API RESPONSE OK: true
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+WeeklySchedule.tsx:249 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props. Error Component Stack
+    at WeeklySchedule (WeeklySchedule.tsx:16:20)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+printWarning @ react_jsx-dev-runtime.js?v=be57b3f7:64
+error @ react_jsx-dev-runtime.js?v=be57b3f7:48
+validateFragmentProps @ react_jsx-dev-runtime.js?v=be57b3f7:796
+jsxWithValidation @ react_jsx-dev-runtime.js?v=be57b3f7:874
+(anónimo) @ WeeklySchedule.tsx:249
+WeeklySchedule @ WeeklySchedule.tsx:244
+renderWithHooks @ chunk-RPCDYKBN.js?v=be57b3f7:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=be57b3f7:14582
+beginWork @ chunk-RPCDYKBN.js?v=be57b3f7:15924
+beginWork$1 @ chunk-RPCDYKBN.js?v=be57b3f7:19753
+performUnitOfWork @ chunk-RPCDYKBN.js?v=be57b3f7:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=be57b3f7:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=be57b3f7:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=be57b3f7:555
+flush @ @tanstack_react-query.js?v=be57b3f7:569
+batch @ @tanstack_react-query.js?v=be57b3f7:587
+dispatch_fn @ @tanstack_react-query.js?v=be57b3f7:996
+onError @ @tanstack_react-query.js?v=be57b3f7:861
+reject @ @tanstack_react-query.js?v=be57b3f7:465
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:508
+Promise.catch
+run @ @tanstack_react-query.js?v=be57b3f7:498
+start @ @tanstack_react-query.js?v=be57b3f7:536
+fetch @ @tanstack_react-query.js?v=be57b3f7:926
+executeFetch_fn @ @tanstack_react-query.js?v=be57b3f7:2211
+onSubscribe @ @tanstack_react-query.js?v=be57b3f7:1898
+subscribe @ @tanstack_react-query.js?v=be57b3f7:24
+(anónimo) @ @tanstack_react-query.js?v=be57b3f7:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=be57b3f7:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+hook.js:608 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. Error Component Stack
+    at DescriptionWarning (@radix-ui_react-dialog.js?v=be57b3f7:334:29)
+    at @radix-ui_react-dialog.js?v=be57b3f7:238:13
+    at @radix-ui_react-dialog.js?v=be57b3f7:161:58
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at @radix-ui_react-dialog.js?v=be57b3f7:152:64
+    at chunk-2K77HOHX.js?v=be57b3f7:79:13
+    at chunk-2K77HOHX.js?v=be57b3f7:56:13
+    at chunk-AXMZZQ2X.js?v=be57b3f7:42:13
+    at chunk-G76BAGTM.js?v=be57b3f7:260:22
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at DialogPortal (@radix-ui_react-dialog.js?v=be57b3f7:114:11)
+    at _c3 (dialog.tsx:35:6)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at Dialog (@radix-ui_react-dialog.js?v=be57b3f7:55:5)
+    at div (<anonymous>)
+    at WeeklyScheduleAdmin (WeeklyScheduleAdmin.tsx:34:24)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+(anónimo) @ @radix-ui_react-dialog.js?v=be57b3f7:342
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+hook.js:608 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. Error Component Stack
+    at DescriptionWarning (@radix-ui_react-dialog.js?v=be57b3f7:334:29)
+    at @radix-ui_react-dialog.js?v=be57b3f7:238:13
+    at @radix-ui_react-dialog.js?v=be57b3f7:161:58
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at @radix-ui_react-dialog.js?v=be57b3f7:152:64
+    at chunk-2K77HOHX.js?v=be57b3f7:79:13
+    at chunk-2K77HOHX.js?v=be57b3f7:56:13
+    at chunk-AXMZZQ2X.js?v=be57b3f7:42:13
+    at chunk-G76BAGTM.js?v=be57b3f7:260:22
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at DialogPortal (@radix-ui_react-dialog.js?v=be57b3f7:114:11)
+    at _c3 (dialog.tsx:35:6)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at Dialog (@radix-ui_react-dialog.js?v=be57b3f7:55:5)
+    at div (<anonymous>)
+    at WeeklyScheduleAdmin (WeeklyScheduleAdmin.tsx:34:24)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+(anónimo) @ @radix-ui_react-dialog.js?v=be57b3f7:342
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+hook.js:608 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. Error Component Stack
+    at DescriptionWarning (@radix-ui_react-dialog.js?v=be57b3f7:334:29)
+    at @radix-ui_react-dialog.js?v=be57b3f7:238:13
+    at @radix-ui_react-dialog.js?v=be57b3f7:161:58
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at @radix-ui_react-dialog.js?v=be57b3f7:152:64
+    at chunk-2K77HOHX.js?v=be57b3f7:79:13
+    at chunk-2K77HOHX.js?v=be57b3f7:56:13
+    at chunk-AXMZZQ2X.js?v=be57b3f7:42:13
+    at chunk-G76BAGTM.js?v=be57b3f7:260:22
+    at Presence (chunk-E4UC4BFD.js?v=be57b3f7:24:11)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at DialogPortal (@radix-ui_react-dialog.js?v=be57b3f7:114:11)
+    at _c3 (dialog.tsx:35:6)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at Dialog (@radix-ui_react-dialog.js?v=be57b3f7:55:5)
+    at div (<anonymous>)
+    at WeeklyScheduleAdmin (WeeklyScheduleAdmin.tsx:34:24)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at component (<anonymous>)
+    at Route (wouter.js?v=be57b3f7:323:16)
+    at Switch (wouter.js?v=be57b3f7:379:17)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at Router (App.tsx:50:48)
+    at Provider (chunk-OXZDJRWN.js?v=be57b3f7:38:15)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=be57b3f7:64:5)
+    at QueryClientProvider (@tanstack_react-query.js?v=be57b3f7:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+(anónimo) @ @radix-ui_react-dialog.js?v=be57b3f7:342
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=be57b3f7:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=be57b3f7:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=be57b3f7:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=be57b3f7:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=be57b3f7:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=be57b3f7:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=be57b3f7:19416
+commitRoot @ chunk-RPCDYKBN.js?v=be57b3f7:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=be57b3f7:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=be57b3f7:9119
+(anónimo) @ chunk-RPCDYKBN.js?v=be57b3f7:18627
+client:560 [vite] server connection lost. Polling for restart...
+client:736  GET https://f4605a06-f590-4b1d-a27e-b06cffa3a556-00-l8513yfmcwn8.picard.replit.dev/ 502 (Bad Gateway)
+ping @ client:736
+waitForSuccessfulPing @ client:749
+(anónimo) @ client:561

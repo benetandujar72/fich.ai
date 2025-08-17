@@ -40,6 +40,7 @@ export default function ScheduleImport() {
   const queryClient = useQueryClient();
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [importProgress, setImportProgress] = useState(0);
   const [isImporting, setIsImporting] = useState(false);
   const [previewData, setPreviewData] = useState<any>(null);
@@ -50,6 +51,7 @@ export default function ScheduleImport() {
   const { data: academicYears = [] } = useQuery({
     queryKey: ["/api/academic-years", user?.institutionId],
     enabled: !!user?.institutionId,
+    staleTime: 60000, // Dades vàlides per 1 minut per evitar re-renders innecessaris
   });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,6 +62,7 @@ export default function ScheduleImport() {
       const fileName = file.name.toLowerCase();
       if (fileName.endsWith('.xml') || fileName.endsWith('.gpu') || fileName.endsWith('.txt')) {
         setSelectedFile(file);
+        setSelectedFileName(file.name); // Guardem el nom del fitxer per separat
         setPreviewData(null);
         setImportResults(null);
         
@@ -73,6 +76,7 @@ export default function ScheduleImport() {
         // Reset file input
         event.target.value = '';
         setSelectedFile(null);
+        setSelectedFileName("");
         
         toast({
           title: language === "ca" ? "Format no vàlid" : "Formato no válido",
@@ -84,6 +88,7 @@ export default function ScheduleImport() {
       }
     } else {
       setSelectedFile(null);
+      setSelectedFileName("");
     }
   };
 
@@ -203,6 +208,8 @@ export default function ScheduleImport() {
 
   // Complete import function
   const handleCompleteImport = async () => {
+    if (isImporting) return; // Evita múltiples clicks
+    
     setIsImporting(true);
     setImportResults(null);
 
@@ -392,9 +399,9 @@ export default function ScheduleImport() {
                       className="mt-1"
                       data-testid="input-file-upload"
                     />
-                    {selectedFile && (
+                    {selectedFileName && (
                       <p className="text-sm text-green-600 dark:text-green-400 mt-1 font-medium">
-                        {language === "ca" ? "Arxiu seleccionat:" : "Archivo seleccionado:"} {selectedFile.name}
+                        {language === "ca" ? "Arxiu seleccionat:" : "Archivo seleccionado:"} {selectedFileName}
                       </p>
                     )}
                     <p className="text-sm text-muted-foreground mt-1">

@@ -417,7 +417,7 @@ function Router() {
           <Route path="/qr-attendance" component={() => 
             <ProtectedRoute>
               <Header 
-                title="Fichaje QR"
+                title="Fitxatge QR Personal"
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <QRAttendancePage />

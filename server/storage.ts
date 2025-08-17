@@ -1761,7 +1761,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       let subjectsImported = 0, groupsImported = 0, schedulesImported = 0;
       
       // Import teachers
-      const teachersPath = './attached_assets/PROFESSORAT_1754044133486.TXT';
+      const teachersPath = './attached_assets/PROFESSORAT_1755422511894.TXT';
       if (fs.existsSync(teachersPath)) {
         const teachersContent = fs.readFileSync(teachersPath, 'utf8');
         const teachersResult = await this.importUntisTeachers(teachersContent, institutionId, academicYearId);
@@ -1771,7 +1771,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       }
       
       // Import subjects
-      const subjectsPath = './attached_assets/MATÈRIES_1755422344956.TXT';
+      const subjectsPath = './attached_assets/MATÈRIES_1755422511894.TXT';
       if (fs.existsSync(subjectsPath)) {
         const subjectsContent = fs.readFileSync(subjectsPath, 'utf8');
         const subjectsResult = await this.importUntisSubjects(subjectsContent, institutionId, academicYearId);

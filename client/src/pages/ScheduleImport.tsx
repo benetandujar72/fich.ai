@@ -54,12 +54,26 @@ export default function ScheduleImport() {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log('FILE_SELECT: File selected:', file?.name, file?.type);
+    
     if (file) {
-      if (file.name.endsWith('.xml') || file.name.endsWith('.gpu') || file.name.endsWith('.txt')) {
+      const fileName = file.name.toLowerCase();
+      if (fileName.endsWith('.xml') || fileName.endsWith('.gpu') || fileName.endsWith('.txt')) {
         setSelectedFile(file);
         setPreviewData(null);
         setImportResults(null);
+        
+        toast({
+          title: language === "ca" ? "Arxiu seleccionat" : "Archivo seleccionado",
+          description: language === "ca" 
+            ? `Arxiu carregat: ${file.name}`
+            : `Archivo cargado: ${file.name}`,
+        });
       } else {
+        // Reset file input
+        event.target.value = '';
+        setSelectedFile(null);
+        
         toast({
           title: language === "ca" ? "Format no vàlid" : "Formato no válido",
           description: language === "ca" 
@@ -68,6 +82,8 @@ export default function ScheduleImport() {
           variant: "destructive",
         });
       }
+    } else {
+      setSelectedFile(null);
     }
   };
 
@@ -316,6 +332,7 @@ export default function ScheduleImport() {
                         className="bg-green-600 hover:bg-green-700 text-white"
                         size="sm"
                         disabled={isImporting}
+                        data-testid="button-complete-import"
                       >
                         <Upload className="h-4 w-4 mr-2" />
                         {language === "ca" ? "Importació completa" : "Importación completa"}
@@ -326,6 +343,7 @@ export default function ScheduleImport() {
                         size="sm"
                         className="text-green-600 border-green-300 hover:bg-green-100 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/40"
                         disabled={isImporting}
+                        data-testid="button-import-teachers"
                       >
                         <Users className="h-4 w-4 mr-2" />
                         {language === "ca" ? "Només professorat" : "Solo profesorado"}
@@ -336,6 +354,7 @@ export default function ScheduleImport() {
                         size="sm"
                         className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-900/40"
                         disabled={isImporting}
+                        data-testid="button-import-schedules"
                       >
                         <FileText className="h-4 w-4 mr-2" />
                         {language === "ca" ? "Només horaris" : "Solo horarios"}
@@ -344,11 +363,11 @@ export default function ScheduleImport() {
                   </div>
 
                   <div>
-                    <Label htmlFor="academic-year">
+                    <Label htmlFor="academic-year-select">
                       {language === "ca" ? "Curs acadèmic" : "Curso académico"}
                     </Label>
                     <Select value={selectedAcademicYear} onValueChange={setSelectedAcademicYear}>
-                      <SelectTrigger>
+                      <SelectTrigger id="academic-year-select" data-testid="select-academic-year">
                         <SelectValue placeholder={language === "ca" ? "Selecciona curs" : "Selecciona curso"} />
                       </SelectTrigger>
                       <SelectContent>
@@ -371,7 +390,13 @@ export default function ScheduleImport() {
                       accept=".xml,.gpu,.txt"
                       onChange={handleFileSelect}
                       className="mt-1"
+                      data-testid="input-file-upload"
                     />
+                    {selectedFile && (
+                      <p className="text-sm text-green-600 dark:text-green-400 mt-1 font-medium">
+                        {language === "ca" ? "Arxiu seleccionat:" : "Archivo seleccionado:"} {selectedFile.name}
+                      </p>
+                    )}
                     <p className="text-sm text-muted-foreground mt-1">
                       {language === "ca" 
                         ? "Formats acceptats: XML, GPU, TXT"

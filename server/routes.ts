@@ -2921,11 +2921,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Import only teachers from predefined file
       const fs = await import('fs');
-      const teachersPath = './attached_assets/PROFESSORAT_1754044133486.TXT';
+      const teachersPath = './attached_assets/PROFESSORAT_1755422511894.TXT';
       
       if (!fs.existsSync(teachersPath)) {
         return res.status(404).json({ 
-          message: 'Fitxer de professorat no trobat: PROFESSORAT_1754044133486.TXT' 
+          message: 'Fitxer de professorat no trobat: PROFESSORAT_1755422511894.TXT' 
         });
       }
 

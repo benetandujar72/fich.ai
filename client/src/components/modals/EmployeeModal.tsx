@@ -72,8 +72,9 @@ export default function EmployeeModal({ isOpen, onClose, employee, institutionId
 
   useEffect(() => {
     if (employee) {
+      // Handle data from employees list - employee.firstName/lastName from users table
       setFormData({
-        fullName: employee.fullName || "",
+        fullName: employee.fullName || `${employee.firstName || ''} ${employee.lastName || ''}`.trim(),
         dni: employee.dni || "",
         email: employee.email || "",
         phone: employee.phone || "",
@@ -116,12 +117,16 @@ export default function EmployeeModal({ isOpen, onClose, employee, institutionId
 
   const employeeMutation = useMutation({
     mutationFn: async (data: any) => {
-      const url = employee ? `/api/employees/${employee.id}` : "/api/employees";
+      // Use the correct admin route for updating employees - employee.id is the user_id
+      const url = employee ? `/api/admin/employees/${employee.id}` : "/api/employees";
       const method = employee ? "PUT" : "POST";
+      console.log('EMPLOYEE_MODAL: Updating employee with:', method, url, data);
       return await apiRequest(method, url, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      // Invalidate all relevant cache keys
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/employees", institutionId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/employees"] });
       toast({
         title: t("success", language),
         description: employee 
@@ -171,9 +176,9 @@ export default function EmployeeModal({ isOpen, onClose, employee, institutionId
     e.preventDefault();
     
     try {
-      // Validate form data
+      // Prepare data to send to backend
       const employeeData = {
-        userId: employee?.userId || "temp-user-id", // This would be properly handled in real app
+        userId: employee?.id || "temp-user-id", // employee.id IS the user_id
         institutionId,
         fullName: formData.fullName,
         dni: formData.dni,
@@ -184,6 +189,7 @@ export default function EmployeeModal({ isOpen, onClose, employee, institutionId
         status: formData.status,
         startDate: formData.startDate,
         endDate: formData.endDate || null,
+        role: employee?.role || 'employee',
       };
 
       // Basic validation

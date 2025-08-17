@@ -727,7 +727,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const updateData = req.body;
 
-      // Update user record first
+      // Update user record first (firstName, lastName, email)
+      if (updateData.fullName) {
+        const nameParts = updateData.fullName.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        await db.execute(sql`
+          UPDATE users 
+          SET first_name = ${firstName}, 
+              last_name = ${lastName},
+              updated_at = NOW()
+          WHERE id = ${employeeId}
+        `);
+        console.log('EMPLOYEE_UPDATE: User name updated');
+      }
+      
       if (updateData.role) {
         await db.execute(sql`
           UPDATE users 
@@ -759,21 +774,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (Object.keys(employeeUpdateData).length > 0) {
         employeeUpdateData.updated_at = new Date();
         
-        // Build individual SET clauses
-        const setClauses = [];
-        const values = [];
-        
-        for (const [key, value] of Object.entries(employeeUpdateData)) {
-          setClauses.push(`${key} = ?`);
-          values.push(value);
-        }
-        
-        // Add WHERE clause parameter
-        values.push(employeeId);
-        
+        // Update the employees table using proper SQL syntax
         await db.execute(sql`
           UPDATE employees 
-          SET ${sql.raw(setClauses.join(', '))}
+          SET 
+            full_name = ${employeeUpdateData.full_name || sql`full_name`},
+            email = ${employeeUpdateData.email || sql`email`},
+            phone = ${employeeUpdateData.phone || sql`phone`},
+            department_id = ${employeeUpdateData.department_id || sql`department_id`},
+            contract_type = ${employeeUpdateData.contract_type || sql`contract_type`},
+            start_date = ${employeeUpdateData.start_date || sql`start_date`},
+            end_date = ${employeeUpdateData.end_date || sql`end_date`},
+            status = ${employeeUpdateData.status || sql`status`},
+            updated_at = ${employeeUpdateData.updated_at}
           WHERE user_id = ${employeeId}
         `);
         console.log('EMPLOYEE_UPDATE: Employee record updated');

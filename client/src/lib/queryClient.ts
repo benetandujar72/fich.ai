@@ -12,6 +12,9 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  console.log("🌐 API REQUEST:", method, url);
+  if (data) console.log("🌐 API DATA:", data);
+  
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
@@ -19,6 +22,9 @@ export async function apiRequest(
     credentials: "include",
   });
 
+  console.log("🌐 API RESPONSE STATUS:", res.status);
+  console.log("🌐 API RESPONSE OK:", res.ok);
+  
   await throwIfResNotOk(res);
   return res;
 }

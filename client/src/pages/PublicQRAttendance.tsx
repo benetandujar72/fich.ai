@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 
 export default function PublicQRAttendance() {
+  console.log("🚀 PublicQRAttendance component mounted!");
+  
   const { toast } = useToast();
   
   const [qrInput, setQrInput] = useState('');
@@ -82,7 +84,11 @@ export default function PublicQRAttendance() {
 
   const handleQRSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🎯 QR FORM SUBMITTED!");
+    console.log("🎯 QR Input:", qrInput);
+    
     if (!qrInput.trim()) {
+      console.log("🎯 Empty QR input!");
       toast({
         title: "Error",
         description: "Introdueix un codi QR vàlid",
@@ -91,6 +97,7 @@ export default function PublicQRAttendance() {
       return;
     }
 
+    console.log("🎯 Starting QR processing...");
     setProcessing(true);
     processQRMutation.mutate(qrInput);
   };

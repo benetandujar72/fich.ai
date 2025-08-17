@@ -14,7 +14,8 @@ import {
   Building2,
   Info,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Clock
 } from 'lucide-react';
 
 export default function MyQRCode() {
@@ -24,7 +25,9 @@ export default function MyQRCode() {
   
   const [qrCanvas, setQrCanvas] = useState<HTMLCanvasElement | null>(null);
   const [qrSize] = useState<number>(256);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const generateMyQR = async () => {
     if (!user?.id) return;
@@ -48,12 +51,13 @@ export default function MyQRCode() {
       
       setQrCanvas(canvas);
       
-      toast({
-        title: language === "ca" ? "Èxit" : "Éxito",
-        description: language === "ca" ? 
-          "El teu codi QR s'ha generat correctament" : 
-          "Tu código QR se ha generado correctamente",
-      });
+      // Comentem el toast "Èxit" que causa problemes de modal
+      // toast({
+      //   title: language === "ca" ? "Èxit" : "Éxito",
+      //   description: language === "ca" ? 
+      //     "El teu codi QR s'ha generat correctament" : 
+      //     "Tu código QR se ha generado correctamente",
+      // });
     } catch (error) {
       console.error('Error generating QR code:', error);
       toast({
@@ -134,6 +138,19 @@ export default function MyQRCode() {
     }
   }, [user?.id]);
 
+  // Clock timer
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -162,6 +179,28 @@ export default function MyQRCode() {
               : "Tu código QR personal para el fichaje de asistencia"}
           </p>
         </div>
+
+        {/* Current Time Display */}
+        <Card className="mb-6 bg-blue-50 border-blue-200">
+          <CardContent className="text-center p-6">
+            <Clock className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+            <div className="text-2xl font-mono font-bold text-blue-800 mb-1">
+              {currentTime.toLocaleTimeString('ca-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+              })}
+            </div>
+            <div className="text-sm text-blue-600">
+              {currentTime.toLocaleDateString('ca-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Employee Info */}
         <Card className="mb-6">

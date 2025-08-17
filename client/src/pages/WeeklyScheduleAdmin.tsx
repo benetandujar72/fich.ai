@@ -100,14 +100,15 @@ export default function WeeklyScheduleAdmin() {
 
   const weekDays = ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres'];
   const timeSlots = [
-    { period: 1, label: '08:00 - 08:55' },
-    { period: 2, label: '09:00 - 09:55' },
-    { period: 3, label: '10:00 - 10:55' },
-    { period: 4, label: '11:00 - 11:55' },
-    { period: 5, label: '12:00 - 12:55' },
-    { period: 6, label: '13:00 - 13:55' },
-    { period: 7, label: '14:00 - 14:55' },
-    { period: 8, label: '15:00 - 15:55' }
+    { period: 1, label: '1a hora' },
+    { period: 2, label: '2a hora' },
+    { period: 3, label: '3a hora' },
+    { period: 'pati', label: 'Patis Coeducatius', isPause: true },
+    { period: 4, label: '4a hora' },
+    { period: 5, label: '5a hora' },
+    { period: 6, label: '6a hora' },
+    { period: 7, label: '7a hora' },
+    { period: 8, label: '8a hora' }
   ];
 
   if (isLoading) {
@@ -228,10 +229,22 @@ export default function WeeklyScheduleAdmin() {
             <div className="grid grid-cols-6 gap-2">
               {timeSlots.map(slot => (
                 <div key={slot.period} className="contents">
-                  <div className="p-2 text-xs text-center bg-rose-50 dark:bg-slate-800/50 rounded text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-slate-600">
+                  <div className={`p-2 text-xs text-center rounded border ${
+                    slot.isPause 
+                      ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-600' 
+                      : 'bg-rose-50 dark:bg-slate-800/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-slate-600'
+                  }`}>
                     {slot.label}
                   </div>
                   {[1, 2, 3, 4, 5].map(dayOfWeek => {
+                    if (slot.isPause) {
+                      return (
+                        <div key={`${dayOfWeek}-${slot.period}`} className="min-h-[40px] border border-yellow-200 dark:border-yellow-600 rounded bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center">
+                          <span className="text-xs text-yellow-700 dark:text-yellow-400">☕</span>
+                        </div>
+                      );
+                    }
+
                     const daySchedule = getScheduleByDay(dayOfWeek);
                     const session = daySchedule.find(s => s.hourPeriod === slot.period);
                     

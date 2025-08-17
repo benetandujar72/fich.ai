@@ -45,14 +45,14 @@ export default function Login() {
   const quickEmailRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("attendance");
 
-  // Update clock every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+  // Update clock every second - DISABLED to prevent form re-renders
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date());
+  //   }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -198,22 +198,13 @@ export default function Login() {
                     {language === "ca" ? "Fitxa directament amb les teves credencials" : "Ficha directamente con tus credenciales"}
                   </p>
                   
-                  {/* Digital Clock */}
+                  {/* Digital Clock - SIMPLIFIED to prevent re-renders */}
                   <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <div className="text-3xl font-mono font-bold text-primary">
-                      {currentTime.toLocaleTimeString("ca-ES", {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                      })}
+                    <div className="text-lg font-medium text-primary">
+                      {language === "ca" ? "Marcatge ràpid disponible" : "Marcaje rápido disponible"}
                     </div>
                     <div className="text-sm text-muted-foreground mt-1">
-                      {currentTime.toLocaleDateString("ca-ES", {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                      {language === "ca" ? "Introdueix les credencials per fitxar" : "Introduce las credenciales para fichar"}
                     </div>
                   </div>
                 </div>

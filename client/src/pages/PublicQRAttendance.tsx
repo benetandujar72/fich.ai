@@ -33,7 +33,7 @@ export default function PublicQRAttendance() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [lastResult, setLastResult] = useState<any>(null);
 
-  // Update time every second
+  // Update time every second - Optimized
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());

@@ -2451,45 +2451,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied: employee not in your institution' });
       }
 
-      // Get personal schedule sessions
+      // Get personal schedule sessions from Untis import data
       const result = await db.execute(sql`
         SELECT 
-          us.day_of_week as "dayOfWeek",
-          us.hour_period as "hourPeriod",
-          CASE 
-            WHEN us.hour_period = 1 THEN '08:00:00'
-            WHEN us.hour_period = 2 THEN '09:00:00'
-            WHEN us.hour_period = 3 THEN '10:00:00'
-            WHEN us.hour_period = 4 THEN '11:00:00'
-            WHEN us.hour_period = 5 THEN '12:00:00'
-            WHEN us.hour_period = 6 THEN '13:00:00'
-            WHEN us.hour_period = 7 THEN '14:00:00'
-            WHEN us.hour_period = 8 THEN '15:00:00'
-            ELSE '09:00:00'
-          END as "startTime",
-          CASE 
-            WHEN us.hour_period = 1 THEN '08:55:00'
-            WHEN us.hour_period = 2 THEN '09:55:00'
-            WHEN us.hour_period = 3 THEN '10:55:00'
-            WHEN us.hour_period = 4 THEN '11:55:00'
-            WHEN us.hour_period = 5 THEN '12:55:00'
-            WHEN us.hour_period = 6 THEN '13:55:00'
-            WHEN us.hour_period = 7 THEN '14:55:00'
-            WHEN us.hour_period = 8 THEN '15:55:00'
-            ELSE '09:55:00'
-          END as "endTime",
-          us.subject_code as "subjectCode",
-          us.group_code as "groupCode",
-          us.classroom_code as "classroomCode"
-        FROM untis_schedule_sessions us
-        WHERE (
-          us.teacher_code = (SELECT first_name FROM users WHERE id = ${employeeId})
-          OR us.employee_id = ${employeeId}
-        )
-        ORDER BY us.day_of_week, us.hour_period
+          uss.day_of_week as "dayOfWeek",
+          uss.hour_period as "hourPeriod",
+          'Hora ' || uss.hour_period as "timeSlot",
+          uss.subject_code as "subjectCode",
+          uss.group_code as "groupCode", 
+          uss.classroom_code as "classroomCode",
+          uss.subject_code || ' (' || uss.group_code || ')' as "title",
+          uss.classroom_code as "location"
+        FROM untis_schedule_sessions uss
+        WHERE uss.employee_id = ${employeeId}
+        AND uss.institution_id = ${req.user.institutionId}
+        ORDER BY uss.day_of_week, uss.hour_period
       `);
 
-      console.log('ADMIN_PERSONAL_SCHEDULE: Found', result.rows.length, 'sessions');
+      console.log('ADMIN_PERSONAL_SCHEDULE: Found', result.rows.length, 'sessions for employee:', employeeId);
       res.json(result.rows);
     } catch (error) {
       console.error('ADMIN_PERSONAL_SCHEDULE: Error:', error);

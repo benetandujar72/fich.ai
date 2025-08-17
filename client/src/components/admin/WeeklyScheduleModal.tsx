@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,51 +19,48 @@ interface User {
 
 interface ScheduleEntry {
   dayOfWeek: number;
-  startTime: string;
-  endTime: string;
-  breakStart?: string;
-  breakEnd?: string;
-  location?: string;
-  notes?: string;
+  hourPeriod: number;
+  timeSlot: string;
+  subjectCode: string;
+  groupCode: string;
+  classroomCode: string;
+  title: string;
+  location: string;
 }
 
 export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProps) {
   const { data: user } = useQuery({
-    queryKey: ['/api/users', userId],
+    queryKey: ['/api/admin/employees', userId],
+    queryFn: () => apiRequest(`/api/admin/employees/${userId}`),
   }) as { data: User | undefined };
 
   const { data: schedule = [], isLoading } = useQuery({
-    queryKey: ['/api/admin/users', userId, 'schedule'],
+    queryKey: ['/api/admin/personal-schedule', userId],
+    queryFn: () => apiRequest(`/api/admin/personal-schedule/${userId}?week=${getCurrentWeek()}`),
   }) as { data: ScheduleEntry[]; isLoading: boolean };
+
+  const getCurrentWeek = () => {
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(monday.getDate() - monday.getDay() + 1);
+    return monday.toISOString().split('T')[0];
+  };
 
   const dayNames = [
     'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'
   ];
 
-  const getScheduleForDay = (dayIndex: number): ScheduleEntry | null => {
-    return schedule.find((entry) => entry.dayOfWeek === dayIndex + 1) || null;
+  const getScheduleForDay = (dayIndex: number): ScheduleEntry[] => {
+    return schedule.filter((entry) => entry.dayOfWeek === dayIndex + 1);
   };
 
-  const formatTime = (time: string) => {
-    return time.substring(0, 5); // HH:MM format
+  const calculateTotalSessions = () => {
+    return schedule.length;
   };
 
-  const calculateTotalHours = () => {
-    return schedule.reduce((total, entry) => {
-      const start = new Date(`2024-01-01T${entry.startTime}`);
-      const end = new Date(`2024-01-01T${entry.endTime}`);
-      const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-      
-      // Subtract break time if exists
-      if (entry.breakStart && entry.breakEnd) {
-        const breakStart = new Date(`2024-01-01T${entry.breakStart}`);
-        const breakEnd = new Date(`2024-01-01T${entry.breakEnd}`);
-        const breakHours = (breakEnd.getTime() - breakStart.getTime()) / (1000 * 60 * 60);
-        return total + hours - breakHours;
-      }
-      
-      return total + hours;
-    }, 0);
+  const getUniqueSubjects = () => {
+    const subjects = new Set(schedule.map(entry => entry.subjectCode));
+    return subjects.size;
   };
 
   return (
@@ -81,10 +79,10 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {calculateTotalHours().toFixed(1)}h
+                  {calculateTotalSessions()}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Hores Setmanals
+                  Sessions Setmanals
                 </div>
               </CardContent>
             </Card>
@@ -92,10 +90,10 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {schedule.length}
+                  {getUniqueSubjects()}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Dies Laborals
+                  Matèries Diferents
                 </div>
               </CardContent>
             </Card>
@@ -103,10 +101,10 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-purple-600">
-                  {user?.email}
+                  {user?.firstName} {user?.lastName}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Email
+                  Professor/a
                 </div>
               </CardContent>
             </Card>
@@ -123,70 +121,56 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
                 const daySchedule = getScheduleForDay(index);
                 
                 return (
-                  <Card key={index} className={daySchedule ? "border-green-200" : "border-gray-200"}>
+                  <Card key={index} className={daySchedule.length > 0 ? "border-green-200" : "border-gray-200"}>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-lg flex items-center justify-between">
                         {dayName}
-                        {daySchedule && (
+                        {daySchedule.length > 0 && (
                           <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            Actiu
+                            {daySchedule.length} sessions
                           </Badge>
                         )}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-3">
-                      {daySchedule ? (
+                    <CardContent className="space-y-2">
+                      {daySchedule.length > 0 ? (
                         <>
-                          {/* Work Hours */}
-                          <div className="flex items-center gap-2 text-sm">
-                            <Clock className="h-4 w-4 text-blue-500" />
-                            <span className="font-medium">
-                              {formatTime(daySchedule.startTime)} - {formatTime(daySchedule.endTime)}
-                            </span>
-                          </div>
-
-                          {/* Break Time */}
-                          {daySchedule.breakStart && daySchedule.breakEnd && (
-                            <div className="flex items-center gap-2 text-sm text-orange-600">
-                              <Coffee className="h-4 w-4" />
-                              <span>
-                                Descans: {formatTime(daySchedule.breakStart)} - {formatTime(daySchedule.breakEnd)}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Location */}
-                          {daySchedule.location && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <MapPin className="h-4 w-4" />
-                              <span>{daySchedule.location}</span>
-                            </div>
-                          )}
-
-                          {/* Notes */}
-                          {daySchedule.notes && (
-                            <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                              {daySchedule.notes}
-                            </div>
-                          )}
-
-                          {/* Total Hours for Day */}
+                          {/* Sessions */}
+                          {daySchedule
+                            .sort((a, b) => a.hourPeriod - b.hourPeriod)
+                            .map((session, sessionIndex) => (
+                              <div key={sessionIndex} className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4 text-blue-500" />
+                                    <span className="font-medium text-blue-700 dark:text-blue-300">
+                                      {session.timeSlot}
+                                    </span>
+                                  </div>
+                                  <Badge variant="outline" className="text-xs">
+                                    {session.subjectCode}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="text-sm space-y-1">
+                                  <div className="font-medium">
+                                    {session.title}
+                                  </div>
+                                  
+                                  {session.classroomCode && (
+                                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                      <MapPin className="h-3 w-3" />
+                                      <span>{session.classroomCode}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          
+                          {/* Total sessions for day */}
                           <div className="pt-2 border-t">
-                            <div className="text-sm font-medium text-center">
-                              {(() => {
-                                const start = new Date(`2024-01-01T${daySchedule.startTime}`);
-                                const end = new Date(`2024-01-01T${daySchedule.endTime}`);
-                                let hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                                
-                                if (daySchedule.breakStart && daySchedule.breakEnd) {
-                                  const breakStart = new Date(`2024-01-01T${daySchedule.breakStart}`);
-                                  const breakEnd = new Date(`2024-01-01T${daySchedule.breakEnd}`);
-                                  const breakHours = (breakEnd.getTime() - breakStart.getTime()) / (1000 * 60 * 60);
-                                  hours -= breakHours;
-                                }
-                                
-                                return `${hours.toFixed(1)}h total`;
-                              })()}
+                            <div className="text-sm font-medium text-center text-green-600">
+                              {daySchedule.length} sessions aquest dia
                             </div>
                           </div>
                         </>

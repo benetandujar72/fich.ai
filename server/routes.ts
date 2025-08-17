@@ -703,7 +703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         LEFT JOIN attendance_records a ON u.id = a.employee_id 
           AND a.timestamp >= date_trunc('week', CURRENT_DATE)
         LEFT JOIN (
-          SELECT employee_id, COUNT(*) as session_count
+          SELECT employee_id, COUNT(DISTINCT CONCAT(day_of_week, '-', hour_period)) as session_count
           FROM untis_schedule_sessions
           GROUP BY employee_id
         ) uss ON e.id = uss.employee_id
@@ -2430,8 +2430,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             u.last_name,
             u.email,
             u.role,
-            COUNT(us.id) as total_sessions,
-            COALESCE(COUNT(us.id) * 0.9, 0) as weekly_hours
+            COUNT(DISTINCT CONCAT(us.day_of_week, '-', us.hour_period)) as total_sessions,
+            COALESCE(COUNT(DISTINCT CONCAT(us.day_of_week, '-', us.hour_period)), 0) as weekly_hours
           FROM users u
           LEFT JOIN employees e ON u.id = e.user_id
           LEFT JOIN untis_schedule_sessions us ON us.employee_id = e.id

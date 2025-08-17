@@ -63,6 +63,11 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
     return subjects.size;
   };
 
+  const getHourLabel = (hourPeriod: number): string => {
+    const ordinals = ['1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a'];
+    return ordinals[hourPeriod - 1] ? `${ordinals[hourPeriod - 1]} hora` : `Hora ${hourPeriod}`;
+  };
+
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto modal-content-solid">
@@ -139,31 +144,45 @@ export function WeeklyScheduleModal({ userId, onClose }: WeeklyScheduleModalProp
                           {daySchedule
                             .sort((a, b) => a.hourPeriod - b.hourPeriod)
                             .map((session, sessionIndex) => (
-                              <div key={sessionIndex} className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-                                <div className="flex items-center justify-between mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4 text-blue-500" />
-                                    <span className="font-medium text-blue-700 dark:text-blue-300">
-                                      {session.timeSlot}
-                                    </span>
-                                  </div>
-                                  <Badge variant="outline" className="text-xs">
-                                    {session.subjectCode}
-                                  </Badge>
-                                </div>
-                                
-                                <div className="text-sm space-y-1">
-                                  <div className="font-medium">
-                                    {session.title}
+                              <div key={sessionIndex}>
+                                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="h-4 w-4 text-blue-500" />
+                                      <span className="font-medium text-blue-700 dark:text-blue-300">
+                                        {getHourLabel(session.hourPeriod)}
+                                      </span>
+                                    </div>
+                                    <Badge variant="outline" className="text-xs">
+                                      {session.subjectCode}
+                                    </Badge>
                                   </div>
                                   
-                                  {session.classroomCode && (
-                                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                                      <MapPin className="h-3 w-3" />
-                                      <span>{session.classroomCode}</span>
+                                  <div className="text-sm space-y-1">
+                                    <div className="font-medium">
+                                      {session.title}
                                     </div>
-                                  )}
+                                    
+                                    {session.classroomCode && (
+                                      <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                        <MapPin className="h-3 w-3" />
+                                        <span>{session.classroomCode}</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
+                                
+                                {/* Pati coeducatiu entre 3a i 4a hora */}
+                                {session.hourPeriod === 3 && (
+                                  <div className="my-2 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                                    <div className="flex items-center gap-2">
+                                      <Coffee className="h-4 w-4 text-yellow-600" />
+                                      <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
+                                        Patis Coeducatius
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           

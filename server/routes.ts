@@ -774,19 +774,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (Object.keys(employeeUpdateData).length > 0) {
         employeeUpdateData.updated_at = new Date();
         
-        // Update the employees table using proper SQL syntax
+        // Update the employees table - direct approach
         await db.execute(sql`
           UPDATE employees 
           SET 
-            full_name = ${employeeUpdateData.full_name || sql`full_name`},
-            email = ${employeeUpdateData.email || sql`email`},
-            phone = ${employeeUpdateData.phone || sql`phone`},
-            department_id = ${employeeUpdateData.department_id || sql`department_id`},
-            contract_type = ${employeeUpdateData.contract_type || sql`contract_type`},
-            start_date = ${employeeUpdateData.start_date || sql`start_date`},
-            end_date = ${employeeUpdateData.end_date || sql`end_date`},
-            status = ${employeeUpdateData.status || sql`status`},
-            updated_at = ${employeeUpdateData.updated_at}
+            full_name = COALESCE(${employeeUpdateData.full_name}, full_name),
+            email = COALESCE(${employeeUpdateData.email}, email),
+            phone = COALESCE(${employeeUpdateData.phone}, phone),
+            department_id = COALESCE(${employeeUpdateData.department_id}, department_id),
+            contract_type = COALESCE(${employeeUpdateData.contract_type}, contract_type),
+            start_date = COALESCE(${employeeUpdateData.start_date}, start_date),
+            end_date = COALESCE(${employeeUpdateData.end_date}, end_date),
+            status = COALESCE(${employeeUpdateData.status}, status),
+            updated_at = NOW()
           WHERE user_id = ${employeeId}
         `);
         console.log('EMPLOYEE_UPDATE: Employee record updated');
@@ -2465,6 +2465,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get personal schedule sessions from Untis import data
+      // employeeId is actually the user_id, so we need to find the employee_id first
+      const employeeData = await db.execute(sql`
+        SELECT id FROM employees WHERE user_id = ${employeeId}
+      `);
+      
+      const actualEmployeeId = employeeData.rows[0]?.id;
+      
       const result = await db.execute(sql`
         SELECT 
           uss.day_of_week as "dayOfWeek",
@@ -2476,7 +2483,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           uss.subject_code || ' (' || uss.group_code || ')' as "title",
           uss.classroom_code as "location"
         FROM untis_schedule_sessions uss
-        WHERE uss.employee_id = ${employeeId}
+        WHERE (uss.employee_id = ${actualEmployeeId} OR uss.employee_id IN (
+          SELECT id FROM employees WHERE user_id = ${employeeId}
+        ))
         AND uss.institution_id = ${req.user.institutionId}
         ORDER BY uss.day_of_week, uss.hour_period
       `);

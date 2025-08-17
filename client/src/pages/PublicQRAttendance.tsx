@@ -30,16 +30,8 @@ export default function PublicQRAttendance() {
   
   const [qrInput, setQrInput] = useState('');
   const [processing, setProcessing] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [lastResult, setLastResult] = useState<any>(null);
-
-  // Update time every second - Optimized
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const [showResult, setShowResult] = useState(false);
 
   // QR Processing mutation
   const processQRMutation = useMutation({
@@ -63,6 +55,7 @@ export default function PublicQRAttendance() {
     },
     onSuccess: (data) => {
       setLastResult(data);
+      setShowResult(true);
       console.log("🎉 QR SUCCESS:", data);
       toast({
         title: "Fitxatge registrat",
@@ -70,17 +63,28 @@ export default function PublicQRAttendance() {
       });
       setQrInput('');
       setProcessing(false);
+      
+      // Hide result after 5 seconds
+      setTimeout(() => {
+        setShowResult(false);
+      }, 5000);
     },
     onError: (error: any) => {
       console.log("❌ QR ERROR:", error);
       console.log("❌ Error details:", JSON.stringify(error, null, 2));
       setLastResult({ error: true, message: error.message });
+      setShowResult(true);
       toast({
         title: "Error",
         description: error.message || 'Error al processar el codi QR',
         variant: "destructive",
       });
       setProcessing(false);
+      
+      // Hide error after 5 seconds
+      setTimeout(() => {
+        setShowResult(false);
+      }, 5000);
     },
   });
 
@@ -136,10 +140,10 @@ export default function PublicQRAttendance() {
           <CardContent className="text-center p-6">
             <Clock className="h-8 w-8 text-blue-600 mx-auto mb-3" />
             <div className="text-2xl font-mono font-bold text-blue-800 mb-1">
-              {formatTime(currentTime)}
+              {formatTime(new Date())}
             </div>
             <div className="text-sm text-blue-600">
-              {formatDate(currentTime)}
+              {formatDate(new Date())}
             </div>
           </CardContent>
         </Card>
@@ -222,8 +226,8 @@ export default function PublicQRAttendance() {
           </CardContent>
         </Card>
 
-        {/* Last Result */}
-        {lastResult && (
+        {/* Last Result - Only show when showResult is true */}
+        {showResult && lastResult && (
           <Card className={`bg-white/80 backdrop-blur-sm border-2 ${
             lastResult.error ? 'border-red-200' : 'border-green-200'
           }`}>

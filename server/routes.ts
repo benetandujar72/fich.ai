@@ -126,8 +126,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             'medium' as priority,
             'completed' as status
           FROM attendance_records a
-          LEFT JOIN users u ON a.employee_id = u.id
-          WHERE a.employee_id = ${userId}
+          LEFT JOIN employees e ON a.employee_id = e.id
+          LEFT JOIN users u ON e.user_id = u.id
+          WHERE e.user_id = ${userId}
           ORDER BY a.timestamp DESC
           LIMIT ${Math.floor(limit/2)}
         `
@@ -208,7 +209,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               MIN(CASE WHEN a.type = 'check_in' THEN a.timestamp END)
             ))/3600 as hours_worked
           FROM attendance_records a
-          WHERE a.employee_id = ${userId}
+          LEFT JOIN employees e ON a.employee_id = e.id
+          WHERE e.user_id = ${userId}
             AND a.timestamp >= ${monday.toISOString()}
             AND a.timestamp <= ${friday.toISOString()}
           GROUP BY DATE(a.timestamp AT TIME ZONE 'Europe/Madrid')
@@ -1192,7 +1194,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ELSE 0 
           END as compliance_rate
         FROM users u
-        LEFT JOIN attendance_records ar ON u.id = ar.employee_id 
+        LEFT JOIN employees e ON u.id = e.user_id
+        LEFT JOIN attendance_records ar ON e.id = ar.employee_id 
           AND ar.timestamp >= ${monday.toISOString()}
           AND ar.timestamp <= ${friday.toISOString()}
         WHERE u.institution_id = ${institutionId} AND u.role = 'employee'
@@ -1211,7 +1214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 COUNT(CASE WHEN type = 'check_in' THEN 1 END) as check_ins,
                 COUNT(CASE WHEN type = 'check_out' THEN 1 END) as check_outs
               FROM attendance_records 
-              WHERE employee_id = ${employee.id}
+              WHERE employee_id = (SELECT id FROM employees WHERE user_id = ${employee.id})
                 AND DATE(timestamp AT TIME ZONE 'Europe/Madrid') = ${format(currentDay, 'yyyy-MM-dd')}
             `);
 
@@ -1894,16 +1897,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
 
+      // Get employee_id from user_id
+      const employeeRecord = await db.execute(sql`
+        SELECT id as employee_id FROM employees WHERE user_id = ${userId}
+      `);
+      
+      const actualEmployeeId = employeeRecord.rows[0]?.employee_id;
+      if (!actualEmployeeId) {
+        return res.status(404).json({ message: 'Employee record not found' });
+      }
+
       // Get real attendance records for the week
       const attendanceData = await db.execute(sql`
         SELECT 
           DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') as day,
           ar.type,
           ar.timestamp,
-          ar.is_late,
           ar.notes
         FROM attendance_records ar
-        WHERE ar.employee_id = ${userId}
+        WHERE ar.employee_id = ${actualEmployeeId}
           AND ar.timestamp >= ${weekStart}
           AND ar.timestamp <= ${weekEnd.toISOString()}
         ORDER BY ar.timestamp
@@ -1927,12 +1939,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       Object.values(weeklySchedule).forEach((dayData: any) => {
         const checkIns = dayData.records.filter((r: any) => r.type === 'check_in').length;
         const checkOuts = dayData.records.filter((r: any) => r.type === 'check_out').length;
-        const hasDelays = dayData.records.some((r: any) => r.is_late);
         
-        if (checkIns > 0 && checkOuts > 0 && !hasDelays) {
+        if (checkIns > 0 && checkOuts > 0) {
           dayData.status = 'complete';
         } else if (checkIns > 0 || checkOuts > 0) {
-          dayData.status = hasDelays ? 'incidents' : 'incomplete';
+          dayData.status = 'incomplete';
         } else {
           dayData.status = 'no_attendance';
         }
@@ -1945,6 +1956,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching weekly schedule:', error);
       res.status(500).json({ message: 'Error obtenint horari setmanal' });
+    }
+  });
+
+  // Weekly attendance endpoint for employee calendar
+  app.get('/api/attendance/weekly/:employeeId/:weekStart', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId, weekStart } = req.params;
+      const userRole = req.user.role;
+
+      // Check permissions
+      if (userRole === 'employee' && req.user.id !== employeeId) {
+        return res.status(403).json({ message: 'Access denied: can only view your own attendance' });
+      }
+
+      // Get employee_id from user_id
+      const employeeRecord = await db.execute(sql`
+        SELECT e.id as employee_id, u.id as user_id
+        FROM users u
+        LEFT JOIN employees e ON u.id = e.user_id
+        WHERE u.id = ${employeeId}
+      `);
+      
+      const actualEmployeeId = employeeRecord.rows[0]?.employee_id;
+      if (!actualEmployeeId) {
+        return res.json([]); // Return empty array if no employee record
+      }
+
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      console.log('WEEKLY_ATTENDANCE: Fetching for employee_id:', actualEmployeeId, 'week:', weekStart);
+
+      const result = await db.execute(sql`
+        SELECT 
+          DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') as date,
+          ar.type,
+          ar.timestamp,
+          ar.notes,
+          ar.method,
+          ar.location
+        FROM attendance_records ar
+        WHERE ar.employee_id = ${actualEmployeeId}
+          AND DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') >= DATE(${weekStart})
+          AND DATE(ar.timestamp AT TIME ZONE 'Europe/Madrid') <= DATE(${weekEnd.toISOString()})
+        ORDER BY ar.timestamp
+      `);
+
+      console.log('WEEKLY_ATTENDANCE: Found', result.rows.length, 'records for employee', actualEmployeeId);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error fetching weekly attendance:', error);
+      res.status(500).json({ message: 'Error obtenint assistència setmanal', error: error.message });
     }
   });
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -32,6 +32,7 @@ export default function PublicQRAttendance() {
   const [processing, setProcessing] = useState(false);
   const [lastResult, setLastResult] = useState<any>(null);
   const [showResult, setShowResult] = useState(false);
+  const [displayTime, setDisplayTime] = useState(new Date());
 
   // QR Processing mutation
   const processQRMutation = useMutation({
@@ -105,6 +106,8 @@ export default function PublicQRAttendance() {
 
     console.log("🎯 Starting QR processing...");
     setProcessing(true);
+    // Update display time when processing starts
+    setDisplayTime(new Date());
     processQRMutation.mutate(qrInput);
   };
 
@@ -140,10 +143,10 @@ export default function PublicQRAttendance() {
           <CardContent className="text-center p-6">
             <Clock className="h-8 w-8 text-blue-600 mx-auto mb-3" />
             <div className="text-2xl font-mono font-bold text-blue-800 mb-1">
-              {formatTime(new Date())}
+              {formatTime(displayTime)}
             </div>
             <div className="text-sm text-blue-600">
-              {formatDate(new Date())}
+              {formatDate(displayTime)}
             </div>
           </CardContent>
         </Card>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
+import { t } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -228,7 +229,7 @@ export default function MyQRCode() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Rol</p>
-                <Badge variant="secondary">{user.role}</Badge>
+                <Badge variant="secondary">{t(user.role, language)}</Badge>
               </div>
               <div>
                 <p className="text-sm text-gray-600">ID Personal</p>

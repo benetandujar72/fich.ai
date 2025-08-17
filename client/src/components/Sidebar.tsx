@@ -354,8 +354,7 @@ export default function Sidebar(props: SidebarProps = {}) {
                   {user.email}
                 </p>
                 <Badge variant="outline" className="mt-1 text-xs">
-                  {user.role === 'superadmin' ? 'Super Admin' : 
-                   user.role === 'admin' ? 'Administrador' : 'Empleat'}
+                  {t(user.role, language)}
                 </Badge>
               </div>
             </div>

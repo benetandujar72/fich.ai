@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/lib/i18n";
 import { Activity, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,6 +16,7 @@ interface MobileHeaderProps {
 
 export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, onLogout }: MobileHeaderProps) {
   const { user } = useAuth();
+  const { language } = useLanguage();
   
   const userInitials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : 'U';
 
@@ -45,8 +48,8 @@ export default function MobileHeader({ isMobileMenuOpen, setIsMobileMenuOpen, on
                 {user?.firstName}
               </p>
               <Badge variant="outline" className="text-[10px] px-1 py-0 leading-3 h-auto">
-                {user?.role === 'superadmin' ? 'SA' : 
-                 user?.role === 'admin' ? 'Admin' : 'Emp'}
+                {user?.role === 'superadmin' ? t("superadmin_short", language) : 
+                 user?.role === 'admin' ? t("admin_short", language) : t("employee_short", language)}
               </Badge>
             </div>
           </div>

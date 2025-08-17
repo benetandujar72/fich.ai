@@ -787,14 +787,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await db.execute(sql`
           UPDATE employees 
           SET 
-            full_name = COALESCE(${employeeUpdateData.full_name}, full_name),
-            email = COALESCE(${employeeUpdateData.email}, email),
-            phone = COALESCE(${employeeUpdateData.phone}, phone),
-            department_id = COALESCE(${employeeUpdateData.department_id}, department_id),
-            contract_type = COALESCE(${employeeUpdateData.contract_type}, contract_type),
-            start_date = COALESCE(${employeeUpdateData.start_date}, start_date),
-            end_date = COALESCE(${employeeUpdateData.end_date}, end_date),
-            status = COALESCE(${employeeUpdateData.status}, status),
+            full_name = COALESCE(${employeeUpdateData.full_name || null}, full_name),
+            email = COALESCE(${employeeUpdateData.email || null}, email),
+            phone = COALESCE(${employeeUpdateData.phone || null}, phone),
+            department_id = COALESCE(${employeeUpdateData.department_id || null}, department_id),
+            contract_type = COALESCE(${employeeUpdateData.contract_type || null}, contract_type),
+            start_date = COALESCE(${employeeUpdateData.start_date || null}, start_date),
+            end_date = COALESCE(${employeeUpdateData.end_date || null}, end_date),
+            status = COALESCE(${employeeUpdateData.status || null}, status),
             updated_at = NOW()
           WHERE user_id = ${employeeId}
         `);

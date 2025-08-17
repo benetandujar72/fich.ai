@@ -27,9 +27,23 @@ export const translations = {
     "status": "Estat",
     "filter": "Filtrar",
     "employee_list": "Llista d'empleats",
-    "employee": "Empleat",
     "schedule": "Horari",
     "actions": "Accions",
+    
+    // User roles
+    "superadmin": "Superadministrador",
+    "admin": "Administrador", 
+    "employee": "Empleat",
+    
+    // Role abbreviations
+    "superadmin_short": "SA",
+    "admin_short": "Admin",
+    "employee_short": "Emp",
+    
+    // Role dropdown options
+    "role_employee": "Empleat",
+    "role_admin": "Administrador", 
+    "role_superadmin": "Superadministrador",
     
     // Attendance
     "quick_checkin": "Fitxatge ràpid",
@@ -122,7 +136,7 @@ export const translations = {
     "delay": "Retard",
     "logout": "Sortir",
     "low": "Baix",
-    "medium": "Mitjà", 
+    "medium": "Mitjà",
     "high": "Alt",
     "urgent": "Urgent",
     "normal": "Normal",
@@ -155,9 +169,23 @@ export const translations = {
     "status": "Estado",
     "filter": "Filtrar",
     "employee_list": "Lista de empleados",
-    "employee": "Empleado",
     "schedule": "Horario",
     "actions": "Acciones",
+    
+    // User roles
+    "superadmin": "Superadministrador",
+    "admin": "Administrador",
+    "employee": "Empleado",
+    
+    // Role abbreviations
+    "superadmin_short": "SA",
+    "admin_short": "Admin", 
+    "employee_short": "Emp",
+    
+    // Role dropdown options
+    "role_employee": "Empleado",
+    "role_admin": "Administrador",
+    "role_superadmin": "Superadministrador",
     
     // Attendance
     "quick_checkin": "Fichaje rápido",

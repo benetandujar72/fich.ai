@@ -113,28 +113,50 @@ export default function QRScanner() {
 
       console.log('🎥 Requesting camera access...');
       
-      // First try with environment camera (back camera on mobile)
-      let constraints = { 
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
-      };
-
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-      } catch (envError) {
-        console.log('🎥 Environment camera failed, trying any camera...');
-        // Fallback to any available camera
+      // Detect iOS Safari
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+      
+      console.log('📱 Device detection:', { isIOS, isSafari });
+      
+      // iOS Safari specific constraints
+      let constraints;
+      if (isIOS && isSafari) {
+        // iOS Safari requires specific constraints
         constraints = { 
           video: { 
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 640, max: 1920 },
+            height: { ideal: 480, max: 1080 },
+            frameRate: { ideal: 30, max: 30 }
+          },
+          audio: false
+        };
+      } else {
+        // Standard constraints for other browsers
+        constraints = { 
+          video: { 
+            facingMode: 'environment',
             width: { ideal: 1280 },
             height: { ideal: 720 }
           } 
         };
+      }
+
+      let stream;
+      try {
+        console.log('🎥 Trying with environment camera...');
         stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (envError) {
+        console.log('🎥 Environment camera failed, trying any camera...', envError);
+        // Fallback to any available camera
+        const fallbackConstraints = { 
+          video: { 
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          } 
+        };
+        stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
       }
       
       console.log('🎥 Camera access granted!');
@@ -143,22 +165,35 @@ export default function QRScanner() {
         videoRef.current.srcObject = stream;
         setIsScanning(true);
         
+        // iOS Safari specific handling
+        if (isIOS && isSafari) {
+          videoRef.current.setAttribute('playsinline', 'true');
+          videoRef.current.setAttribute('webkit-playsinline', 'true');
+          videoRef.current.muted = true;
+        }
+        
         // Wait for video to load
         videoRef.current.onloadedmetadata = () => {
           console.log('🎥 Video metadata loaded');
-          videoRef.current?.play();
+          if (videoRef.current) {
+            videoRef.current.play().catch(playError => {
+              console.error('Play error:', playError);
+            });
+          }
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Camera error:', error);
       let errorMessage = "No es pot accedir a la càmera.";
       
       if (error.name === 'NotAllowedError') {
-        errorMessage = "Permisos de càmera denegats. Permet l'accés a la càmera i torna a provar.";
+        errorMessage = "Permisos de càmera denegats. A iOS, ves a Configuració > Safari > Càmera i permet l'accés.";
       } else if (error.name === 'NotFoundError') {
         errorMessage = "No s'ha trobat cap càmera. Utilitza l'entrada manual.";
       } else if (error.name === 'NotSupportedError') {
         errorMessage = "Càmera no compatible amb aquest dispositiu.";
+      } else if (error.name === 'OverconstrainedError') {
+        errorMessage = "Configuració de càmera no compatible. Provant amb configuració bàsica...";
       }
       
       toast({
@@ -277,9 +312,19 @@ export default function QRScanner() {
           {/* Camera Scanner */}
           {!isScanning ? (
             <div className="text-center space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                <p className="text-sm text-blue-800 mb-2">
+                  📱 <strong>Per iPhone/iPad:</strong>
+                </p>
+                <p className="text-xs text-blue-700">
+                  • Assegura't que Safari té permisos de càmera<br/>
+                  • Ves a Configuració &gt; Safari &gt; Càmera &gt; Permet<br/>
+                  • Recarrega la pàgina si cal
+                </p>
+              </div>
               <Button 
                 onClick={startScanning}
-                className="w-full h-12"
+                className="w-full h-12 bg-green-600 hover:bg-green-700"
                 size="lg"
               >
                 <Camera className="mr-2 h-5 w-5" />
@@ -294,6 +339,7 @@ export default function QRScanner() {
                   autoPlay 
                   playsInline
                   muted
+                  webkit-playsinline="true"
                   className="w-full rounded-lg border-2 border-dashed border-primary"
                   style={{ maxHeight: '400px', objectFit: 'cover' }}
                 />
@@ -304,6 +350,9 @@ export default function QRScanner() {
                 </div>
                 <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
                   📱 Apunta al QR
+                </div>
+                <div className="absolute bottom-2 left-2 bg-green-600/80 text-white px-2 py-1 rounded text-xs">
+                  🟢 Càmera activa
                 </div>
               </div>
               

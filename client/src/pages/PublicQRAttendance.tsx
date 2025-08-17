@@ -174,7 +174,7 @@ export default function PublicQRAttendance() {
           <p className="text-sm text-gray-600">Sistema de control d'assistència</p>
         </div>
 
-        {/* Current Time Display */}
+        {/* Current Time Display - FIXED */}
         <Card className="bg-white/80 backdrop-blur-sm border-2 border-blue-200">
           <CardContent className="text-center p-6">
             <Clock className="h-8 w-8 text-blue-600 mx-auto mb-3" />
@@ -183,6 +183,9 @@ export default function PublicQRAttendance() {
             </div>
             <div className="text-sm text-blue-600">
               {formatDate(displayTime)}
+            </div>
+            <div className="text-xs text-gray-500 mt-2">
+              Últma actualització: {displayTime.toISOString()}
             </div>
           </CardContent>
         </Card>

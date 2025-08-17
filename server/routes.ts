@@ -2288,6 +2288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Change password for another user (admin functionality)
+  // Canvi de contrasenya per administradors (per a qualsevol usuari)
   app.put('/api/users/admins/:userId/password', isAuthenticated, async (req: any, res) => {
     try {
       const { userId } = req.params;
@@ -2322,6 +2323,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Password updated successfully' });
     } catch (error) {
       console.error("Error changing user password:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
+  // Canvi de contrasenya pels usuaris (només la seva pròpia)
+  app.put('/api/users/change-password', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { currentPassword, newPassword } = req.body;
+      
+      console.log('CHANGE_OWN_PASSWORD: User changing own password:', userId);
+      
+      // Verificar contrasenya actual
+      const userResult = await db.execute(sql`
+        SELECT password_hash FROM users WHERE id = ${userId}
+      `);
+      
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      const user = userResult.rows[0];
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password_hash as string);
+      
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+      
+      // Hash nova contrasenya
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Actualitzar contrasenya
+      await db.execute(sql`
+        UPDATE users 
+        SET 
+          password_hash = ${hashedPassword},
+          updated_at = NOW()
+        WHERE id = ${userId}
+      `);
+
+      console.log('CHANGE_OWN_PASSWORD: Successfully updated own password');
+      res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error("Error changing own password:", error);
       res.status(500).json({ message: "Failed to change password" });
     }
   });

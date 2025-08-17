@@ -102,9 +102,7 @@ export default function QuickAttendanceModal({
               className={`w-full py-3 px-6 text-lg font-medium ${
                 shouldDisableCheckIn || isLoading
                   ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
-                  : attendanceStatus?.entryColor === 'green' 
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-orange-600 hover:bg-orange-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
               data-testid="modal-checkin-button"
             >
@@ -116,12 +114,7 @@ export default function QuickAttendanceModal({
               ) : (
                 <>
                   <LogIn className="mr-2 h-5 w-5" />
-                  {language === "ca" ? "Entrada" : "Entrada"}
-                  {shouldDisableCheckIn && (
-                    <span className="ml-2 text-xs">
-                      ({language === "ca" ? "Ja fitxat" : "Ya fichado"})
-                    </span>
-                  )}
+                  {language === "ca" ? "Fitxar entrada" : "Fichar entrada"}
                 </>
               )}
             </Button>
@@ -131,9 +124,7 @@ export default function QuickAttendanceModal({
               className={`w-full py-3 px-6 text-lg font-medium ${
                 shouldDisableCheckOut || isLoading
                   ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
-                  : attendanceStatus?.exitColor === 'green' 
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
+                  : "bg-green-600 hover:bg-green-700 text-white"
               }`}
               data-testid="modal-checkout-button"
             >
@@ -144,13 +135,8 @@ export default function QuickAttendanceModal({
                 </>
               ) : (
                 <>
-                  <LogOut className="mr-2 h-5 w-5" />
-                  {language === "ca" ? "Sortida" : "Salida"}
-                  {shouldDisableCheckOut && (
-                    <span className="ml-2 text-xs">
-                      ({language === "ca" ? "Primer fitxa entrada" : "Primero ficha entrada"})
-                    </span>
-                  )}
+                  <LogOut className="mr-2 h-5 w-5 rotate-180" />
+                  {language === "ca" ? "Fitxar sortida" : "Fichar salida"}
                 </>
               )}
             </Button>

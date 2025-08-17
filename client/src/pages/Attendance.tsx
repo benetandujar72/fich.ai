@@ -340,22 +340,12 @@ export default function Attendance() {
                 className={`w-full py-4 px-6 text-lg font-medium ${
                   shouldDisableCheckIn
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : attendanceStatus.entryColor === 'green' 
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-orange-600 text-white hover:bg-orange-700"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
                 data-testid="checkin-button"
               >
                 <LogIn className="mr-3 h-5 w-5" />
-                {t("checkin_entry", language)}
-                {shouldDisableCheckIn && (
-                  <span className="ml-2 text-xs">
-                    ({hasCheckedInTodayAlready 
-                      ? (language === "ca" ? "Ja has fitxat l'entrada avui" : "Ya has fichado la entrada hoy")
-                      : (language === "ca" ? "Ja has fitxat l'entrada" : "Ya has fichado la entrada")
-                    })
-                  </span>
-                )}
+                {language === "ca" ? "Fitxar entrada" : "Fichar entrada"}
               </Button>
               <Button 
                 onClick={handleCheckOut}
@@ -366,22 +356,12 @@ export default function Attendance() {
                 className={`w-full py-4 px-6 text-lg font-medium ${
                   shouldDisableCheckOut
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : attendanceStatus.exitColor === 'green' 
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-red-600 text-white hover:bg-red-700"
+                    : "bg-green-600 text-white hover:bg-green-700"
                 }`}
                 data-testid="checkout-button"
               >
-                <LogOut className="mr-3 h-5 w-5" />
-                {t("checkin_exit", language)}
-                {shouldDisableCheckOut && (
-                  <span className="ml-2 text-xs">
-                    ({hasCheckedOutTodayAlready
-                      ? (language === "ca" ? "Ja has fitxat la sortida avui" : "Ya has fichado la salida hoy")
-                      : (language === "ca" ? "Primer has de fitxar l'entrada" : "Primero debes fichar la entrada")
-                    })
-                  </span>
-                )}
+                <LogOut className="mr-3 h-5 w-5 rotate-180" />
+                {language === "ca" ? "Fitxar sortida" : "Fichar salida"}
               </Button>
             </div>
 

@@ -36,6 +36,7 @@ import PublicQRAttendance from "@/pages/PublicQRAttendance";
 import EmployeeQRGenerator from "@/pages/EmployeeQRGenerator";
 import MyQRCode from "@/pages/MyQRCode";
 import QRScanner from "@/pages/QRScanner";
+import UnifiedQR from "@/pages/UnifiedQR";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -225,9 +226,9 @@ function Router() {
         <Switch>
           <Route path="/" component={() => 
             <ProtectedRoute>
-              {/* Redirect employees directly to QR scanner */}
+              {/* Redirect employees directly to Unified QR */}
               {user?.role === 'employee' ? (
-                <QRScanner />
+                <UnifiedQR />
               ) : (
                 <>
                   <Header 
@@ -445,6 +446,12 @@ function Router() {
           <Route path="/qr-scanner" component={() => 
             <ProtectedRoute>
               <QRScanner />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/unified-qr" component={() => 
+            <ProtectedRoute>
+              <UnifiedQR />
             </ProtectedRoute>
           } />
 

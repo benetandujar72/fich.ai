@@ -293,23 +293,23 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
-                    {language === "ca" ? "Fitxatge QR Mòbil" : "Fichaje QR Móvil"}
+                    {language === "ca" ? "Fitxatge QR Unificat" : "Fichaje QR Unificado"}
                   </h3>
                   <p className="text-sm text-gray-600">
                     {language === "ca" 
-                      ? "Apunta el mòbil al teu QR i fitxa automàticament" 
-                      : "Apunta el móvil a tu QR y ficha automáticamente"}
+                      ? "Genera, visualitza i escaneja el teu QR en un sol lloc" 
+                      : "Genera, visualiza y escanea tu QR en un solo lugar"}
                   </p>
                 </div>
               </div>
               <Button
-                onClick={() => setLocation("/qr-scanner")}
+                onClick={() => setLocation("/unified-qr")}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
                 size="lg"
-                data-testid="button-qr-scanner"
+                data-testid="button-unified-qr"
               >
                 <QrCode className="mr-2 h-5 w-5" />
-                {language === "ca" ? "Obrir Escàner" : "Abrir Escáner"}
+                {language === "ca" ? "Fitxatge QR Unificat" : "Fichaje QR Unificado"}
               </Button>
             </div>
           </CardContent>

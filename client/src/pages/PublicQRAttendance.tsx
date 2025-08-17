@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -33,6 +33,22 @@ export default function PublicQRAttendance() {
   const [lastResult, setLastResult] = useState<any>(null);
   const [showResult, setShowResult] = useState(false);
   const [displayTime, setDisplayTime] = useState(new Date());
+  
+  // Add a timer like in App.tsx for the clock
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    // Start the clock timer
+    timerRef.current = setInterval(() => {
+      setDisplayTime(new Date());
+    }, 1000);
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   // QR Processing mutation
   const processQRMutation = useMutation({
@@ -55,24 +71,38 @@ export default function PublicQRAttendance() {
       return data;
     },
     onSuccess: (data) => {
+      console.log("🎉 QR SUCCESS DATA:", JSON.stringify(data, null, 2));
       setLastResult(data);
       setShowResult(true);
-      console.log("🎉 QR SUCCESS:", data);
+      
+      // DEBUG LOGS FOR MODAL ISSUE
+      console.log("🔍 TOAST DEBUG - Success toast about to show");
+      console.log("🔍 TOAST DEBUG - data.type:", data.type);
+      console.log("🔍 TOAST DEBUG - data.employeeName:", data.employeeName);
+      
       toast({
         title: "Fitxatge registrat",
         description: `${data.type === 'check_in' ? 'Entrada' : 'Sortida'} registrada correctament per ${data.employeeName}`,
       });
+      
+      console.log("🔍 TOAST DEBUG - Toast called, clearing form");
       setQrInput('');
       setProcessing(false);
       
       // Hide result after 5 seconds
       setTimeout(() => {
+        console.log("🔍 TIMEOUT DEBUG - Hiding result after 5 seconds");
         setShowResult(false);
       }, 5000);
     },
     onError: (error: any) => {
       console.log("❌ QR ERROR:", error);
       console.log("❌ Error details:", JSON.stringify(error, null, 2));
+      
+      // DEBUG LOGS FOR MODAL ISSUE  
+      console.log("🔍 TOAST DEBUG - Error toast about to show");
+      console.log("🔍 TOAST DEBUG - error.message:", error.message);
+      
       setLastResult({ error: true, message: error.message });
       setShowResult(true);
       toast({
@@ -84,6 +114,7 @@ export default function PublicQRAttendance() {
       
       // Hide error after 5 seconds
       setTimeout(() => {
+        console.log("🔍 TIMEOUT DEBUG - Hiding error after 5 seconds");
         setShowResult(false);
       }, 5000);
     },

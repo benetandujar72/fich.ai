@@ -35,6 +35,7 @@ import AcademicDataMigration from "@/pages/AcademicDataMigration";
 import PublicQRAttendance from "@/pages/PublicQRAttendance";
 import EmployeeQRGenerator from "@/pages/EmployeeQRGenerator";
 import MyQRCode from "@/pages/MyQRCode";
+import QRScanner from "@/pages/QRScanner";
 import NotFound from "@/pages/not-found";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/lib/i18n";
@@ -431,6 +432,12 @@ function Router() {
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <MyQRCode />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/qr-scanner" component={() => 
+            <ProtectedRoute>
+              <QRScanner />
             </ProtectedRoute>
           } />
 

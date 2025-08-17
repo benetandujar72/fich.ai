@@ -15,8 +15,10 @@ import {
   Info,
   Copy,
   ExternalLink,
-  Clock
+  Clock,
+  UserCheck
 } from 'lucide-react';
+import { Link } from 'wouter';
 
 export default function MyQRCode() {
   const { user } = useAuth();
@@ -288,6 +290,19 @@ export default function MyQRCode() {
                   <Printer className="h-4 w-4 mr-2" />
                   {language === "ca" ? "Imprimir" : "Imprimir"}
                 </Button>
+              </div>
+              
+              {/* Quick scanner link */}
+              <div className="mt-6 text-center">
+                <Link href="/qr-scanner">
+                  <Button variant="default" size="lg" className="bg-green-600 hover:bg-green-700 text-white">
+                    <UserCheck className="mr-2 h-5 w-5" />
+                    {language === "ca" ? "Obrir Escàner Mòbil" : "Abrir Escáner Móvil"}
+                  </Button>
+                </Link>
+                <p className="text-sm text-green-600 mt-2 font-medium">
+                  ⚡ {language === "ca" ? "Fitxatge ràpid des del mòbil" : "Fichaje rápido desde móvil"}
+                </p>
               </div>
             </div>
           </CardContent>

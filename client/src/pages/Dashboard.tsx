@@ -26,7 +26,9 @@ import {
   Calendar,
   TrendingUp,
   Filter,
-  Eye
+  Eye,
+  QrCode,
+  UserCheck
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -278,6 +280,40 @@ export default function Dashboard() {
           <Download className="h-5 w-5" />
           <span className="text-sm">{t("reports", language)}</span>
         </Button>
+      </div>
+
+      {/* Prominent QR Scanner Button */}
+      <div className="mb-8">
+        <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 rounded-full">
+                  <UserCheck className="h-8 w-8 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {language === "ca" ? "Fitxatge QR Mòbil" : "Fichaje QR Móvil"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {language === "ca" 
+                      ? "Apunta el mòbil al teu QR i fitxa automàticament" 
+                      : "Apunta el móvil a tu QR y ficha automáticamente"}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => setLocation("/qr-scanner")}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3"
+                size="lg"
+                data-testid="button-qr-scanner"
+              >
+                <QrCode className="mr-2 h-5 w-5" />
+                {language === "ca" ? "Obrir Escàner" : "Abrir Escáner"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Dashboard Content Grid */}

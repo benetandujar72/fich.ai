@@ -2763,10 +2763,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // QR Processing (Public endpoint - no auth required)
   app.post("/api/attendance/qr-process", async (req, res) => {
+    console.log("🔥 QR ENDPOINT HIT!");
+    console.log("🔥 Request body:", req.body);
+    console.log("🔥 Headers:", req.headers);
+    
     try {
       const { qrData, timestamp, location } = req.body;
       
+      console.log("🔥 Extracted data - QR:", qrData, "Timestamp:", timestamp, "Location:", location);
+      
       if (!qrData || !timestamp) {
+        console.log("🔥 Missing required fields!");
         return res.status(400).json({ error: "Codi QR i timestamp són obligatoris" });
       }
 

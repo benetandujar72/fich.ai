@@ -712,6 +712,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PUT endpoint to update employee information
+  app.put('/api/admin/employees/:employeeId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId } = req.params;
+      const userRole = req.user.role;
+
+      if (!['admin', 'superadmin'].includes(userRole)) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      console.log('EMPLOYEE_UPDATE: Updating employee:', employeeId);
+      console.log('EMPLOYEE_UPDATE: Data:', req.body);
+
+      const updateData = req.body;
+
+      // Update user record first
+      if (updateData.role) {
+        await db.execute(sql`
+          UPDATE users 
+          SET role = ${updateData.role}, updated_at = NOW()
+          WHERE id = ${employeeId}
+        `);
+        console.log('EMPLOYEE_UPDATE: User role updated to:', updateData.role);
+      }
+
+      // Update employee record
+      const employeeUpdateData: any = {};
+      if (updateData.fullName) employeeUpdateData.full_name = updateData.fullName;
+      if (updateData.email) {
+        employeeUpdateData.email = updateData.email;
+        // Also update in users table
+        await db.execute(sql`
+          UPDATE users 
+          SET email = ${updateData.email}, updated_at = NOW()
+          WHERE id = ${employeeId}
+        `);
+      }
+      if (updateData.phone) employeeUpdateData.phone = updateData.phone;
+      if (updateData.departmentId) employeeUpdateData.department_id = updateData.departmentId;
+      if (updateData.contractType) employeeUpdateData.contract_type = updateData.contractType;
+      if (updateData.startDate) employeeUpdateData.start_date = updateData.startDate;
+      if (updateData.endDate) employeeUpdateData.end_date = updateData.endDate;
+      if (updateData.status) employeeUpdateData.status = updateData.status;
+
+      if (Object.keys(employeeUpdateData).length > 0) {
+        employeeUpdateData.updated_at = new Date();
+        
+        // Build individual SET clauses
+        const setClauses = [];
+        const values = [];
+        
+        for (const [key, value] of Object.entries(employeeUpdateData)) {
+          setClauses.push(`${key} = ?`);
+          values.push(value);
+        }
+        
+        // Add WHERE clause parameter
+        values.push(employeeId);
+        
+        await db.execute(sql`
+          UPDATE employees 
+          SET ${sql.raw(setClauses.join(', '))}
+          WHERE user_id = ${employeeId}
+        `);
+        console.log('EMPLOYEE_UPDATE: Employee record updated');
+      }
+
+      res.json({ 
+        success: true, 
+        message: 'Employee updated successfully' 
+      });
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      res.status(500).json({ message: "Failed to update employee" });
+    }
+  });
+
   // Employee attendance history endpoint
   app.get('/api/attendance-history/:employeeId', isAuthenticated, async (req: any, res) => {
     try {

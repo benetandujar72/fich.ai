@@ -72,6 +72,8 @@ export default function PublicQRAttendance() {
       setProcessing(false);
     },
     onError: (error: any) => {
+      console.log("❌ QR ERROR:", error);
+      console.log("❌ Error details:", JSON.stringify(error, null, 2));
       setLastResult({ error: true, message: error.message });
       toast({
         title: "Error",
@@ -167,7 +169,10 @@ export default function PublicQRAttendance() {
                       variant="outline"
                       size="sm"
                       className="text-xs"
-                      onClick={() => setQrInput(code)}
+                      onClick={() => {
+                        console.log("🔘 Quick button clicked:", code);
+                        setQrInput(code);
+                      }}
                       disabled={processing}
                     >
                       {code}

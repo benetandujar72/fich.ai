@@ -32,6 +32,7 @@ import WeeklyScheduleAdmin from "@/pages/WeeklyScheduleAdmin";
 import Communications from "@/pages/Communications";
 import QRAttendancePage from "@/pages/QRAttendance";
 import AcademicDataMigration from "@/pages/AcademicDataMigration";
+import MCPPage from "@/pages/MCP";
 
 import EmployeeQRGenerator from "@/pages/EmployeeQRGenerator";
 import MyQRCode from "@/pages/MyQRCode";
@@ -472,6 +473,15 @@ function Router() {
                 onQuickAttendance={() => setIsQuickAttendanceOpen(true)}
               />
               <AdminManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/mcp" component={() =>
+            <ProtectedRoute requiredRoles={['admin', 'superadmin']}>
+              <Header 
+                title="MCP Automation"
+              />
+              <MCPPage />
             </ProtectedRoute>
           } />
           

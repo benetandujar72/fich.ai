@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
+import mcpRoutes from './mcp/routes'; // Importar las rutas MCP
 import { 
   insertEmployeeSchema,
   insertAttendanceRecordSchema,
@@ -20,6 +21,9 @@ import bcrypt from "bcrypt";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // MCP routes
+  app.use('/api/mcp', mcpRoutes);
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -1955,7 +1959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error fetching weekly schedule:', error);
-      res.status(500).json({ message: 'Error obtenint horari setmanal' });
+      res.status(500).json({ message: 'Error obtaining weekly schedule' });
     }
   });
 
@@ -2007,7 +2011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result.rows);
     } catch (error) {
       console.error('Error fetching weekly attendance:', error);
-      res.status(500).json({ message: 'Error obtenint assistència setmanal', error: error.message });
+      res.status(500).json({ message: 'Error obtaining weekly attendance', error: error.message });
     }
   });
 
@@ -3159,7 +3163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Error processing QR:", error);
-      res.status(500).json({ error: "Error processant el codi QR" });
+      res.status(500).json({ error: "Error processing QR code" });
     }
   });
   
@@ -3306,8 +3310,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('UNTIS_IMPORT: Statistics error:', error);
       res.status(500).json({ 
-        message: 'Error obtenint estadístiques d\'importació',
-        error: error instanceof Error ? error.message : 'Error desconegut'
+        message: 'Error obtaining import statistics',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });

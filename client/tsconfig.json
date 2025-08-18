@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"]
+}

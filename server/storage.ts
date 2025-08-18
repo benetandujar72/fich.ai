@@ -72,7 +72,7 @@ import {
 } from "@shared/schema";
 import { logger } from './logger';
 import { db } from "./db";
-import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull, between } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { format } from "date-fns";
 
@@ -163,6 +163,35 @@ export interface IStorage {
   getAutomatedAlertSettings(institutionId: string | null): Promise<any>;
   updateAutomatedAlertSettings(institutionId: string | null, alertSettings: any): Promise<any>;
   sendTestAlert(institutionId: string | null): Promise<void>;
+
+  getAttendanceHistoryForUser(
+    fullName: string,
+    institutionId: string,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<any[]>;
+
+  // Reports functionality
+  getAttendanceOverview(institutionId: string, startDate?: Date, endDate?: Date): Promise<{
+    totalEmployees: number;
+    attendanceRate: number;
+    averageHoursPerDay: number;
+    totalLatesThisMonth: number;
+    totalAbsencesThisMonth: number;
+  }>;
+
+  getForensicDataForUser(
+    fullName: string,
+    institutionId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]>;
+
+  getRiskAnalysisData(
+    institutionId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2915,6 +2944,131 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       console.error("Error getting attendance rates by period:", error);
       throw error;
     }
+  }
+
+  async getAttendanceHistoryForUser(
+    fullName: string,
+    institutionId: string,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<any[]> {
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    let query = db
+      .select({
+        timestamp: attendanceRecords.timestamp,
+        type: attendanceRecords.type,
+        method: attendanceRecords.method,
+        notes: attendanceRecords.notes,
+      })
+      .from(attendanceRecords)
+      .innerJoin(employees, eq(attendanceRecords.employeeId, employees.id))
+      .innerJoin(users, eq(employees.userId, users.id))
+      .where(
+        and(
+          eq(users.institutionId, institutionId),
+          eq(users.firstName, firstName),
+          eq(users.lastName, lastName)
+        )
+      );
+    
+    if (startDate && endDate) {
+      query = query.where(between(attendanceRecords.timestamp, startDate, endDate));
+    }
+
+    return await query.orderBy(desc(attendanceRecords.timestamp));
+  }
+
+  async getForensicDataForUser(
+    fullName: string,
+    institutionId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]> {
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    // Paso 1: Obtener el ID del usuario
+    const user = await db.query.users.findFirst({
+      where: and(
+        eq(users.institutionId, institutionId),
+        eq(users.firstName, firstName),
+        eq(users.lastName, lastName)
+      ),
+      columns: { id: true }
+    });
+
+    if (!user) {
+      return [];
+    }
+
+    // Paso 2: Obtener todos los eventos en el rango de fechas
+    const attendanceData = await db
+      .select({
+        eventType: sql`'Fitxatge'`,
+        timestamp: attendanceRecords.timestamp,
+        details: sql`CONCAT('Tipus: ', ${attendanceRecords.type}, ', Mètode: ', ${attendanceRecords.method})`,
+        justification: sql`''`, // Los fichajes no tienen justificación directa
+      })
+      .from(attendanceRecords)
+      .innerJoin(employees, eq(attendanceRecords.employeeId, employees.id))
+      .where(and(
+        eq(employees.userId, user.id),
+        between(attendanceRecords.timestamp, startDate, endDate)
+      ));
+
+    const absenceData = await db
+      .select({
+        eventType: sql`'Absència'`,
+        timestamp: absences.date,
+        details: sql`CONCAT('Motiu: ', ${absences.reason})`,
+        justification: absenceJustifications.justificationText,
+      })
+      .from(absences)
+      .leftJoin(absenceJustifications, eq(absences.id, absenceJustifications.absenceId))
+      .where(and(
+        eq(absences.employeeId, user.id), // Asumiendo que absences.employeeId es el userId
+        between(absences.date, startDate, endDate)
+      ));
+
+    // Combinar y ordenar todos los eventos
+    const allEvents = [...attendanceData, ...absenceData].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+
+    return allEvents;
+  }
+
+  async getRiskAnalysisData(
+    institutionId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]> {
+    // Definimos "llegar tarde" como fichar después de las 08:05 AM
+    const lateThreshold = '08:05:00';
+
+    const result = await db
+      .select({
+        userId: users.id,
+        fullName: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`,
+        email: users.email,
+        totalLates: sql<number>`COUNT(CASE WHEN ${attendanceRecords.type} = 'check_in' AND ${attendanceRecords.timestamp}::time > ${lateThreshold} THEN 1 END)::int`,
+        totalAbsences: sql<number>`(SELECT COUNT(*) FROM ${absences} WHERE ${absences.employeeId} = ${users.id} AND ${absences.isJustified} = false AND ${absences.date} BETWEEN ${startDate} AND ${endDate})::int`
+      })
+      .from(users)
+      .leftJoin(employees, eq(users.id, employees.userId))
+      .leftJoin(attendanceRecords, and(
+        eq(employees.id, attendanceRecords.employeeId),
+        between(attendanceRecords.timestamp, startDate, endDate)
+      ))
+      .where(eq(users.institutionId, institutionId))
+      .groupBy(users.id)
+      .orderBy(desc(sql`"totalLates"`), desc(sql`"totalAbsences"`));
+      
+    return result;
   }
 }
 

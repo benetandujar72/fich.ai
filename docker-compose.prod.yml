@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      # La URL de la base de datos ahora apunta al servicio 'db' de Docker
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy # Espera a que la BD esté lista
+    networks:
+      - app-network
+    command: ["./docker-entrypoint.prod.sh"] # Usaremos un script para iniciar
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data: # Volumen para persistir los datos de la BD
+
+

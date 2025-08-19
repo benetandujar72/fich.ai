@@ -3122,8 +3122,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
   async createAbsence(data: InsertAbsence) {
     return db.insert(absences).values({
       ...data,
-      startDate: new Date(data.startDate).toISOString(),
-      endDate: new Date(data.endDate).toISOString(),
+      startDate: new Date(data.startDate).toISOString().split('T')[0],
+      endDate: new Date(data.endDate).toISOString().split('T')[0],
     }).returning();
   }
 
@@ -3134,8 +3134,8 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       .where(
         and(
           eq(absences.employeeId, employeeId),
-          gte(absences.startDate, startDate.toISOString()),
-          lte(absences.startDate, endDate.toISOString())
+          gte(absences.startDate, startDate.toISOString().split('T')[0]),
+          lte(absences.endDate, endDate.toISOString().split('T')[0])
         )
       )
       .orderBy(desc(absences.startDate));
@@ -3152,7 +3152,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
     const updateData = { ...absence, ...data };
     if (data.endDate) {
-      updateData.endDate = new Date(data.endDate).toISOString();
+      updateData.endDate = new Date(data.endDate).toISOString().split('T')[0];
     }
     return db.update(absences).set(updateData).where(eq(absences.id, id)).returning();
   }
@@ -3302,4 +3302,39 @@ export async function getUsersByDepartmentName(departmentName: string, instituti
     });
 
     return departmentEmployees.map(emp => emp.user);
+}
+
+export async function createAcademicYear(institutionId: string, data: Partial<InsertAcademicYear>) {
+  const values = {
+    ...data,
+    institutionId,
+    name: data.name || 'Default Name',
+    startDate: data.startDate ? new Date(data.startDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    endDate: data.endDate ? new Date(data.endDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+  };
+  return db.insert(academicYears).values(values).returning();
+}
+
+export async function updateAcademicYear(id: string, data: Partial<AcademicYear>) {
+  const updateData: { [key: string]: any } = { ...data };
+  if (data.startDate) {
+    updateData.startDate = new Date(data.startDate).toISOString().split('T')[0];
+  }
+  if (data.endDate) {
+    updateData.endDate = new Date(data.endDate).toISOString().split('T')[0];
+  }
+  return db.update(academicYears).set(updateData).where(eq(academicYears.id, id)).returning();
+}
+
+export async function getActiveAcademicYear(institutionId: string): Promise<AcademicYear | null> {
+    const now = new Date().toISOString().split('T')[0];
+    const result = await db.query.academicYears.findFirst({
+        where: and(
+            eq(schema.academicYears.institutionId, institutionId),
+            eq(schema.academicYears.isActive, true),
+            lte(schema.academicYears.startDate, now),
+            gte(schema.academicYears.endDate, now)
+        ),
+    });
+    return result || null;
 }

@@ -3319,7 +3319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Error handling middleware
   app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
-    console.error(err);
+    logger.error("Unhandled error:", err);
     if (err instanceof Error) {
       res.status(500).json({ message: err.message });
     } else {

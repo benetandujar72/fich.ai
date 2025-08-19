@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db } from "./db.js";
 import { 
   institutions, 
   academicYears, 
@@ -7,14 +7,15 @@ import {
   employees, 
   schedules,
   settings 
-} from "@shared/schema";
+} from "../shared/schema.js";
 import type { 
   InsertInstitution, 
   InsertEmployee, 
   InsertSchedule,
   InsertSetting,
-  UpsertUser
-} from "@shared/schema";
+  UpsertUser,
+  Employee
+} from "../shared/schema.js";
 
 // Institut Bitàcola test data for 2025-2026
 export async function seedDatabase() {
@@ -129,7 +130,7 @@ export async function seedDatabase() {
     const scheduleData: InsertSchedule[] = [];
     
     // Standard schedule: 8:00-14:30 Monday to Friday for full-time teachers
-    createdEmployees.forEach((employee, index) => {
+    createdEmployees.forEach((employee: Employee, index: number) => {
       if (employee.contractType === "full_time") {
         for (let day = 1; day <= 5; day++) { // Monday to Friday
           scheduleData.push({

@@ -1,83 +1,94 @@
 import {
   users,
+  sessions,
   institutions,
-  academicYears,
   employees,
-  departments,
   schedules,
   attendanceRecords,
   absences,
   alerts,
   substituteAssignments,
   settings,
-  attendanceNetworkSettings,
   emailSettings,
   absenceJustifications,
   alertNotifications,
-  subjects,
-  classGroups,
-  classrooms,
-  untisScheduleSessions,
+  attendanceNetworkSettings,
   communications,
   communicationAttachments,
   communicationAuditLog,
   messageTemplates,
-  weeklySchedule,
-  type User,
-  type UpsertUser,
-  type Institution,
-  type InsertInstitution,
-  type AcademicYear,
-  type InsertAcademicYear,
-  type Employee,
-  type InsertEmployee,
-  type Schedule,
-  type InsertSchedule,
-  type AttendanceRecord,
-  type InsertAttendanceRecord,
-  type Absence,
-  type InsertAbsence,
-  type Alert,
-  type InsertAlert,
-  type SubstituteAssignment,
-  type InsertSubstituteAssignment,
-  type Setting,
-  type InsertSetting,
-  type AttendanceNetworkSetting,
-  type InsertAttendanceNetworkSetting,
-  type EmailSetting,
-  type InsertEmailSetting,
-  type AbsenceJustification,
-  type InsertAbsenceJustification,
-  type AlertNotification,
-  type InsertAlertNotification,
-  type Subject,
-  type InsertSubject,
-  type ClassGroup,
-  type InsertClassGroup,
-  type Classroom,
-  type InsertClassroom,
-  type UntisScheduleSession,
-  type InsertUntisScheduleSession,
-  type Communication,
-  type InsertCommunication,
-  type CommunicationAttachment,
-  type InsertCommunicationAttachment,
-  type CommunicationAuditLog,
-  type InsertCommunicationAuditLog,
-  type MessageTemplate,
-  type InsertMessageTemplate,
-  type WeeklySchedule,
-  type InsertWeeklySchedule,
-  riskAssessments,
-  smtpConfigurations,
   emailTemplates,
+  reportTemplates,
+  academicYears,
+  departments,
+  subjects,
+  classGroups,
+  classrooms,
+  untisScheduleSessions,
+  weeklySchedule,
   privacyRequests,
-  reportTemplates
+  userScheduleTemplates,
 } from "../shared/schema.js";
+import type {
+  User,
+  Institution,
+  InsertInstitution,
+  Employee,
+  InsertEmployee,
+  Schedule,
+  InsertSchedule,
+  AttendanceRecord,
+  InsertAttendanceRecord,
+  Absence,
+  InsertAbsence,
+  Alert,
+  InsertAlert,
+  SubstituteAssignment,
+  InsertSubstituteAssignment,
+  Setting,
+  InsertSetting,
+  AttendanceNetworkSetting,
+  InsertAttendanceNetworkSetting,
+  EmailSetting,
+  InsertEmailSetting,
+  AbsenceJustification,
+  InsertAbsenceJustification,
+  AlertNotification,
+  InsertAlertNotification,
+  AcademicYear,
+  InsertAcademicYear,
+  Department,
+  Subject,
+  InsertSubject,
+  ClassGroup,
+  InsertClassGroup,
+  Classroom,
+  InsertClassroom,
+  UntisScheduleSession,
+  InsertUntisScheduleSession,
+  Communication,
+  InsertCommunication,
+  CommunicationWithUsers,
+  CommunicationAttachment,
+  InsertCommunicationAttachment,
+  CommunicationAuditLog,
+  InsertCommunicationAuditLog,
+  MessageTemplate,
+  InsertMessageTemplate,
+  EmailTemplate,
+  InsertEmailTemplate,
+  ReportTemplate,
+  InsertReportTemplate,
+  WeeklySchedule,
+  InsertWeeklySchedule,
+} from "../shared/schema.js";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+import { eq, and, or, desc, asc, isNull, isNotNull, gte, lte, count, sql, inArray } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import * as schema from "../shared/schema.js";
 import { logger } from './logger.js';
 import { db } from "./db.js";
-import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull, between } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { format } from "date-fns";
 
@@ -3095,6 +3106,148 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     });
 
     return departmentEmployees.map(emp => emp.user);
+  }
+
+  async createAbsence(data: InsertAbsence) {
+    return db.insert(absences).values({
+      ...data,
+      startDate: new Date(data.startDate).toISOString(),
+      endDate: new Date(data.endDate).toISOString(),
+    }).returning();
+  }
+
+  async getAbsencesByEmployeeAndDateRange(employeeId: string, startDate: Date, endDate: Date) {
+    return db
+      .select()
+      .from(absences)
+      .where(
+        and(
+          eq(absences.employeeId, employeeId),
+          gte(absences.startDate, startDate.toISOString()),
+          lte(absences.startDate, endDate.toISOString())
+        )
+      )
+      .orderBy(desc(absences.startDate));
+  }
+
+  async getAbsenceById(id: string) {
+    const [absence] = await db.select().from(absences).where(eq(absences.id, id));
+    return absence;
+  }
+
+  async updateAbsence(id: string, data: Partial<InsertAbsence>) {
+    const [absence] = await db.select().from(absences).where(eq(absences.id, id));
+    if (!absence) throw new Error('Absence not found');
+
+    const updateData = { ...absence, ...data };
+    if (data.endDate) {
+      updateData.endDate = new Date(data.endDate).toISOString();
+    }
+    return db.update(absences).set(updateData).where(eq(absences.id, id)).returning();
+  }
+
+  async submitAbsenceJustification(
+    employeeId: string,
+    absenceDate: string,
+    reason: string,
+    adminNotes?: string
+  ) {
+    
+    const absenceDateFormatted = new Date(absenceDate).toISOString().split('T')[0];
+    
+    const relatedAbsences = await db.select()
+      .from(absences)
+      .where(and(
+        eq(absences.employeeId, employeeId),
+        eq(absences.startDate, absenceDateFormatted),
+      ));
+      
+    if (relatedAbsences.length === 0) {
+      throw new Error("No s'ha trobat cap absència per a la data especificada.");
+    }
+    
+    const absenceId = relatedAbsences[0].id;
+    
+    const [justification] = await db.insert(absenceJustifications).values({
+      employeeId: employeeId,
+      absenceId: absenceId,
+      reason: reason,
+      status: 'pending',
+      date: absenceDateFormatted, 
+      adminResponse: adminNotes
+    }).returning();
+    
+    await db.update(absences)
+      .set({ isJustified: true })
+      .where(eq(absences.id, absenceId));
+      
+    return justification;
+  }
+
+  async getUnjustifiedAbsences(employeeId: string, limit = 50) {
+    const result = await db
+      .select({
+        id: absences.id,
+        date: absences.startDate,
+        reason: absences.reason,
+        status: absences.status,
+        justificationText: absenceJustifications.reason,
+      })
+      .from(absences)
+      .leftJoin(absenceJustifications, eq(absences.id, absenceJustifications.absenceId))
+      .where(and(
+        eq(absences.employeeId, employeeId),
+        eq(absences.isJustified, false),
+        isNull(absenceJustifications.id) 
+      ))
+      .orderBy(desc(absences.startDate))
+      .limit(limit);
+
+    return result.map(item => ({
+      ...item,
+      // Aseguramos que date sea string
+      date: typeof item.date === 'string' ? item.date : (item.date as Date).toISOString().split('T')[0]
+    }));
+  }
+
+  async getAbsenceJustifications(employeeId: string, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+    
+    const justifications = await db
+      .select({
+        id: absenceJustifications.id,
+        date: absences.startDate,
+        reason: absenceJustifications.reason,
+        status: absenceJustifications.status,
+        adminResponse: absenceJustifications.adminResponse,
+      })
+      .from(absenceJustifications)
+      .innerJoin(absences, eq(absenceJustifications.absenceId, absences.id))
+      .where(eq(absenceJustifications.employeeId, employeeId))
+      .orderBy(desc(absences.startDate))
+      .limit(limit)
+      .offset(offset);
+    
+    const totalResult = await db
+      .select({ count: sql<number>`cast(count(*) as int)` })
+      .from(absenceJustifications)
+      .where(eq(absenceJustifications.employeeId, employeeId));
+    
+    const total = totalResult[0].count;
+      
+    return {
+      justifications,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page
+    };
+  }
+
+  async getJustificationDetails(justificationId: string) {
+    const result = await db
+      .select()
+      .from(absenceJustifications)
+      .where(eq(absenceJustifications.id, justificationId));
+    return result.length > 0 ? result[0] : null;
   }
 }
 

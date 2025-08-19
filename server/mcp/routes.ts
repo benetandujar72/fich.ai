@@ -1,4 +1,4 @@
-import { Router, Request } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { isAuthenticated } from '../auth.js';
 import { handleExecute } from './index.js';
 
@@ -14,7 +14,7 @@ interface AuthenticatedRequest extends Request {
 const router = Router();
 
 // Middleware de autorización específico para MCP
-const isAuthorizedAdmin = (req: AuthenticatedRequest, res, next) => {
+const isAuthorizedAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const user = req.user;
   if (user && (user.role === 'admin' || user.role === 'superadmin')) {
     return next();
@@ -23,7 +23,7 @@ const isAuthorizedAdmin = (req: AuthenticatedRequest, res, next) => {
 };
 
 // Proteger la ruta con autenticación y autorización
-router.post('/execute', isAuthenticated, isAuthorizedAdmin, (req, res, next) => {
+router.post('/execute', isAuthenticated, isAuthorizedAdmin, (req: Request, res: Response, next: NextFunction) => {
   handleExecute(req, res).catch(next);
 });
 

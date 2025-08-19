@@ -35,7 +35,7 @@ export class SendGridService {
         to: params.to,
         from: params.from,
         subject: params.subject,
-        text: params.text,
+        text: params.text || '',
         html: params.html,
         attachments: params.attachments,
       });

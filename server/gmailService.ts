@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { EmailSetting } from '@shared/schema';
+import { EmailSetting } from '../shared/schema.js';
 
 export class GmailService {
   private transporter: nodemailer.Transporter | null = null;
@@ -9,7 +9,7 @@ export class GmailService {
   }
   
   private initializeTransporter() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: this.emailConfig.smtpHost,
       port: this.emailConfig.smtpPort,
       secure: false, // true for 465, false for other ports like 587

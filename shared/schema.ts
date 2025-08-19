@@ -523,6 +523,32 @@ export const adminAlertConfigs = pgTable("admin_alert_configs", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Email templates
+export const emailTemplates = pgTable("email_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  name: varchar("name").notNull(),
+  subject: varchar("subject").notNull(),
+  content: text("content").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Report templates
+export const reportTemplates = pgTable("report_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  institutionId: varchar("institution_id").notNull(),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  templateData: jsonb("template_data").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Privacy policy requests tracking
 export const privacyRequests = pgTable("privacy_requests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -900,6 +926,18 @@ export const insertMessageTemplateSchema = createInsertSchema(messageTemplates).
   updatedAt: true,
 });
 
+export const insertEmailTemplateSchema = createInsertSchema(emailTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertReportTemplateSchema = createInsertSchema(reportTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertWeeklyScheduleSchema = createInsertSchema(weeklySchedule).omit({
   id: true,
   createdAt: true,
@@ -963,6 +1001,10 @@ export type CommunicationAuditLog = typeof communicationAuditLog.$inferSelect;
 export type InsertCommunicationAuditLog = z.infer<typeof insertCommunicationAuditLogSchema>;
 export type MessageTemplate = typeof messageTemplates.$inferSelect;
 export type InsertMessageTemplate = z.infer<typeof insertMessageTemplateSchema>;
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = z.infer<typeof insertEmailTemplateSchema>;
+export type ReportTemplate = typeof reportTemplates.$inferSelect;
+export type InsertReportTemplate = z.infer<typeof insertReportTemplateSchema>;
 
 export type WeeklySchedule = typeof weeklySchedule.$inferSelect;
 export type InsertWeeklySchedule = z.infer<typeof insertWeeklyScheduleSchema>;

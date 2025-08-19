@@ -20,7 +20,8 @@ ENV PORT=5000
 
 # Instala solo dependencias de producción para runtime más ligero
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev \
+  && npm i --no-save drizzle-orm@0.39.1 pg@8
 
 # Copia artefactos construidos
 COPY --from=builder /app/dist ./dist

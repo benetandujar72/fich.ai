@@ -105,7 +105,7 @@ async function sendMessage(params: SendMessageParams, executingUser: ExecutingUs
   }
 
   // Asumimos que existe esta función. Si no, necesitaremos implementarla o adaptarla.
-  const usersInDepartment = await storage.getUsersByDepartmentName(departmentName);
+  const usersInDepartment = await storage.getUsersByDepartmentName(departmentName, executingUser.institutionId!);
 
   if (!usersInDepartment || usersInDepartment.length === 0) {
     return {
@@ -275,7 +275,7 @@ async function getRiskAnalysis(params: GetRiskAnalysisParams, executingUser: Exe
   const riskData = await storage.getRiskAnalysisData(institutionId, startDate, endDate);
 
   // 3. Definir umbrales y clasificar a los empleados
-  const classifiedEmployees = riskData.map(employee => {
+  const classifiedEmployees = riskData.map((employee: any) => {
     let riskLevel = 'Baix';
     let score = 0;
 
@@ -296,7 +296,7 @@ async function getRiskAnalysis(params: GetRiskAnalysisParams, executingUser: Exe
       riskScore: score,
       riskLevel: riskLevel,
     };
-  }).filter(e => e.riskScore > 0); // Solo mostramos empleados con alguna incidencia
+  }).filter((e: any) => e.riskScore > 0); // Solo mostramos empleados con alguna incidencia
 
   return {
     reportType: `Anàlisi de Risc d'Absentisme`,

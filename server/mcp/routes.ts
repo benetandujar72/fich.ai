@@ -1,11 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { isAuthenticated } from '../auth.js';
 import { handleExecute } from './index.js';
-import { User } from '../../shared/schema.js';
-
 // Extendemos el tipo Request para incluir la propiedad `user` que añade `passport`
 interface AuthenticatedRequest extends Request {
-  user?: User;
+  user?: { id: string; role: string; institutionId?: string };
 }
 
 const router = Router();
@@ -20,8 +18,8 @@ const isAuthorizedAdmin = (req: AuthenticatedRequest, res: Response, next: NextF
 };
 
 // Proteger la ruta con autenticación y autorización
-router.post('/execute', isAuthenticated, isAuthorizedAdmin, (req, res, next) => {
-  handleExecute(req as AuthenticatedRequest, res).catch(next);
+router.post('/execute', isAuthenticated as any, isAuthorizedAdmin as any, (req: any, res: any, next: any) => {
+  handleExecute(req as AuthenticatedRequest, res as Response).catch(next);
 });
 
 export default router;

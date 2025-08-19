@@ -2012,7 +2012,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result.rows);
     } catch (error) {
       console.error('Error fetching weekly attendance:', error);
-      res.status(500).json({ message: 'Error obtaining weekly attendance', error: error.message });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: 'Error obtaining weekly attendance', error: message });
     }
   });
 
@@ -3319,7 +3320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Error handling middleware
   app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
-    logger.error("Unhandled error:", err);
+    logger.error("Unhandled error:", err instanceof Error ? err.message : String(err));
     if (err instanceof Error) {
       res.status(500).json({ message: err.message });
     } else {

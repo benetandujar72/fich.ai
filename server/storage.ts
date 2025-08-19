@@ -81,14 +81,25 @@ import type {
   InsertReportTemplate,
   WeeklySchedule,
   InsertWeeklySchedule,
+  UpsertUser,
 } from "../shared/schema.js";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { eq, and, or, desc, asc, isNull, isNotNull, gte, lte, count, sql, inArray } from "drizzle-orm";
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import {
+  eq,
+  and,
+  or,
+  desc,
+  asc,
+  isNull,
+  isNotNull,
+  gte,
+  lte,
+  count,
+  sql,
+  inArray,
+} from "drizzle-orm";
+import { db } from "./db.js";
 import * as schema from "../shared/schema.js";
 import { logger } from './logger.js';
-import { db } from "./db.js";
 import { alias } from "drizzle-orm/pg-core";
 import { format } from "date-fns";
 

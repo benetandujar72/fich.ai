@@ -45,19 +45,19 @@ export async function seedDatabase() {
 
     // 3. Create Departments
     const departmentData = [
-      { name: "Matemàtiques", institutionId: institution.id },
-      { name: "Llengua Catalana i Literatura", institutionId: institution.id },
-      { name: "Llengua Castellana i Literatura", institutionId: institution.id },
-      { name: "Anglès", institutionId: institution.id },
-      { name: "Ciències Naturals", institutionId: institution.id },
-      { name: "Física i Química", institutionId: institution.id },
-      { name: "Història", institutionId: institution.id },
-      { name: "Geografia", institutionId: institution.id },
-      { name: "Educació Física", institutionId: institution.id },
-      { name: "Tecnologia", institutionId: institution.id },
-      { name: "Arts Plàstiques", institutionId: institution.id },
-      { name: "Música", institutionId: institution.id },
-      { name: "Administració", institutionId: institution.id }
+      { name: "Matemàtiques", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Llengua Catalana i Literatura", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Llengua Castellana i Literatura", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Anglès", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Ciències Naturals", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Física i Química", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Història", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Geografia", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Educació Física", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Tecnologia", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Arts Plàstiques", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Música", institutionId: institution.id, academicYearId: academicYear.id },
+      { name: "Administració", institutionId: institution.id, academicYearId: academicYear.id }
     ];
 
     const createdDepartments = await db.insert(departments).values(departmentData).returning();
@@ -101,26 +101,26 @@ export async function seedDatabase() {
 
     // 5. Create Employee records with realistic assignment to departments
     const employeesData: InsertEmployee[] = [
-      { userId: "user-001", institutionId: institution.id, departmentId: createdDepartments[12].id, dni: "12345678A", fullName: "Marta Puig Solà", email: "marta.puig@institutbitacola.edu.cat", phone: "+34 93 123 45 67", contractType: "full_time", status: "active", startDate: "2025-09-01" },
-      { userId: "user-002", institutionId: institution.id, departmentId: createdDepartments[0].id, dni: "23456789B", fullName: "Jordi Vila Martín", email: "jordi.vila@institutbitacola.edu.cat", phone: "+34 93 234 56 78", contractType: "full_time", status: "active", startDate: "2023-09-01" },
-      { userId: "user-003", institutionId: institution.id, departmentId: createdDepartments[1].id, dni: "34567890C", fullName: "Carme Roca Fortuny", email: "carme.roca@institutbitacola.edu.cat", phone: "+34 93 345 67 89", contractType: "full_time", status: "active", startDate: "2022-09-01" },
-      { userId: "user-004", institutionId: institution.id, departmentId: createdDepartments[2].id, dni: "45678901D", fullName: "Pere Mas Ribas", email: "pere.mas@institutbitacola.edu.cat", phone: "+34 93 456 78 90", contractType: "full_time", status: "active", startDate: "2021-09-01" },
-      { userId: "user-005", institutionId: institution.id, departmentId: createdDepartments[3].id, dni: "56789012E", fullName: "Anna Font Casals", email: "anna.font@institutbitacola.edu.cat", phone: "+34 93 567 89 01", contractType: "full_time", status: "active", startDate: "2024-09-01" },
-      { userId: "user-006", institutionId: institution.id, departmentId: createdDepartments[4].id, dni: "67890123F", fullName: "David Serra Vidal", email: "david.serra@institutbitacola.edu.cat", phone: "+34 93 678 90 12", contractType: "full_time", status: "active", startDate: "2020-09-01" },
-      { userId: "user-007", institutionId: institution.id, departmentId: createdDepartments[5].id, dni: "78901234G", fullName: "Laura Tort Camps", email: "laura.tort@institutbitacola.edu.cat", phone: "+34 93 789 01 23", contractType: "full_time", status: "active", startDate: "2023-09-01" },
-      { userId: "user-008", institutionId: institution.id, departmentId: createdDepartments[6].id, dni: "89012345H", fullName: "Xavier Pla Bosch", email: "xavier.pla@institutbitacola.edu.cat", phone: "+34 93 890 12 34", contractType: "full_time", status: "active", startDate: "2022-09-01" },
-      { userId: "user-009", institutionId: institution.id, departmentId: createdDepartments[7].id, dni: "90123456I", fullName: "Montserrat Olivé Rovira", email: "montse.olive@institutbitacola.edu.cat", phone: "+34 93 901 23 45", contractType: "part_time", status: "active", startDate: "2024-09-01" },
-      { userId: "user-010", institutionId: institution.id, departmentId: createdDepartments[8].id, dni: "01234567J", fullName: "Ramon Soler Pons", email: "ramon.soler@institutbitacola.edu.cat", phone: "+34 93 012 34 56", contractType: "full_time", status: "active", startDate: "2019-09-01" },
-      { userId: "user-011", institutionId: institution.id, departmentId: createdDepartments[9].id, dni: "12345670K", fullName: "Teresa Mir Comas", email: "teresa.mir@institutbitacola.edu.cat", phone: "+34 93 123 45 70", contractType: "full_time", status: "active", startDate: "2023-09-01" },
-      { userId: "user-012", institutionId: institution.id, departmentId: createdDepartments[10].id, dni: "23456701L", fullName: "Marc Sala Ferrer", email: "marc.sala@institutbitacola.edu.cat", phone: "+34 93 234 56 01", contractType: "full_time", status: "active", startDate: "2025-09-01" },
-      { userId: "user-013", institutionId: institution.id, departmentId: createdDepartments[11].id, dni: "34567012M", fullName: "Núria Costa Blanch", email: "nuria.costa@institutbitacola.edu.cat", phone: "+34 93 345 60 12", contractType: "full_time", status: "active", startDate: "2024-09-01" },
-      { userId: "user-014", institutionId: institution.id, departmentId: createdDepartments[0].id, dni: "45670123N", fullName: "Albert Torres Gual", email: "albert.torres@institutbitacola.edu.cat", phone: "+34 93 456 01 23", contractType: "part_time", status: "active", startDate: "2023-09-01" },
-      { userId: "user-015", institutionId: institution.id, departmentId: createdDepartments[1].id, dni: "56701234O", fullName: "Rosa Camps Valls", email: "rosa.camps@institutbitacola.edu.cat", phone: "+34 93 567 12 34", contractType: "full_time", status: "active", startDate: "2022-09-01" },
-      { userId: "user-016", institutionId: institution.id, departmentId: createdDepartments[2].id, dni: "67012345P", fullName: "Lluís Naval Puche", email: "lluis.naval@institutbitacola.edu.cat", phone: "+34 93 601 23 45", contractType: "full_time", status: "active", startDate: "2021-09-01" },
-      { userId: "user-017", institutionId: institution.id, departmentId: createdDepartments[3].id, dni: "70123456Q", fullName: "Pilar Julià Ribó", email: "pilar.julia@institutbitacola.edu.cat", phone: "+34 93 012 34 67", contractType: "substitute", status: "active", startDate: "2025-01-15" },
-      { userId: "user-018", institutionId: institution.id, departmentId: createdDepartments[4].id, dni: "01234568R", fullName: "Enric Moya Llobera", email: "enric.moya@institutbitacola.edu.cat", phone: "+34 93 123 45 68", contractType: "full_time", status: "active", startDate: "2020-09-01" },
-      { userId: "user-019", institutionId: institution.id, departmentId: createdDepartments[5].id, dni: "12345679S", fullName: "Cristina Ramos Llull", email: "cristina.ramos@institutbitacola.edu.cat", phone: "+34 93 234 56 79", contractType: "full_time", status: "active", startDate: "2024-09-01" },
-      { userId: "user-020", institutionId: institution.id, departmentId: createdDepartments[6].id, dni: "23456780T", fullName: "Francesc Garcia Miró", email: "francesc.garcia@institutbitacola.edu.cat", phone: "+34 93 345 67 80", contractType: "full_time", status: "active", startDate: "2023-09-01" }
+      { userId: "user-001", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[12].id, dni: "12345678A", fullName: "Marta Puig Solà", email: "marta.puig@institutbitacola.edu.cat", phone: "+34 93 123 45 67", contractType: "full_time", status: "active", startDate: "2025-09-01" },
+      { userId: "user-002", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[0].id, dni: "23456789B", fullName: "Jordi Vila Martín", email: "jordi.vila@institutbitacola.edu.cat", phone: "+34 93 234 56 78", contractType: "full_time", status: "active", startDate: "2023-09-01" },
+      { userId: "user-003", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[1].id, dni: "34567890C", fullName: "Carme Roca Fortuny", email: "carme.roca@institutbitacola.edu.cat", phone: "+34 93 345 67 89", contractType: "full_time", status: "active", startDate: "2022-09-01" },
+      { userId: "user-004", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[2].id, dni: "45678901D", fullName: "Pere Mas Ribas", email: "pere.mas@institutbitacola.edu.cat", phone: "+34 93 456 78 90", contractType: "full_time", status: "active", startDate: "2021-09-01" },
+      { userId: "user-005", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[3].id, dni: "56789012E", fullName: "Anna Font Casals", email: "anna.font@institutbitacola.edu.cat", phone: "+34 93 567 89 01", contractType: "full_time", status: "active", startDate: "2024-09-01" },
+      { userId: "user-006", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[4].id, dni: "67890123F", fullName: "David Serra Vidal", email: "david.serra@institutbitacola.edu.cat", phone: "+34 93 678 90 12", contractType: "full_time", status: "active", startDate: "2020-09-01" },
+      { userId: "user-007", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[5].id, dni: "78901234G", fullName: "Laura Tort Camps", email: "laura.tort@institutbitacola.edu.cat", phone: "+34 93 789 01 23", contractType: "full_time", status: "active", startDate: "2023-09-01" },
+      { userId: "user-008", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[6].id, dni: "89012345H", fullName: "Xavier Pla Bosch", email: "xavier.pla@institutbitacola.edu.cat", phone: "+34 93 890 12 34", contractType: "full_time", status: "active", startDate: "2022-09-01" },
+      { userId: "user-009", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[7].id, dni: "90123456I", fullName: "Montserrat Olivé Rovira", email: "montse.olive@institutbitacola.edu.cat", phone: "+34 93 901 23 45", contractType: "part_time", status: "active", startDate: "2024-09-01" },
+      { userId: "user-010", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[8].id, dni: "01234567J", fullName: "Ramon Soler Pons", email: "ramon.soler@institutbitacola.edu.cat", phone: "+34 93 012 34 56", contractType: "full_time", status: "active", startDate: "2019-09-01" },
+      { userId: "user-011", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[9].id, dni: "12345670K", fullName: "Teresa Mir Comas", email: "teresa.mir@institutbitacola.edu.cat", phone: "+34 93 123 45 70", contractType: "full_time", status: "active", startDate: "2023-09-01" },
+      { userId: "user-012", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[10].id, dni: "23456701L", fullName: "Marc Sala Ferrer", email: "marc.sala@institutbitacola.edu.cat", phone: "+34 93 234 56 01", contractType: "full_time", status: "active", startDate: "2025-09-01" },
+      { userId: "user-013", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[11].id, dni: "34567012M", fullName: "Núria Costa Blanch", email: "nuria.costa@institutbitacola.edu.cat", phone: "+34 93 345 60 12", contractType: "full_time", status: "active", startDate: "2024-09-01" },
+      { userId: "user-014", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[0].id, dni: "45670123N", fullName: "Albert Torres Gual", email: "albert.torres@institutbitacola.edu.cat", phone: "+34 93 456 01 23", contractType: "part_time", status: "active", startDate: "2023-09-01" },
+      { userId: "user-015", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[1].id, dni: "56701234O", fullName: "Rosa Camps Valls", email: "rosa.camps@institutbitacola.edu.cat", phone: "+34 93 567 12 34", contractType: "full_time", status: "active", startDate: "2022-09-01" },
+      { userId: "user-016", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[2].id, dni: "67012345P", fullName: "Lluís Naval Puche", email: "lluis.naval@institutbitacola.edu.cat", phone: "+34 93 601 23 45", contractType: "full_time", status: "active", startDate: "2021-09-01" },
+      { userId: "user-017", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[3].id, dni: "70123456Q", fullName: "Pilar Julià Ribó", email: "pilar.julia@institutbitacola.edu.cat", phone: "+34 93 012 34 67", contractType: "substitute", status: "active", startDate: "2025-01-15" },
+      { userId: "user-018", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[4].id, dni: "01234568R", fullName: "Enric Moya Llobera", email: "enric.moya@institutbitacola.edu.cat", phone: "+34 93 123 45 68", contractType: "full_time", status: "active", startDate: "2020-09-01" },
+      { userId: "user-019", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[5].id, dni: "12345679S", fullName: "Cristina Ramos Llull", email: "cristina.ramos@institutbitacola.edu.cat", phone: "+34 93 234 56 79", contractType: "full_time", status: "active", startDate: "2024-09-01" },
+      { userId: "user-020", institutionId: institution.id, academicYearId: academicYear.id, departmentId: createdDepartments[6].id, dni: "23456780T", fullName: "Francesc Garcia Miró", email: "francesc.garcia@institutbitacola.edu.cat", phone: "+34 93 345 67 80", contractType: "full_time", status: "active", startDate: "2023-09-01" }
     ];
 
     const createdEmployees = await db.insert(employees).values(employeesData).returning();

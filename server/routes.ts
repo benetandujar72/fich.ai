@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
 import { setupAuth, isAuthenticated } from "./auth.js";
@@ -17,8 +17,7 @@ import { z } from "zod";
 import { db } from "./db.js";
 import { startOfWeek, endOfWeek, addDays, format } from "date-fns";
 import bcrypt from "bcrypt";
-import { NextFunction, Request, Response } from "express";
-import logger from "./logger.js";
+import { logger } from "./logger.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -3319,13 +3318,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Error handling middleware
-  app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-    logger.error('Unhandled error:', error);
-    let errorMessage = 'An unexpected error occurred';
-    if (error instanceof Error) {
-      errorMessage = error.message;
+  app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
     }
-    res.status(500).json({ message: errorMessage });
   });
 
   return httpServer;

@@ -10,12 +10,12 @@ export class GmailService {
   
   private initializeTransporter() {
     this.transporter = nodemailer.createTransport({
-      host: this.emailConfig.smtpHost,
-      port: this.emailConfig.smtpPort,
-      secure: false, // true for 465, false for other ports like 587
+      host: this.emailConfig.smtpHost || '',
+      port: this.emailConfig.smtpPort || 587,
+      secure: (this.emailConfig.smtpPort || 587) === 465, // true for 465, false for other ports
       auth: {
-        user: this.emailConfig.smtpUser,
-        pass: this.emailConfig.smtpPassword, // App-specific password for Gmail
+        user: this.emailConfig.smtpUser || '',
+        pass: this.emailConfig.smtpPassword || '',
       },
       tls: {
         rejectUnauthorized: false

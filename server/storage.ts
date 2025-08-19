@@ -3205,10 +3205,9 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
         justificationText: absenceJustifications.reason,
       })
       .from(absences)
-      .leftJoin(absenceJustifications, eq(absences.id, absenceJustifications.absenceId))
+      .leftJoin(absenceJustifications, eq(absences.id, absenceJustifications.id)) // Usar la PK de absenceJustifications para la relación
       .where(and(
         eq(absences.employeeId, employeeId),
-        eq(absences.isJustified, false),
         isNull(absenceJustifications.id) 
       ))
       .orderBy(desc(absences.startDate))
@@ -3216,7 +3215,6 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 
     return result.map(item => ({
       ...item,
-      // Aseguramos que date sea string
       date: typeof item.date === 'string' ? item.date : (item.date as Date).toISOString().split('T')[0]
     }));
   }
@@ -3227,15 +3225,14 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
     const justifications = await db
       .select({
         id: absenceJustifications.id,
-        date: absences.startDate,
+        date: absenceJustifications.date, // Usar la fecha de la justificación
         reason: absenceJustifications.reason,
         status: absenceJustifications.status,
         adminResponse: absenceJustifications.adminResponse,
       })
       .from(absenceJustifications)
-      .innerJoin(absences, eq(absenceJustifications.absenceId, absences.id))
       .where(eq(absenceJustifications.employeeId, employeeId))
-      .orderBy(desc(absences.startDate))
+      .orderBy(desc(absenceJustifications.date))
       .limit(limit)
       .offset(offset);
     

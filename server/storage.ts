@@ -3263,3 +3263,43 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
 }
 
 export const storage = new DatabaseStorage();
+
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email));
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getInstitutionById(
+  id: string,
+): Promise<Institution | null> {
+  const result = await db
+    .select()
+    .from(institutions)
+    .where(eq(institutions.id, id));
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getUsersByDepartmentName(departmentName: string, institutionId: string) {
+    const department = await db.query.departments.findFirst({
+        where: and(
+            eq(schema.departments.name, departmentName),
+            eq(schema.departments.institutionId, institutionId)
+        ),
+    });
+
+    if (!department) {
+        return [];
+    }
+
+    const departmentEmployees = await db.query.employees.findMany({
+        where: eq(schema.employees.departmentId, department.id),
+        with: {
+            user: true,
+        },
+    });
+
+    return departmentEmployees.map(emp => emp.user);
+}

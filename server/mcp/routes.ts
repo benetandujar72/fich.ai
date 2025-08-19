@@ -1,6 +1,6 @@
 import { Router, Request } from 'express';
-import { isAuthenticated } from '../auth';
-import { handleExecute } from './index';
+import { isAuthenticated } from '../auth.js';
+import { handleExecute } from './index.js';
 
 // Extendemos el tipo Request para incluir la propiedad `user` que añade `passport`
 interface AuthenticatedRequest extends Request {

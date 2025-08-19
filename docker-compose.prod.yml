@@ -20,7 +20,8 @@ services:
         condition: service_healthy # Espera a que la BD esté lista
     networks:
       - app-network
-    command: ["./docker-entrypoint.prod.sh"] # Usaremos un script para iniciar
+    entrypoint: ["./docker-entrypoint.prod.sh"] # CORRECTO: Usar entrypoint
+    # 'command' se pasa como argumento al entrypoint, usando el CMD del Dockerfile
 
   db:
     image: postgres:15-alpine

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { analyzePrompt } from './openai';
-import { actionCatalog } from './actions';
+import { analyzePrompt } from './openai.js';
+import { actionCatalog } from './actions.js';
 
 interface AuthenticatedRequest extends Request {
   body: {

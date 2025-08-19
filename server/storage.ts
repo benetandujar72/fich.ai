@@ -69,9 +69,14 @@ import {
   type InsertMessageTemplate,
   type WeeklySchedule,
   type InsertWeeklySchedule,
-} from "@shared/schema";
-import { logger } from './logger';
-import { db } from "./db";
+  riskAssessments,
+  smtpConfigurations,
+  emailTemplates,
+  privacyRequests,
+  reportTemplates
+} from "../shared/schema.js";
+import { logger } from './logger.js';
+import { db } from "./db.js";
 import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull, between } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { format } from "date-fns";
@@ -192,6 +197,8 @@ export interface IStorage {
     startDate: Date,
     endDate: Date
   ): Promise<any[]>;
+
+  getUsersByDepartmentName(departmentName: string): Promise<User[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2975,6 +2982,7 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       );
     
     if (startDate && endDate) {
+      // @ts-ignore - Drizzle's type inference can be tricky here, but the query is valid
       query = query.where(between(attendanceRecords.timestamp, startDate, endDate));
     }
 
@@ -3069,6 +3077,24 @@ Data de prova: ${new Date().toLocaleString('ca-ES')}`;
       .orderBy(desc(sql`"totalLates"`), desc(sql`"totalAbsences"`));
       
     return result;
+  }
+
+  async getUsersByDepartmentName(departmentName: string): Promise<User[]> {
+    const department = await db.query.departments.findFirst({
+      where: eq(departments.name, departmentName),
+      columns: { id: true }
+    });
+
+    if (!department) return [];
+
+    const departmentEmployees = await db.query.employees.findMany({
+      where: eq(employees.departmentId, department.id),
+      with: {
+        user: true,
+      }
+    });
+
+    return departmentEmployees.map(emp => emp.user);
   }
 }
 

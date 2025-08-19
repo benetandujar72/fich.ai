@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./auth";
-import mcpRoutes from './mcp/routes'; // Importar las rutas MCP
+import { storage } from "./storage.js";
+import { setupAuth, isAuthenticated } from "./auth.js";
+import mcpRoutes from './mcp/routes.js';
 import { 
   insertEmployeeSchema,
   insertAttendanceRecordSchema,
@@ -10,11 +10,11 @@ import {
   insertSettingSchema,
   insertCommunicationSchema,
   smtpConfigurations
-} from "@shared/schema";
+} from "../shared/schema.js";
 import nodemailer from "nodemailer";
 import { eq, and, gte, lte, desc, asc, or, sql, count, ne, isNull, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "./db";
+import { db } from "./db.js";
 import { startOfWeek, endOfWeek, addDays, format } from "date-fns";
 import bcrypt from "bcrypt";
 

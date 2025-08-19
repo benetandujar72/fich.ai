@@ -1,7 +1,7 @@
-import { storage } from '../storage'; // Asegúrate que la ruta es correcta
-import { emailService } from '../emailService'; // Importamos el servicio de email
-import { knowledgeBase } from './knowledge_base'; // Importamos la base de conocimiento
-import { analyzePromptWithContext } from './openai'; // Asumimos que esta función existirá
+import { storage } from '../storage.js'; // Asegúrate que la ruta es correcta
+import { emailService } from '../emailService.js'; // Importamos el servicio de email
+import { knowledgeBase } from './knowledge_base.js'; // Importamos la base de conocimiento
+import { analyzePromptWithContext } from './openai.js'; // Asumimos que esta función existirá
 
 // Definimos los tipos de parámetros para cada acción para tener un código más seguro y predecible.
 interface CreateUserParams {
